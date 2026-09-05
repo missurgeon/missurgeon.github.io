@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>병동 수술전후 처치 대시보드 · 외과</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F4EF;--bg-2:#EFEDE6;--ink:#141821;--ink-2:#3D4351;--ink-3:#6B7280;
+  --line:#D9D6CC;--line-2:#E8E5DC;--card:#FFFFFF;
+  --ok:#166534;--ok-bg:#DCFCE7;--warn:#92400E;--warn-bg:#FEF3C7;--danger:#991B1B;--danger-bg:#FEE2E2;
+  --accent-mbs:#0E7490;--accent-gc:#9F1239;--accent-vhr:#B45309;--accent-ih:#0F766E;
+  --shadow:0 1px 2px rgba(20,24,33,.04), 0 4px 12px rgba(20,24,33,.04);--radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;font-size:14px;line-height:1.5}
+h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-.01em}
+
+.topbar{background:var(--ink);color:#F5F4EF;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-mark{width:34px;height:34px;border-radius:6px;background:#F5F4EF;color:var(--ink);display:grid;place-items:center;font-family:'Fraunces',serif;font-weight:700;font-size:18px}
+.brand h1{font-size:15px;color:#F5F4EF;font-family:'Inter',sans-serif;font-weight:600}
+.brand .sub{font-size:11px;color:#B8B5AB;margin-top:1px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
+.top-meta{display:flex;gap:20px;font-size:12px;color:#B8B5AB;font-family:'JetBrains Mono',monospace}
+.top-meta strong{color:#F5F4EF;font-weight:600}
+
+.tabs{background:var(--bg-2);border-bottom:1px solid var(--line);padding:0 28px;display:flex}
+.tab{padding:14px 22px;font-size:13px;font-weight:500;color:var(--ink-3);cursor:pointer;border-bottom:2px solid transparent;user-select:none;transition:color .15s}
+.tab:hover{color:var(--ink)}
+.tab.active{color:var(--ink);border-bottom-color:currentColor}
+.tab[data-surg="mbs"].active{color:var(--accent-mbs)}
+.tab[data-surg="gc"].active{color:var(--accent-gc)}
+.tab[data-surg="vhr"].active{color:var(--accent-vhr)}
+.tab[data-surg="ih"].active{color:var(--accent-ih)}
+.tab .tag{font-size:10px;font-family:'JetBrains Mono',monospace;background:var(--line-2);color:var(--ink-3);padding:2px 6px;border-radius:3px;margin-left:8px;text-transform:uppercase;letter-spacing:.05em}
+
+.main{display:grid;grid-template-columns:340px 1fr;gap:20px;padding:20px 28px;max-width:1600px;margin:0 auto}
+
+.calc{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid var(--line-2);align-self:start}
+.calc h2{font-size:14px;font-family:'Inter',sans-serif;font-weight:600;margin-bottom:4px}
+.calc .hint{font-size:11px;color:var(--ink-3);margin-bottom:16px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
+
+.field{margin-bottom:12px}
+.field label{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;color:var(--ink-2);margin-bottom:4px;font-weight:500}
+.field input,.field select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:13px;background:#FFF;color:var(--ink);font-family:'Inter',sans-serif}
+.field input:focus,.field select:focus{outline:none;border-color:var(--ink)}
+.field-inline{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.check{display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:12px;cursor:pointer;background:#FFF;user-select:none}
+.check:has(input:checked){background:var(--ink);color:#F5F4EF;border-color:var(--ink)}
+.check input{accent-color:currentColor}
+
+.info-btn{width:16px;height:16px;border-radius:50%;background:var(--line-2);color:var(--ink-2);border:none;cursor:pointer;font-size:10px;font-weight:700;display:inline-grid;place-items:center;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.info-btn:hover{background:var(--ink);color:#F5F4EF}
+
+/* ── STOP-BANG compact card (sidebar) ── */
+.stopbang-box{border:1px solid var(--line-2);background:var(--bg-2);border-radius:8px;padding:12px;margin-top:4px}
+.sb-result{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
+.sb-bigscore{display:flex;align-items:baseline;gap:4px}
+.sb-bigscore strong{font-family:'Fraunces',serif;font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.sb-bigscore span{font-size:13px;color:var(--ink-3);font-family:'JetBrains Mono',monospace}
+.sb-mid{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.sb-risklabel{font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;padding:3px 9px;border-radius:4px;background:var(--card);border:1px solid var(--line)}
+.sb-open{background:var(--ink);color:#F5F4EF;border:none;border-radius:6px;padding:9px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.sb-open:hover{background:#2a3040}
+.sb-open.pulse{animation:pulse .6s ease 2}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(14,116,144,.55)}100%{box-shadow:0 0 0 16px rgba(14,116,144,0)}}
+.sb-note{margin-top:9px;font-size:11px;color:var(--ink-2);line-height:1.5;font-family:'JetBrains Mono',monospace}
+
+.content{display:flex;flex-direction:column;gap:20px}
+
+.risk-summary{background:var(--card);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);border:1px solid var(--line-2)}
+.risk-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+.risk-head h2{font-size:20px}
+.risk-head .surg-label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.risk-gauge-wrap{display:flex;align-items:center;gap:16px}
+.risk-gauge{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-family:'Fraunces',serif;font-size:22px;font-weight:700;background:conic-gradient(var(--danger) 0%, var(--warn) 40%, var(--ok) 100%);position:relative}
+.risk-gauge::before{content:'';position:absolute;inset:5px;background:#FFF;border-radius:50%}
+.risk-gauge span{position:relative;z-index:1}
+.risk-cards{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.rcard{padding:14px 12px;border-radius:8px;background:var(--bg-2);border:1px solid var(--line-2);position:relative;transition:transform .1s}
+.rcard:hover{transform:translateY(-1px);border-color:var(--ink-3)}
+.rcard .rlabel{font-size:11px;color:var(--ink-3);font-weight:500;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.rcard .rlabel .info-btn{background:rgba(0,0,0,.05)}
+.rcard.risk-high .rlabel .info-btn{background:rgba(153,27,27,.15);color:var(--danger)}
+.rcard.risk-warn .rlabel .info-btn{background:rgba(146,64,14,.15);color:var(--warn)}
+.rcard.risk-ok .rlabel .info-btn{background:rgba(22,101,52,.12);color:var(--ok)}
+.rcard .rval{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:-.02em}
+.rcard .rsub{font-size:10px;color:var(--ink-3);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.rcard .rbar{height:3px;background:var(--line);border-radius:2px;margin-top:8px;overflow:hidden}
+.rcard .rbar::after{content:'';display:block;height:100%;background:var(--ink);width:var(--w,10%);transition:width .3s ease}
+.rcard.risk-high{background:var(--danger-bg);border-color:#FCA5A5}
+.rcard.risk-high .rval{color:var(--danger)}
+.rcard.risk-high .rbar::after{background:var(--danger)}
+.rcard.risk-warn{background:var(--warn-bg);border-color:#FCD34D}
+.rcard.risk-warn .rval{color:var(--warn)}
+.rcard.risk-warn .rbar::after{background:var(--warn)}
+.rcard.risk-ok{background:var(--ok-bg);border-color:#86EFAC}
+.rcard.risk-ok .rval{color:var(--ok)}
+.rcard.risk-ok .rbar::after{background:var(--ok)}
+
+.timeline-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.timeline-header h2{font-size:18px}
+.legend{display:flex;gap:12px;font-size:11px;color:var(--ink-3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em}
+.legend-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.phases{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.phase{background:var(--card);border-radius:var(--radius);padding:16px;border:1px solid var(--line-2);box-shadow:var(--shadow)}
+.phase-head{display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--line-2);margin-bottom:12px}
+.phase-num{font-family:'Fraunces',serif;font-size:24px;font-weight:600;color:var(--ink-3);letter-spacing:-.03em;line-height:1}
+.phase-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:600}
+.phase-sub{font-size:10px;color:var(--ink-3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em}
+.phase ul{list-style:none}
+.phase li{padding:8px 0;border-bottom:1px dashed var(--line-2);font-size:12.5px;line-height:1.55;display:flex;align-items:flex-start;gap:8px}
+.phase li:last-child{border-bottom:none}
+.phase li .marker{width:5px;height:5px;border-radius:50%;background:var(--ink-3);margin-top:8px;flex-shrink:0}
+.phase li.crit .marker{background:var(--danger)}
+.phase li.warn .marker{background:var(--warn)}
+.phase li .txt{flex:1}
+.phase li code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg-2);padding:1px 5px;border-radius:3px;color:var(--ink-2)}
+
+.comp-section h2{font-size:18px;margin-bottom:12px}
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.comp{background:var(--card);border-radius:var(--radius);padding:16px;border:1px solid var(--line-2);box-shadow:var(--shadow);border-left:3px solid var(--danger)}
+.comp.orange{border-left-color:var(--warn)}
+.comp.amber{border-left-color:#D97706}
+.comp h3{font-size:14px;font-family:'Inter',sans-serif;font-weight:600;margin-bottom:2px;display:flex;justify-content:space-between;align-items:center}
+.comp .comp-when{font-size:10px;color:var(--ink-3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.comp-sect{margin-bottom:10px}
+.comp-sect:last-child{margin-bottom:0}
+.comp-lbl{font-size:10px;color:var(--ink-3);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.comp-body{font-size:12.5px;color:var(--ink-2);line-height:1.55}
+.comp-body strong{color:var(--ink);font-weight:600}
+.comp ol{padding-left:16px}
+.comp ol li{margin-bottom:3px;font-size:12.5px}
+
+/* ── Modals ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,24,33,.5);backdrop-filter:blur(3px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex;animation:fade .18s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{background:var(--card);border-radius:12px;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);border:1px solid var(--line)}
+.modal.modal-sb{max-width:540px}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--line-2);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:sticky;top:0;background:var(--card);z-index:1}
+.modal-head h3{font-size:18px;line-height:1.3}
+.modal-head .badge{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+.modal-close{background:var(--bg-2);border:none;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;color:var(--ink-2);flex-shrink:0}
+.modal-close:hover{background:var(--ink);color:#F5F4EF}
+.modal-body{padding:20px 24px}
+.modal-body section{margin-bottom:18px}
+.modal-body h4{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:6px}
+.modal-body p{font-size:13.5px;line-height:1.65;color:var(--ink-2);margin-bottom:6px}
+.modal-body ul{padding-left:18px;margin:6px 0}
+.modal-body li{font-size:13px;line-height:1.6;margin-bottom:3px;color:var(--ink-2)}
+.modal-body .cutoff-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px;border:1px solid var(--line-2)}
+.modal-body .cutoff-table th{background:var(--bg-2);text-align:left;padding:8px 12px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2)}
+.modal-body .cutoff-table td{padding:8px 12px;border-top:1px solid var(--line-2)}
+.modal-body .cutoff-table .lvl-ok{color:var(--ok);font-weight:600}
+.modal-body .cutoff-table .lvl-warn{color:var(--warn);font-weight:600}
+.modal-body .cutoff-table .lvl-danger{color:var(--danger);font-weight:600}
+.method{background:var(--bg-2);border-left:3px solid var(--ink);padding:10px 14px;border-radius:0 6px 6px 0;font-size:12.5px;line-height:1.6;color:var(--ink-2)}
+.modal-body code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-2);padding:1px 5px;border-radius:3px}
+
+/* ── STOP-BANG checker modal ── */
+.sb-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.sb-grid .check{font-size:12px;padding:8px 9px}
+.sb-grid .check b{font-family:'Fraunces',serif;font-size:13px;margin-right:3px}
+.sb-grid .check em{font-style:normal;font-size:10px;color:var(--ink-3);margin-left:auto;font-family:'JetBrains Mono',monospace;opacity:.9}
+.sb-grid .check.locked{cursor:default}
+.sb-grid .check.locked:has(input:checked){background:var(--warn-bg);color:var(--warn);border-color:#FCD34D}
+.sb-grid .check.locked:has(input:checked) em{color:var(--warn);opacity:1}
+.sb-tip{margin-top:7px;font-size:11px;color:var(--ink-3);line-height:1.5}
+.sb-live{display:flex;align-items:center;gap:16px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:12px 16px}
+.sb-live .num{display:flex;align-items:baseline;gap:5px}
+.sb-live .num strong{font-family:'Fraunces',serif;font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.sb-live .num span{font-size:15px;color:var(--ink-3);font-family:'JetBrains Mono',monospace}
+.sb-live-info{flex:1}
+.sb-live-label{font-size:13px;font-weight:600;margin-bottom:2px}
+.sb-live-note{font-size:11px;color:var(--ink-2);font-family:'JetBrains Mono',monospace;line-height:1.5}
+details.sb-info-collapse{margin-top:14px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:8px 12px}
+details.sb-info-collapse summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--ink-2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em}
+details.sb-info-collapse .inner{padding-top:8px}
+.sb-actions{margin-top:16px;display:flex;justify-content:flex-end}
+.sb-apply{background:var(--ink);color:#F5F4EF;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.sb-apply:hover{background:#2a3040}
+
+.footer{padding:24px 28px;text-align:center;font-size:11px;color:var(--ink-3);font-family:'JetBrains Mono',monospace;letter-spacing:.05em;border-top:1px solid var(--line-2);margin-top:20px}
+
+
+/* ── Caprini compact card (sidebar) ── */
+.caprini-box{border:1px solid var(--line-2);background:var(--bg-2);border-radius:8px;padding:12px;margin-top:10px}
+.cap-result{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
+.cap-bigscore{display:flex;align-items:baseline;gap:4px}
+.cap-bigscore strong{font-family:'Fraunces',serif;font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.cap-bigscore span{font-size:13px;color:var(--ink-3);font-family:'JetBrains Mono',monospace}
+.cap-mid{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.cap-risklabel{font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;padding:3px 9px;border-radius:4px;background:var(--card);border:1px solid var(--line);white-space:nowrap}
+.cap-risklabel.lv-ok{background:var(--ok-bg);border-color:#86EFAC;color:var(--ok)}
+.cap-risklabel.lv-warn{background:var(--warn-bg);border-color:#FCD34D;color:var(--warn)}
+.cap-risklabel.lv-danger{background:var(--danger-bg);border-color:#FCA5A5;color:var(--danger)}
+.cap-open{background:var(--ink);color:#F5F4EF;border:none;border-radius:6px;padding:9px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.cap-open:hover{background:#2a3040}
+.cap-open.pulse{animation:pulse .6s ease 2}
+.cap-note{margin-top:9px;font-size:11px;color:var(--ink-2);line-height:1.5;font-family:'JetBrains Mono',monospace}
+
+/* ── sidebar STOP-BANG risklabel tinted background ── */
+.sb-risklabel.lv-ok{background:var(--ok-bg);border-color:#86EFAC;color:var(--ok)}
+.sb-risklabel.lv-warn{background:var(--warn-bg);border-color:#FCD34D;color:var(--warn)}
+.sb-risklabel.lv-danger{background:var(--danger-bg);border-color:#FCA5A5;color:var(--danger)}
+
+/* ── Caprini modal ── */
+.cap-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.cap-grid .check{font-size:11.5px;padding:7px 9px;line-height:1.35}
+.cap-grid .check b{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-3);margin-right:5px;letter-spacing:.05em}
+.cap-grid .check:has(input:checked) b{color:#F5F4EF}
+.cap-section-head{display:flex;align-items:baseline;justify-content:space-between;margin:12px 0 4px;padding-bottom:4px;border-bottom:1px solid var(--line-2)}
+.cap-section-head h5{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2);font-weight:600}
+.cap-section-head .pts{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink-3);background:var(--card);padding:2px 7px;border-radius:3px;border:1px solid var(--line-2)}
+.cap-live{display:flex;align-items:center;gap:16px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:12px 16px;margin-top:6px}
+.cap-live .num{display:flex;align-items:baseline;gap:5px}
+.cap-live .num strong{font-family:'Fraunces',serif;font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.cap-live .num span{font-size:15px;color:var(--ink-3);font-family:'JetBrains Mono',monospace}
+.cap-live-info{flex:1}
+.cap-live-label{font-size:13px;font-weight:600;margin-bottom:2px}
+.cap-live-note{font-size:11px;color:var(--ink-2);font-family:'JetBrains Mono',monospace;line-height:1.5}
+.cap-actions{margin-top:16px;display:flex;justify-content:flex-end;gap:8px}
+.cap-apply{background:var(--ink);color:#F5F4EF;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.cap-apply:hover{background:#2a3040}
+.cap-reset{background:var(--bg-2);color:var(--ink-2);border:1px solid var(--line);border-radius:8px;padding:12px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+
+/* ── Calibration button + badge + modal ── */
+.cal-btn{background:var(--bg-2);border:1px solid var(--line);color:var(--ink-2);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;cursor:pointer;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.cal-btn:hover{background:var(--ink);color:#F5F4EF;border-color:var(--ink)}
+.cal-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--accent-mbs);background:#E0F2FE;border:1px solid #BAE6FD;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em;margin-left:8px}
+.cal-badge.hidden{display:none}
+.cal-modal{max-width:760px}
+.cal-tabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--line-2)}
+.cal-tab{padding:9px 14px;font-size:12px;font-family:'Inter',sans-serif;font-weight:600;background:none;border:none;color:var(--ink-3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.cal-tab.active[data-surg=mbs]{color:var(--accent-mbs);border-bottom-color:var(--accent-mbs)}
+.cal-tab.active[data-surg=gc]{color:var(--accent-gc);border-bottom-color:var(--accent-gc)}
+.cal-tab.active[data-surg=vhr]{color:var(--accent-vhr);border-bottom-color:var(--accent-vhr)}
+.cal-tab.active[data-surg=ih]{color:var(--accent-ih);border-bottom-color:var(--accent-ih)}
+.cal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px}
+.cal-field label{display:block;font-size:11.5px;color:var(--ink-2);margin-bottom:4px;font-weight:500}
+.cal-field label .sub{font-size:10px;color:var(--ink-3);font-family:'JetBrains Mono',monospace;margin-left:4px}
+.cal-field input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:13px;font-family:'JetBrains Mono',monospace;background:#FFF}
+.cal-field input:focus{outline:none;border-color:var(--ink)}
+.cal-help{background:var(--bg-2);border-left:3px solid var(--ink);padding:10px 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.6;color:var(--ink-2);margin-bottom:12px}
+.cal-actions{margin-top:18px;display:flex;justify-content:space-between;gap:8px;padding-top:14px;border-top:1px solid var(--line-2)}
+.cal-actions .left{display:flex;gap:8px}
+
+@media (max-width:1200px){
+  .main{grid-template-columns:1fr}
+  .calc{position:relative}
+  .phases{grid-template-columns:repeat(2,1fr)}
+  .risk-cards{grid-template-columns:repeat(3,1fr)}
+  .comp-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .phases,.risk-cards{grid-template-columns:1fr}
+  .main{padding:16px}
+  .sb-grid{grid-template-columns:1fr}
+}
+@media print{
+  .calc,.modal-overlay{display:none}
+  .main{grid-template-columns:1fr}
+  .phases{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">외</div>
+    <div>
+      <h1>병동 수술전후 처치 대시보드</h1>
+      <div class="sub">Surgical Ward · Perioperative Care Console</div>
+    </div>
+  </div>
+  <div class="top-meta">
+    <span>당직 · <strong id="ts">—</strong></span>
+    <span>단위 · <strong>외과 병동</strong></span>
+    <span>참조 · <strong>ERAS · ASMBS · ESPEN · AHA/ACC 2024</strong></span>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-surg="mbs">비만대사수술 <span class="tag">MBS</span></div>
+  <div class="tab" data-surg="gc">위암 위절제술 <span class="tag">GC</span></div>
+  <div class="tab" data-surg="vhr">복벽탈장·복벽재건 <span class="tag">VHR</span></div>
+  <div class="tab" data-surg="ih">서혜부탈장 <span class="tag">IH</span></div>
+</div>
+
+<div class="main">
+
+  <aside class="calc">
+    <h2>환자 위험도 입력</h2>
+    <div class="hint">Patient Risk Profile · Live</div>
+
+    <div class="field field-inline">
+      <div>
+        <label>연령 <button class="info-btn" data-info="age">i</button></label>
+        <input id="age" type="number" value="55" min="18" max="100">
+      </div>
+      <div>
+        <label>BMI <button class="info-btn" data-info="bmi">i</button></label>
+        <input id="bmi" type="number" value="42" min="15" max="80" step="0.1">
+      </div>
+    </div>
+
+    <div class="field field-inline">
+      <div>
+        <label>HbA1c (%) <button class="info-btn" data-info="hba1c">i</button></label>
+        <input id="hba1c" type="number" value="7.2" min="4" max="15" step="0.1">
+      </div>
+      <div>
+        <label>알부민 (g/dL) <button class="info-btn" data-info="albumin">i</button></label>
+        <input id="alb" type="number" value="3.8" min="1" max="6" step="0.1">
+      </div>
+    </div>
+
+    <div class="field field-inline">
+      <div>
+        <label>eGFR <button class="info-btn" data-info="egfr">i</button></label>
+        <input id="egfr" type="number" value="75" min="5" max="150">
+      </div>
+      <div>
+        <label>ASA class <button class="info-btn" data-info="asa">i</button></label>
+        <select id="asa">
+          <option value="1">I</option>
+          <option value="2">II</option>
+          <option value="3" selected>III</option>
+          <option value="4">IV</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>RCRI 항목 <button class="info-btn" data-info="rcri">i</button></label>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="r_ihd"> 허혈성 심질환</label>
+        <label class="check"><input type="checkbox" id="r_chf"> 심부전</label>
+        <label class="check"><input type="checkbox" id="r_cvd"> 뇌혈관질환</label>
+        <label class="check"><input type="checkbox" id="r_ins"> 인슐린 DM</label>
+        <label class="check"><input type="checkbox" id="r_cr"> Cr &gt; 2.0</label>
+        <label class="check"><input type="checkbox" id="r_hi"> 고위험 수술</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>추가 위험요인 <button class="info-btn" data-info="add">i</button></label>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="f_smk"> 흡연자</label>
+        <label class="check"><input type="checkbox" id="f_osa"> OSA/OHS</label>
+        <label class="check"><input type="checkbox" id="f_ac"> 항응고제</label>
+        <label class="check"><input type="checkbox" id="f_str"> 스테로이드</label>
+        <label class="check"><input type="checkbox" id="f_vte"> VTE 과거력</label>
+        <label class="check"><input type="checkbox" id="f_fra"> Frailty CFS≥5</label>
+      </div>
+    </div>
+
+    <div class="field field-inline">
+      <div>
+        <label>목둘레 (cm) <button class="info-btn" data-info="neck">i</button></label>
+        <input id="neck" type="number" value="41" min="20" max="70">
+      </div>
+      <div>
+        <label>성별 <button class="info-btn" data-info="gender">i</button></label>
+        <select id="gender">
+          <option value="M" selected>남</option>
+          <option value="F">여</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- STOP-BANG: 팝업 체크 → 자동 계산 → 삽입 -->
+    <div class="field stopbang-box">
+      <label>STOP-BANG (OSA 스크리닝)
+        <button class="info-btn" data-info="stopbang">i</button>
+      </label>
+      <div class="sb-result">
+        <div class="sb-bigscore">
+          <strong id="sbScore">—</strong><span>/8</span>
+        </div>
+        <div class="sb-mid">
+          <div class="sb-risklabel" id="sbRiskLabel">—</div>
+          <button class="sb-open" id="sbOpenBtn">항목 체크하기</button>
+        </div>
+      </div>
+      <div class="sb-note" id="sbNote">팝업에서 항목을 체크하면 점수가 자동 계산되어 여기 삽입됩니다.</div>
+    </div>
+
+    <!-- Caprini VTE: 팝업 체크 → 자동 계산 → 삽입 -->
+    <div class="field caprini-box">
+      <label>Caprini VTE 위험 점수
+        <button class="info-btn" data-info="caprini">i</button>
+      </label>
+      <div class="cap-result">
+        <div class="cap-bigscore">
+          <strong id="capScore">0</strong><span id="capMax">/—</span>
+        </div>
+        <div class="cap-mid">
+          <div class="cap-risklabel" id="capRiskLabel">—</div>
+          <button class="cap-open" id="capOpenBtn">항목 체크하기</button>
+        </div>
+      </div>
+      <div class="cap-note" id="capNote">「항목 체크하기」로 39개 위험인자를 확인하면 VTE 위험도에 자동 반영됩니다.</div>
+    </div>
+  </aside>
+
+  <div class="content">
+
+    <section class="risk-summary">
+      <div class="risk-head">
+        <div>
+          <h2>예상 합병증 위험도 <span class="cal-badge hidden" id="calBadge">본원 보정 적용</span></h2>
+          <div class="surg-label" id="surgLabel">MBS · Bariatric / Metabolic Surgery</div>
+        </div>
+        <div class="risk-gauge-wrap">
+          <button class="cal-btn" id="calOpenBtn">Baseline 보정</button>
+          <div style="font-size:11px;color:var(--ink-3);text-align:right;font-family:'JetBrains Mono',monospace">
+            종합 위험도<br><span style="color:var(--ink);font-size:14px;font-weight:600" id="overallLabel">중등도</span>
+          </div>
+          <div class="risk-gauge"><span id="overall">—</span></div>
+        </div>
+      </div>
+      <div class="risk-cards" id="riskCards"></div>
+    </section>
+
+    <section>
+      <div class="timeline-header">
+        <h2>수술 전후 프로토콜 체크리스트</h2>
+        <div class="legend">
+          <span><span class="legend-dot" style="background:var(--danger)"></span>필수</span>
+          <span><span class="legend-dot" style="background:var(--warn)"></span>고위험시</span>
+          <span><span class="legend-dot" style="background:var(--ink-3)"></span>표준</span>
+        </div>
+      </div>
+      <div class="phases" id="phases"></div>
+    </section>
+
+    <section class="comp-section">
+      <h2>합병증별 조기 인지 및 대처 실무지침</h2>
+      <div class="comp-grid" id="compGrid"></div>
+    </section>
+
+  </div>
+</div>
+
+<div class="footer">
+  참조 · ERAS Society 2022 (Bariatric, Gastrectomy) · ASMBS position statements · ESPEN 2024/2025 · 2024 AHA/ACC Perioperative CV Guideline · ASRA 2025 5th ed · Woodcock 2020 (Adrenal insufficiency) · El-Boghdadly 2025 (GLP-1 RA) · Oprea 2026 (SGLT2i)
+  <br>본 대시보드는 임상적 판단을 대체하지 않습니다. 개별 환자 결정은 담당 주치의·마취과·해당 진료과 협의를 따르십시오.
+</div>
+
+<!-- ═══ 일반 정보 팝업 ═══ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div>
+        <h3 id="mTitle">—</h3>
+        <div class="badge" id="mBadge">—</div>
+      </div>
+      <button class="modal-close" id="mClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+  </div>
+</div>
+
+<!-- ═══ STOP-BANG 체크 팝업 (여기서 체크 → 점수 자동 계산 → 삽입) ═══ -->
+<div class="modal-overlay" id="sbModal">
+  <div class="modal modal-sb" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div>
+        <h3>STOP-BANG 점수 계산</h3>
+        <div class="badge">OSA Screening · 팝업 체크 → 자동 계산 → 삽입</div>
+      </div>
+      <button class="modal-close" id="sbClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <section>
+        <h4>항목 체크 — 체크할 때마다 점수가 바로 계산됩니다</h4>
+        <div class="sb-grid">
+          <label class="check stopbang-input"><input type="checkbox" id="sb_s"> <b>S</b> 코골이가 큼</label>
+          <label class="check stopbang-input"><input type="checkbox" id="sb_t"> <b>T</b> 낮에 졸림·피로</label>
+          <label class="check stopbang-input"><input type="checkbox" id="sb_o"> <b>O</b> 무호흡 관찰됨</label>
+          <label class="check stopbang-input"><input type="checkbox" id="sb_p"> <b>P</b> 고혈압</label>
+          <label class="check locked"><input type="checkbox" id="sb_b" disabled="disabled"> <b>B</b> BMI&gt;35 <em id="sbBStat"></em></label>
+          <label class="check locked"><input type="checkbox" id="sb_a" disabled="disabled"> <b>A</b> 나이&gt;50 <em id="sbAStat"></em></label>
+          <label class="check locked"><input type="checkbox" id="sb_n" disabled="disabled"> <b>N</b> 목둘레&gt;40 <em id="sbNStat"></em></label>
+          <label class="check locked"><input type="checkbox" id="sb_g" disabled="disabled"> <b>G</b> 남성 <em id="sbGStat"></em></label>
+        </div>
+        <div class="sb-tip">B·A·N·G(계측 4항목)는 좌측 입력값(연령·BMI·목둘레·성별) 기준으로 자동 체크됩니다.</div>
+      </section>
+
+      <section>
+        <h4>현재 점수</h4>
+        <div class="sb-live">
+          <div class="num"><strong id="sbModalNum">0</strong><span>/8</span></div>
+          <div class="sb-live-info">
+            <div class="sb-live-label" id="sbModalLabel">—</div>
+            <div class="sb-live-note" id="sbModalNote">—</div>
+          </div>
+        </div>
+      </section>
+
+      <details class="sb-info-collapse">
+        <summary>점수 의미 · 층화 기준 보기</summary>
+        <div class="inner">
+          <p style="font-size:12.5px">STOP-BANG은 미진단 OSA의 주변기 위험을 가려내는 스크리닝 도구. 비만대사수술 환자 35–94%가 OSA를 동반합니다.</p>
+          <table class="cutoff-table">
+            <thead><tr><th>점수</th><th>층위</th><th>조치</th></tr></thead>
+            <tbody>
+              <tr><td>0–2</td><td class="lvl-ok">저위험</td><td>표준 감시</td></tr>
+              <tr><td>3–4</td><td class="lvl-warn">중등도</td><td>야간 SpO₂ · 반좌위 유지</td></tr>
+              <tr><td>5–8</td><td class="lvl-danger">고위험</td><td>수면다원검사 고려 · CPAP 준비 · 마약성 최소화</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:12.5px;margin-top:8px">위 점수는 호흡기 합병증 위험도 수정계수에 자동 반영됩니다 (5–8점 → ×2.0, 3–4점 → ×1.5).</p>
+        </div>
+      </details>
+
+      <div class="sb-actions">
+        <button class="sb-apply" id="sbApply">확인 · 대시보드에 점수 삽입</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ Caprini VTE 팝업 ═══ -->
+<div class="modal-overlay" id="capModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div>
+        <h3>Caprini VTE Risk (2005)</h3>
+        <div class="badge">39개 위험인자 · 자동 계산 · 대시보드 삽입</div>
+      </div>
+      <button class="modal-close" id="capClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="method" style="margin-bottom:8px">
+        <strong>자동 반영</strong>: 좌측 사이드바의 연령·BMI·수술유형(수술군 탭)·활성 악성종양(위암 탭)·VTE 과거력 등은 자동으로 체크됩니다. 나머지 문진 항목만 아래에서 체크하세요.
+      </div>
+
+      <div class="cap-section-head"><h5>1점 항목</h5><span class="pts">각 +1점</span></div>
+      <div class="cap-grid">
+        <label class="check locked"><input type="checkbox" id="c1_age41" disabled> <b>C1a</b> 연령 41–60세 <em id="c1_age41s"></em></label>
+        <label class="check locked"><input type="checkbox" id="c1_bmi25" disabled> <b>C1b</b> BMI &gt; 25 <em id="c1_bmi25s"></em></label>
+        <label class="check"><input type="checkbox" id="c1_minor"> <b>C1c</b> 소수술 예정</label>
+        <label class="check"><input type="checkbox" id="c1_surg30"> <b>C1d</b> 30일 내 대수술</label>
+        <label class="check"><input type="checkbox" id="c1_vv"> <b>C1e</b> 하지정맥류</label>
+        <label class="check"><input type="checkbox" id="c1_ibd"> <b>C1f</b> IBD 병력</label>
+        <label class="check"><input type="checkbox" id="c1_sw"> <b>C1g</b> 다리 부종 (현재)</label>
+        <label class="check"><input type="checkbox" id="c1_ami"> <b>C1h</b> AMI &lt;3개월</label>
+        <label class="check"><input type="checkbox" id="c1_chf"> <b>C1i</b> CHF &lt;1개월</label>
+        <label class="check"><input type="checkbox" id="c1_sep"> <b>C1j</b> Sepsis &lt;1개월</label>
+        <label class="check"><input type="checkbox" id="c1_lung"> <b>C1k</b> 폐렴/폐질환 &lt;1개월</label>
+        <label class="check"><input type="checkbox" id="c1_copd"> <b>C1l</b> COPD</label>
+        <label class="check"><input type="checkbox" id="c1_ocp"> <b>C1m</b> 경구피임약/HRT (여성)</label>
+        <label class="check"><input type="checkbox" id="c1_preg"> <b>C1n</b> 임신·산욕기 &lt;1개월 (여성)</label>
+      </div>
+
+      <div class="cap-section-head"><h5>2점 항목</h5><span class="pts">각 +2점</span></div>
+      <div class="cap-grid">
+        <label class="check locked"><input type="checkbox" id="c2_age60" disabled> <b>C2a</b> 연령 61–74세 <em id="c2_age60s"></em></label>
+        <label class="check locked"><input type="checkbox" id="c2_mal" disabled> <b>C2b</b> 활성/과거 악성종양 <em id="c2_mals"></em></label>
+        <label class="check locked"><input type="checkbox" id="c2_lap" disabled> <b>C2c</b> 45분+ 개복/복강경 <em id="c2_laps"></em></label>
+        <label class="check"><input type="checkbox" id="c2_art"> <b>C2d</b> 관절경 수술</label>
+        <label class="check"><input type="checkbox" id="c2_cvc"> <b>C2e</b> 중심정맥카테터</label>
+        <label class="check"><input type="checkbox" id="c2_bed"> <b>C2f</b> 침상안정 &gt;72h</label>
+        <label class="check"><input type="checkbox" id="c2_cast"> <b>C2g</b> 부목/석고 고정</label>
+      </div>
+
+      <div class="cap-section-head"><h5>3점 항목</h5><span class="pts">각 +3점</span></div>
+      <div class="cap-grid">
+        <label class="check locked"><input type="checkbox" id="c3_age75" disabled> <b>C3a</b> 연령 ≥75세 <em id="c3_age75s"></em></label>
+        <label class="check locked"><input type="checkbox" id="c3_vte" disabled> <b>C3b</b> VTE 과거력 <em id="c3_vtes"></em></label>
+        <label class="check"><input type="checkbox" id="c3_fam"> <b>C3c</b> VTE 가족력</label>
+        <label class="check"><input type="checkbox" id="c3_fv"> <b>C3d</b> Factor V Leiden</label>
+        <label class="check"><input type="checkbox" id="c3_pt"> <b>C3e</b> Prothrombin 20210A</label>
+        <label class="check"><input type="checkbox" id="c3_la"> <b>C3f</b> Lupus anticoagulant</label>
+        <label class="check"><input type="checkbox" id="c3_acl"> <b>C3g</b> Anticardiolipin Ab</label>
+        <label class="check"><input type="checkbox" id="c3_hcy"> <b>C3h</b> 상승 Homocysteine</label>
+        <label class="check"><input type="checkbox" id="c3_hit"> <b>C3i</b> HIT (heparin-유발 감소증)</label>
+        <label class="check"><input type="checkbox" id="c3_thr"> <b>C3j</b> 기타 유전성 혈전성향증</label>
+      </div>
+
+      <div class="cap-section-head"><h5>5점 항목</h5><span class="pts">각 +5점</span></div>
+      <div class="cap-grid">
+        <label class="check"><input type="checkbox" id="c5_stk"> <b>C5a</b> 뇌졸중 &lt;1개월</label>
+        <label class="check"><input type="checkbox" id="c5_trm"> <b>C5b</b> 다발성 외상 &lt;1개월</label>
+        <label class="check"><input type="checkbox" id="c5_frc"> <b>C5c</b> 고관절/골반/다리 골절 &lt;1개월</label>
+        <label class="check"><input type="checkbox" id="c5_art"> <b>C5d</b> 선택적 하지 관절치환술</label>
+        <label class="check"><input type="checkbox" id="c5_spi"> <b>C5e</b> 급성 척수손상/마비 &lt;1개월</label>
+      </div>
+
+      <section style="margin-top:14px">
+        <h4>현재 점수</h4>
+        <div class="cap-live">
+          <div class="num"><strong id="capModalNum">0</strong><span>점</span></div>
+          <div class="cap-live-info">
+            <div class="cap-live-label" id="capModalLabel">—</div>
+            <div class="cap-live-note" id="capModalNote">—</div>
+          </div>
+        </div>
+      </section>
+
+      <details class="sb-info-collapse">
+        <summary>위험 층화 · 예방요법 권고 (2005 Caprini)</summary>
+        <div class="inner">
+          <table class="cutoff-table">
+            <thead><tr><th>점수</th><th>층위</th><th>60일 VTE</th><th>예방요법</th></tr></thead>
+            <tbody>
+              <tr><td>0–1</td><td class="lvl-ok">Very Low</td><td>&lt;0.5%</td><td>조기 이상만</td></tr>
+              <tr><td>2</td><td class="lvl-ok">Low</td><td>~1.5%</td><td>기계적 예방 (IPC)</td></tr>
+              <tr><td>3–4</td><td class="lvl-warn">Moderate</td><td>~3.0%</td><td>기계적 + LMWH</td></tr>
+              <tr><td>5–6</td><td class="lvl-danger">High</td><td>~6.0%</td><td>기계적 + LMWH · 연장 예방 검토</td></tr>
+              <tr><td>7–8</td><td class="lvl-danger">Highest</td><td>~1.9%*</td><td>기계적 + LMWH + 연장 예방</td></tr>
+              <tr><td>&gt;8</td><td class="lvl-danger">Super-High</td><td>5.85%</td><td>다학제 · 연장 예방 · 개별화</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:11.5px;margin-top:8px;color:var(--ink-3);font-family:'JetBrains Mono',monospace">* Pannucci 2012 (성형외과 3,334명) — 예방받은 환자 포함 관찰치. 근거: PMC4505816.</p>
+          <p style="font-size:11.5px;margin-top:6px;line-height:1.6">비만대사수술 특이사항: BMI &gt;40 자체가 이미 고위험군 — enoxaparin 40 mg BID (또는 체중기반 0.5 mg/kg BID) + IPC + 조기 이상, 연장 예방 10–14일 검토.</p>
+        </div>
+      </details>
+
+      <div class="cap-actions">
+        <button class="cap-reset" id="capReset">모두 해제</button>
+        <button class="cap-apply" id="capApply">확인 · 대시보드에 삽입</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Baseline 재보정 팝업 ═══ -->
+<div class="modal-overlay" id="calModal">
+  <div class="modal cal-modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div>
+        <h3>수술군별 Baseline 위험도 재보정</h3>
+        <div class="badge">병원 실측 관찰률 → 브라우저 저장</div>
+      </div>
+      <button class="modal-close" id="calClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="cal-help">
+        각 수술군의 <strong>본원 최근 관찰 합병증률(%)</strong>을 입력하면 이 값이 baseline이 되고, 환자 위험인자(HbA1c·BMI·RCRI·Caprini 등)에 따른 배수 수정이 그 위에 적용됩니다. 값은 이 브라우저에만 저장됩니다 (localStorage).
+        기본값(문헌 근거)은 각 입력 아래에 표시됩니다.
+      </div>
+      <div class="cal-tabs">
+        <button class="cal-tab active" data-surg="mbs">MBS</button>
+        <button class="cal-tab" data-surg="gc">GC</button>
+        <button class="cal-tab" data-surg="vhr">VHR</button>
+        <button class="cal-tab" data-surg="ih">IH</button>
+      </div>
+      <div id="calFields" class="cal-grid"></div>
+      <div class="cal-actions">
+        <div class="left">
+          <button class="cap-reset" id="calResetOne">현재 탭 기본값</button>
+          <button class="cap-reset" id="calResetAll">전체 초기화</button>
+        </div>
+        <button class="cap-apply" id="calSave">저장 · 대시보드 적용</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ────────────────────── 1. 지표 상세 설명 (팝업) ────────────────────── */
+const INFO = {
+  age: {
+    title: '연령 (Age)', badge: 'Demographic · Baseline',
+    body: `
+      <section><h4>임상적 의미</h4><p>65세 이상은 프레일티·근감소증·다약제·인지저하 위험이 급격히 상승. 특히 위암 위절제·복벽재건 대형수술에서 수술 관련 사망률의 독립 위험인자.</p></section>
+      <section><h4>측정법</h4><p class="method">주민등록상 만 나이. 실제 병동에서는 <strong>생리적 연령(Frailty CFS)</strong>이 예후를 더 잘 예측함 — 나이가 애매하면 CFS로 층화.</p></section>
+      <section><h4>층화 기준</h4>
+        <table class="cutoff-table"><thead><tr><th>연령대</th><th>주의사항</th></tr></thead><tbody>
+        <tr><td>&lt;65세</td><td class="lvl-ok">표준 프로토콜</td></tr>
+        <tr><td>65–79세</td><td class="lvl-warn">CGA 스크리닝, 다약제 검토, 섬망 예방</td></tr>
+        <tr><td>≥80세</td><td class="lvl-danger">CGA 필수, 프리해빌리테이션, 가족 목표 상담</td></tr>
+        </tbody></table>
+      </section>`
+  },
+  bmi: {
+    title: 'BMI (Body Mass Index)', badge: 'kg/m² · Anthropometric',
+    body: `
+      <section><h4>임상적 의미</h4><p>비만대사수술 적응증(BMI≥35 + 동반질환, 혹은 ≥40)의 기본. 복벽재건에서는 BMI≥35가 mesh 감염·SSI·재발의 강력한 예측인자.</p></section>
+      <section><h4>측정법</h4><p class="method">체중(kg) ÷ 신장(m)². <strong>가운·신발 제거, 아침 공복</strong> 측정이 원칙. 이동식 저울 오차 ±0.5 kg — 병동 저울 주기적 캘리브레이션.</p></section>
+      <section><h4>층화 기준</h4>
+        <table class="cutoff-table"><thead><tr><th>BMI</th><th>임상 의미</th></tr></thead><tbody>
+        <tr><td>&lt;30</td><td class="lvl-ok">표준 위험</td></tr>
+        <tr><td>30–39.9</td><td class="lvl-warn">SSI·VTE 위험 상승, OSA 스크리닝</td></tr>
+        <tr><td>40–49.9</td><td class="lvl-warn">고위험군, 다학제 접근</td></tr>
+        <tr><td>≥50 (super-obesity)</td><td class="lvl-danger">전문 센터, 예방적 4–8주 저칼로리식</td></tr>
+        </tbody></table>
+      </section>`
+  },
+  hba1c: {
+    title: 'HbA1c (당화혈색소)', badge: '% · Glycemic control',
+    body: `
+      <section><h4>임상적 의미</h4><p>최근 2–3개월 평균 혈당 지표. HbA1c &gt; 8% 이상이면 SSI·문합부 누출·재입원의 독립 위험인자 — 선택수술 <strong>조정 근거</strong>.</p></section>
+      <section><h4>측정법</h4><p class="method">EDTA 튜브 정맥채혈, HPLC 또는 immunoassay. 헤모글로빈 이상증(HbS, HbC)·최근 수혈·용혈 상태에서는 <strong>fructosamine</strong>으로 보완.</p></section>
+      <section><h4>층화 기준</h4>
+        <table class="cutoff-table"><thead><tr><th>HbA1c</th><th>조치</th></tr></thead><tbody>
+        <tr><td>&lt;6.5%</td><td class="lvl-ok">표준</td></tr>
+        <tr><td>6.5–7.9%</td><td class="lvl-warn">수술 진행, 술중·후 혈당 감시 강화</td></tr>
+        <tr><td>8.0–8.9%</td><td class="lvl-warn">내분비내과 협진, 최적화 후 재평가</td></tr>
+        <tr><td>≥9.0%</td><td class="lvl-danger">선택수술 연기, 3–6주 최적화 후 재평가</td></tr>
+        </tbody></table>
+      </section>
+      <section><h4>수술 당일 목표 혈당</h4><p>목표 <code>140–180 mg/dL</code>. &lt;80 이나 &gt;250 은 즉시 개입. 기저 insulin 50–80%, sulfonylurea·SGLT2i·GLP-1 RA는 사전 중단.</p></section>`
+  },
+  albumin: {
+    title: '혈청 알부민 (Serum Albumin)', badge: 'g/dL · Nutrition',
+    body: `
+      <section><h4>임상적 의미</h4><p>영양상태·간합성능·염증의 통합 지표. 알부민 &lt; 3.0 g/dL는 위암 위절제 후 문합부 누출·30일 사망률의 독립 예측인자.</p></section>
+      <section><h4>측정법</h4><p class="method">bromocresol green(BCG) 또는 bromocresol purple(BCP) 법. 급성 감염·염증기 저평가 가능 — <strong>prealbumin(transthyretin)</strong>·<strong>CRP</strong>와 함께 해석.</p></section>
+      <section><h4>층화 기준</h4>
+        <table class="cutoff-table"><thead><tr><th>알부민</th><th>조치</th></tr></thead><tbody>
+        <tr><td>≥3.5</td><td class="lvl-ok">표준</td></tr>
+        <tr><td>3.0–3.4</td><td class="lvl-warn">ONS 추가, 재평가 1주</td></tr>
+        <tr><td>2.5–2.9</td><td class="lvl-warn">수술 지연 검토, 7–14일 사전 영양지원</td></tr>
+        <tr><td>&lt;2.5</td><td class="lvl-danger">선택수술 지연, 경장/경정맥 영양</td></tr>
+        </tbody></table>
+      </section>`
+  },
+  egfr: {
+    title: 'eGFR (추정 사구체 여과율)', badge: 'mL/min/1.73m² · Renal',
+    body: `
+      <section><h4>임상적 의미</h4><p>수술 전 신기능 baseline. 만성 신기능 저하는 술후 AKI·심혈관 이벤트·조영제 사용 제약을 결정.</p></section>
+      <section><h4>측정법</h4><p class="method">CKD-EPI 2021 공식. 혈청 크레아티닌 + 연령 + 성별. 근육량 극단(비만·근감소증)에서는 <strong>cystatin C 기반 eGFR</strong>이 더 정확.</p></section>
+      <section><h4>층화 기준</h4>
+        <table class="cutoff-table"><thead><tr><th>eGFR</th><th>CKD stage · 조치</th></tr></thead><tbody>
+        <tr><td>≥60</td><td class="lvl-ok">G1–2</td></tr>
+        <tr><td>45–59</td><td class="lvl-warn">G3a · Metformin 감량, 신독성 회피</td></tr>
+        <tr><td>30–44</td><td class="lvl-warn">G3b · Metformin 중단, DOAC 용량조정</td></tr>
+        <tr><td>15–29</td><td class="lvl-danger">G4 · 신장내과 협진, 조영제 최소화</td></tr>
+        <tr><td>&lt;15</td><td class="lvl-danger">G5 · 투석 계획, 복막투석은 혈액투석 전환</td></tr>
+        </tbody></table>
+      </section>`
+  },
+  asa: {
+    title: 'ASA Physical Status', badge: 'Class · Anesthetic risk',
+    body: `
+      <section><h4>임상적 의미</h4><p>American Society of Anesthesiologists 신체 상태 분류. 마취 위험·수술 사망률의 표준 지표.</p></section>
+      <section><h4>분류</h4>
+        <table class="cutoff-table"><thead><tr><th>Class</th><th>정의</th></tr></thead><tbody>
+        <tr><td>I</td><td class="lvl-ok">정상 건강</td></tr>
+        <tr><td>II</td><td class="lvl-ok">경증 전신질환 (조절된 HTN, DM, 흡연)</td></tr>
+        <tr><td>III</td><td class="lvl-warn">중증 전신질환 (조절된 CHF, COPD, HbA1c&gt;9)</td></tr>
+        <tr><td>IV</td><td class="lvl-danger">생명 위협 전신질환 (최근 MI, sepsis)</td></tr>
+        <tr><td>V</td><td class="lvl-danger">수술 없이 24h 이내 사망 예측</td></tr>
+        </tbody></table>
+      </section>`
+  },
+  rcri: {
+    title: 'RCRI (Revised Cardiac Risk Index)', badge: 'Lee index · 심혈관 위험',
+    body: `
+      <section><h4>임상적 의미</h4><p>비심장수술 환자의 주요 심장 이벤트(사망, MI, 심정지) 예측. 2024 AHA/ACC 가이드라인의 표준 도구.</p></section>
+      <section><h4>6개 항목 (각 1점)</h4><ul>
+        <li>고위험 수술 (복강내·흉곽내·서혜부 이상 혈관수술)</li>
+        <li>허혈성 심질환 병력</li>
+        <li>울혈성 심부전 병력</li>
+        <li>뇌혈관질환 병력 (TIA, stroke)</li>
+        <li>인슐린 치료 당뇨병</li>
+        <li>수술 전 크레아티닌 &gt; 2.0 mg/dL</li>
+      </ul></section>
+      <section><h4>위험도</h4>
+        <table class="cutoff-table"><thead><tr><th>점수</th><th>주요 심혈관 이벤트</th></tr></thead><tbody>
+        <tr><td>0</td><td class="lvl-ok">0.4%</td></tr>
+        <tr><td>1</td><td class="lvl-ok">1.0%</td></tr>
+        <tr><td>2</td><td class="lvl-warn">2.4%</td></tr>
+        <tr><td>≥3</td><td class="lvl-danger">5.4% — BNP/NT-proBNP 측정, 심장내과 협진</td></tr>
+        </tbody></table>
+      </section>`
+  },
+  stopbang: {
+    title: 'STOP-BANG (OSA 스크리닝)', badge: '0–8점 · 폐쇄성 수면무호흡',
+    body: `
+      <section><h4>임상적 의미</h4><p>비만대사수술 환자 35–94%가 OSA 동반. 미진단 OSA는 술후 저산소증·심장이벤트의 최대 위험 인자. STOP-BANG ≥ 3 → 중등도 이상 위험.</p></section>
+      <section><h4>8개 항목 (각 1점)</h4><ul>
+        <li><strong>S</strong>noring — 코골이가 큼</li>
+        <li><strong>T</strong>ired — 낮 졸림</li>
+        <li><strong>O</strong>bserved — 무호흡 관찰</li>
+        <li><strong>P</strong>ressure — 고혈압</li>
+        <li><strong>B</strong>MI &gt; 35</li>
+        <li><strong>A</strong>ge &gt; 50</li>
+        <li><strong>N</strong>eck &gt; 40 cm</li>
+        <li><strong>G</strong>ender = male</li>
+      </ul></section>
+      <section><h4>대시보드 사용법</h4><p class="method"><strong>「항목 체크하기」 버튼</strong>을 누르면 팝업이 열립니다. 팝업에서 S·T·O·P 문진 항목을 체크하면 점수가 자동 계산되고, B·A·N·G는 좌측 입력값에서 자동 체크됩니다. 점수는 위험도 계산에 즉시 반영되며, 「확인」 버튼을 누르면 대시보드 사이드바에 삽입됩니다.</p></section>`
+  },
+  add: {
+    title: '추가 위험요인 (Modifiable Risk Factors)', badge: 'Preoperative Optimization',
+    body: `
+      <section><h4>흡연</h4><p>최소 <strong>4주 전 금연</strong> → 상처감염·suture failure·재원기간 감소. RYGB 후 marginal ulcer 방지에 필수.</p></section>
+      <section><h4>OSA/OHS</h4><p>자기 CPAP 지참, 수술 직후부터 즉시 재개. 마약성 진통제 최소화. 반좌위 유지.</p></section>
+      <section><h4>항응고제</h4><p>Warfarin 5일 전, DOAC 72h (고출혈), Clopidogrel 5–7일 전. Bridging은 기계판막·최근 VTE에서만.</p></section>
+      <section><h4>스테로이드</h4><p>Prednisone &gt; 5 mg/일 × 3주 이상 → stress dose 필요. 대형 수술: hydrocortisone 100 mg IV 유도 시 + 200 mg/24h.</p></section>
+      <section><h4>VTE 과거력</h4><p>Caprini score 재계산, 연장 예방(post-discharge extended prophylaxis) 필수 검토.</p></section>
+      <section><h4>Frailty CFS ≥ 5</h4><p>Clinical Frailty Scale 5+ 는 사망·재원기간 독립 예측. 프리해빌리테이션 2–4주.</p></section>`
+  },
+  caprini: {
+    title: 'Caprini VTE Risk (2005)', badge: '39-item weighted RAM · 표준 VTE 위험 도구',
+    body: `
+      <section><h4>임상적 의미</h4><p>Caprini 2005 모델은 39개 위험인자에 가중치(1·2·3·5점)를 부여해 수술환자의 60일 VTE 위험을 층화. 2005 RAM이 2010 RAM보다 최고위험군을 더 잘 분리하는 것으로 검증됨(Pannucci 2012). ACCP·ASCO 예방요법 권고의 기반.</p></section>
+      <section><h4>점수 항목</h4><ul>
+        <li><strong>1점</strong>: 연령 41–60, 소수술, 30일 내 대수술, BMI&gt;25, 하지정맥류, IBD, 다리부종, 심부전 &lt;1개월, sepsis &lt;1개월, COPD, 경구피임약 등</li>
+        <li><strong>2점</strong>: 연령 61–74, 45분+ 대수술, 관절경, 악성종양, CVC, 침상안정 &gt;72h, 부목/석고</li>
+        <li><strong>3점</strong>: 연령 ≥75, VTE 과거력/가족력, Factor V Leiden, HIT, 혈전성향증</li>
+        <li><strong>5점</strong>: 뇌졸중·다발외상·골절·척수손상 &lt;1개월, 하지관절치환술</li>
+      </ul></section>
+      <section><h4>위험 층화 및 예방</h4>
+        <table class="cutoff-table"><thead><tr><th>점수</th><th>층위</th><th>예방요법</th></tr></thead><tbody>
+        <tr><td>0–1</td><td class="lvl-ok">Very Low</td><td>조기 이상</td></tr>
+        <tr><td>2</td><td class="lvl-ok">Low</td><td>기계적 (IPC)</td></tr>
+        <tr><td>3–4</td><td class="lvl-warn">Moderate</td><td>기계적 + LMWH</td></tr>
+        <tr><td>5–6</td><td class="lvl-danger">High</td><td>기계적 + LMWH · 연장 예방 검토</td></tr>
+        <tr><td>≥7</td><td class="lvl-danger">Highest</td><td>기계적 + LMWH + 연장 예방</td></tr>
+        </tbody></table>
+      </section>
+      <section><h4>대시보드 사용법</h4><p class="method">「항목 체크하기」 버튼으로 팝업을 여세요. 연령·BMI·수술유형·활성 악성종양·VTE 과거력은 좌측 입력값에서 <strong>자동 체크</strong>되고, 나머지 문진 항목만 수동 체크하면 됩니다. 점수는 즉시 VTE 위험 배수(0–1: ×1.0 · 2: ×1.4 · 3–4: ×1.9 · 5–6: ×2.6 · ≥7: ×3.4)에 반영됩니다.</p></section>`
+  },
+  e_leak_mbs: {
+    title: '문합부 누출 · MBS (Anastomotic Leak)', badge: 'Baseline 1.5% · MBSAQIP',
+    body: `
+      <section><h4>문합부 위치</h4>
+        <ul>
+          <li><strong>RYGB</strong>: Gastrojejunostomy (GJ) — 위낭과 근위 공장 문합, 가장 흔한 누출 부위</li>
+          <li><strong>RYGB</strong>: Jejunojejunostomy (JJ) — Roux limb과 원위 공장 문합</li>
+          <li><strong>Sleeve Gastrectomy (SG)</strong>: staple line 상부 (His angle 근처) — SG 누출의 85–89%</li>
+          <li><strong>OAGB/BPD-DS</strong>: 단일 문합 or 이중 문합, 더 높은 누출률</li>
+        </ul>
+      </section>
+      <section><h4>Baseline 근거 수치</h4>
+        <table class="cutoff-table"><thead><tr><th>수술 유형</th><th>누출률</th><th>출처</th></tr></thead><tbody>
+        <tr><td>전체 (MBSAQIP, n=133,478)</td><td>0.7%</td><td>Alizadeh 2018</td></tr>
+        <tr><td>RYGB (MBSAQIP, n=77,956)</td><td>0.6%</td><td>Mocanu 2019</td></tr>
+        <tr><td>RYGB 문헌 범위</td><td>0.1–6%</td><td>Pooli review</td></tr>
+        <tr><td>Sleeve Gastrectomy</td><td>0.7–3.3%</td><td>Pooli review</td></tr>
+        <tr><td>Duodenal switch (BPD-DS/SADI)</td><td>2.5–3.5%</td><td>Abi Mosleh 2024</td></tr>
+        </tbody></table>
+        <p style="font-size:12px;margin-top:6px">본 대시보드는 <strong>1.5%</strong>를 baseline으로 사용 — RYGB(0.6)와 SG(1.5)의 가중평균, 재수술·복잡술식 포함 실제 병원 데이터 반영.</p>
+      </section>
+      <section><h4>배수 근거</h4>
+        <ul>
+          <li>HbA1c ≥8: ×1.6 — Wong 2021 meta (OR ~1.5-2.0 for anastomotic leak)</li>
+          <li>알부민 &lt;3.0: ×1.7 — Tang 2025 meta (OR 2.67 for GI anastomotic leak)</li>
+          <li>흡연: ×1.3 — Chiang 2022 meta (OR 1.31 for SSI, 1.65 wound disruption)</li>
+        </ul>
+      </section>`
+  },
+  e_leak_gc: {
+    title: '문합부 누출 · GC (Anastomotic Leak)', badge: 'Baseline 2.5% · 한국 다기관',
+    body: `
+      <section><h4>문합부 위치 (Gastrectomy)</h4>
+        <ul>
+          <li><strong>위전절제 (Total gastrectomy)</strong>: Esophagojejunostomy (E-J) — 가장 흔한 누출 부위, 사망률 최고</li>
+          <li><strong>위아전절제 (Subtotal gastrectomy)</strong>: Gastroduodenostomy (Billroth I, G-D) or Gastrojejunostomy (Billroth II/Roux, G-J)</li>
+          <li><strong>Duodenal stump</strong> (D-J stump 누출) — Billroth II/Roux-en-Y 후 십이지장 단단부</li>
+          <li>Jejunojejunostomy (J-J) — Roux-en-Y 재건 시</li>
+        </ul>
+      </section>
+      <section><h4>Baseline 근거 수치</h4>
+        <table class="cutoff-table"><thead><tr><th>코호트</th><th>누출률</th><th>출처</th></tr></thead><tbody>
+        <tr><td>한국 다기관 (n=14,075)</td><td>1.51%</td><td>Roh 2021</td></tr>
+        <tr><td>한국 단일 (n=1,568)</td><td>2.02%</td><td>Jeong 2023</td></tr>
+        <tr><td>한국 단일 (n=5,000+, 내시경 치료)</td><td>2.3%</td><td>Kim YI 2022</td></tr>
+        <tr><td>중국 단일 (n=3,926)</td><td>~3%</td><td>He 2023</td></tr>
+        <tr><td>문헌 범위</td><td>1.2–6.7%</td><td>Calì 2025 review</td></tr>
+        </tbody></table>
+        <p style="font-size:12px;margin-top:6px">본 대시보드 baseline <strong>2.5%</strong> — 한국 데이터(1.5–2.0)와 국제 데이터(3–6.7)의 중간. 위전절제·D2·최근 12개월 데이터로 <strong>본원 재보정 강력 권장</strong>.</p>
+      </section>
+      <section><h4>배수 근거</h4>
+        <ul>
+          <li>HbA1c ≥8: ×1.6 — Wong 2021 meta</li>
+          <li>알부민 &lt;3.0: ×1.7 — Tang 2025 meta (OR 2.67 for GI leak, 특히 위암·대장)</li>
+          <li>흡연: ×1.3 — Sørensen 2012 meta (OR 1.79 for anastomotic leak in colorectal)</li>
+        </ul>
+      </section>`
+  },
+  e_leak_vhr: {
+    title: 'VHR "Leak" · Enterotomy Repair Leak + 근막열개', badge: 'Baseline 1.0% · AHSQC',
+    body: `
+      <section><h4>중요: VHR에는 표준 위장관 문합이 없음</h4>
+        <p class="method">복벽재건 자체는 위장관 문합을 만들지 않습니다. 이 카드가 표시하는 "leak"은 아래 두 상황의 <strong>복합 지표</strong>입니다.</p>
+      </section>
+      <section><h4>① Iatrogenic Enterotomy Repair Leak</h4>
+        <p>복벽재건 중 유착박리 과정에서 발생하는 iatrogenic bowel injury와 그 봉합·문합의 이차 누출:</p>
+        <table class="cutoff-table"><thead><tr><th>접근법</th><th>Enterotomy 발생률</th><th>출처</th></tr></thead><tbody>
+        <tr><td>개복 (Open) VHR</td><td>0.63%</td><td>Cochrane, Bittner 2013</td></tr>
+        <tr><td>복강경 VHR (LVHR)</td><td>1.55%</td><td>Cochrane 2013</td></tr>
+        <tr><td>복강경 LVHR (n=3,925)</td><td>1.78%</td><td>LeBlanc 2007</td></tr>
+        </tbody></table>
+        <p style="font-size:12.5px">지연성 인지가 82%로 조기 진단이 어려움. 인지된 enterotomy의 재문합·수복 후 <strong>누출 가능성 15–30%</strong> (LeBlanc).</p>
+      </section>
+      <section><h4>② Fascial Dehiscence (근막열개)</h4>
+        <table class="cutoff-table"><thead><tr><th>유형</th><th>발생률</th><th>사망률</th></tr></thead><tbody>
+        <tr><td>대형 복벽재건 후 근막열개</td><td>1–3%</td><td>15–25%</td></tr>
+        <tr><td>재발성 VHR</td><td>3–5%</td><td>—</td></tr>
+        </tbody></table>
+      </section>
+      <section><h4>계산식</h4>
+        <p class="method">Baseline <strong>1.0%</strong> = (개복 0.6 + 복강경 1.6)/2 approximation + 근막열개 요소.<br>
+        BMI ≥40 × 1.3, 흡연 × 1.3, 알부민 &lt;3.0 × 1.7 (근막 강도 저하), 재수술 × 2.0을 적용.</p>
+        <p style="font-size:12px;color:var(--warn)"><strong>중요</strong>: 이 카드 수치는 참고용이며, 실제 수술 계획 시 유착 정도·이전 mesh·응급도에 따라 재해석 필요.</p>
+      </section>`
+  },
+  e_leak_ih: {
+    title: 'IH · 재발률 (Recurrence, 1년)', badge: 'Baseline 2.3% · EHS/HerniaSurge',
+    body: `
+      <section><h4>중요: IH에는 위장관 문합 없음</h4>
+        <p class="method">서혜부탈장 수술은 위장관 문합을 만들지 않습니다 (감돈성 응급수술에서 장절제 후 문합이 필요한 예외 &lt;3%). 이 카드는 위험도 카드 표시 일관성을 위해 <strong>1년 재발률</strong>을 대체 지표로 사용합니다.</p>
+      </section>
+      <section><h4>Baseline 근거 수치</h4>
+        <table class="cutoff-table"><thead><tr><th>수술법</th><th>1년 재발률</th><th>출처</th></tr></thead><tbody>
+        <tr><td>Lichtenstein (개복 mesh)</td><td>3.0%</td><td>EHS/HerniaSurge 2018</td></tr>
+        <tr><td>TAPP</td><td>1.7%</td><td>Srivastava 2023</td></tr>
+        <tr><td>TEP</td><td>1.7%</td><td>Srivastava 2023</td></tr>
+        <tr><td>재발성 IH 재수술 (일측→반대측 접근)</td><td>2–5%</td><td>EHS 2023</td></tr>
+        <tr><td>재발 재발 (2회 이상)</td><td>5–10%</td><td>Andresen 2025</td></tr>
+        </tbody></table>
+        <p style="font-size:12px;margin-top:6px">Baseline <strong>2.3%</strong> = Lichtenstein·TAPP·TEP 가중평균 (본원 수술법 비율 재보정 권장).</p>
+      </section>
+      <section><h4>배수 근거</h4>
+        <ul>
+          <li>흡연: ×1.3 — 재발 독립 위험 인자</li>
+          <li>BMI ≥40: ×1.4 — 조직 긴장·mesh 유지 불량</li>
+          <li>재발성 케이스: ×2.0 이상 (재발 재수술)</li>
+          <li>여성·젊은 나이: CPIP 위험 상승 (재발률에는 유의한 영향 없음)</li>
+        </ul>
+      </section>
+      <section><h4>참고: CPIP (Chronic Postoperative Inguinal Pain)</h4>
+        <p>재발과 별개 지표로 <strong>17.01%</strong> (Chu 2024 meta, n=29,466), 유럽 18.65%. 임상적 유의 CPIP 10–12%, 심한 통증 &lt;3%. 대시보드 하단 합병증 카드에서 별도 관리.</p>
+      </section>`
+  },
+  e_vte: {
+    title: 'VTE (DVT/PE) 근거', badge: 'Baseline 1.0–1.5% · Caprini 기반',
+    body: `
+      <section><h4>Baseline 근거 수치</h4>
+        <table class="cutoff-table"><thead><tr><th>수술군</th><th>Baseline VTE</th><th>출처</th></tr></thead><tbody>
+        <tr><td>MBS (RYGB/SG)</td><td>0.5–1.5%</td><td>MBSAQIP</td></tr>
+        <tr><td>Gastrectomy</td><td>1.0–2.0%</td><td>Roh 2021 등</td></tr>
+        <tr><td>VHR (대형 재건)</td><td>1.0–2.0%</td><td>AHSQC</td></tr>
+        <tr><td>Elective IH (일반적)</td><td>0.3–0.7%</td><td>EHS 2018</td></tr>
+        </tbody></table>
+      </section>
+      <section><h4>Caprini 배수 (팝업 계산 결과 자동 반영)</h4>
+        <table class="cutoff-table"><thead><tr><th>Caprini 점수</th><th>배수</th><th>60일 관찰 VTE (Pannucci 2012)</th></tr></thead><tbody>
+        <tr><td>0–1</td><td>×1.0</td><td>&lt;0.5%</td></tr>
+        <tr><td>2</td><td>×1.4</td><td>~1.5%</td></tr>
+        <tr><td>3–4</td><td>×1.9</td><td>0.4%*</td></tr>
+        <tr><td>5–6</td><td>×2.6</td><td>1.2%*</td></tr>
+        <tr><td>≥7</td><td>×3.4</td><td>1.9–5.85%*</td></tr>
+        </tbody></table>
+        <p style="font-size:12px;margin-top:6px">* Pannucci 2012는 예방받은 환자 포함 관찰치. 예방받지 않으면 3–5배 상승 예상.</p>
+      </section>
+      <section><h4>추가 배수</h4>
+        <ul>
+          <li>BMI ≥50: ×1.8 — Sugerman (fatal PE 4% vs 0.2%, 20배 상승); 하부 정맥 hemodynamic 저하</li>
+          <li>BMI 40–50: ×1.4 — Tsai 코호트 (stepwise HR 상승)</li>
+        </ul>
+      </section>`
+  },
+  e_vte_ih: {
+    title: 'VTE (DVT/PE) · IH', badge: 'Baseline 0.5% · Elective IH',
+    body: `
+      <section><h4>Baseline 근거</h4>
+        <p>선택적 개복/복강경 IH 수술의 술후 90일 증상성 VTE 발생률은 <strong>0.3–0.7%</strong> (EHS 2018 · Andresen 2025). 대부분의 IH 환자는 Caprini 점수 2–4점(연령 + 45분+ 대수술)에 해당하여 IPC ± LMWH의 단기 예방만 적용.</p>
+      </section>
+      <section><h4>배수 · 예방 결정</h4>
+        <ul>
+          <li>Caprini ≥5 or VTE 과거력: LMWH + IPC 병용 (§Caprini 팝업 참조)</li>
+          <li>일반적 Caprini 3–4 IH: 기계적 예방 + 단기 LMWH</li>
+          <li>Caprini &lt;3: 조기 이상만으로 충분</li>
+        </ul>
+      </section>`
+  },
+  e_ssi: {
+    title: 'SSI 근거', badge: 'Baseline 2–8% · 30일',
+    body: `
+      <section><h4>Baseline 근거 수치</h4>
+        <table class="cutoff-table"><thead><tr><th>수술군</th><th>Baseline SSI</th><th>출처</th></tr></thead><tbody>
+        <tr><td>MBS (Bariatric)</td><td>1–3%</td><td>MBSAQIP</td></tr>
+        <tr><td>Gastrectomy (GC)</td><td>3–7%</td><td>Chen 2021 meta</td></tr>
+        <tr><td>VHR (일반)</td><td>5–15%</td><td>AHSQC, Wilson 2022</td></tr>
+        <tr><td>VHR mesh 감염 (심부)</td><td>1–6%</td><td>Wilson 2022</td></tr>
+        </tbody></table>
+      </section>
+      <section><h4>배수 근거</h4>
+        <ul>
+          <li>HbA1c ≥8: ×1.8 — Wong 2021 meta (OR 2.29 for SSI); 조기 항생제 필요</li>
+          <li>알부민 &lt;3.0: ×1.5 — Zhuang 2021 (OR 3.32 for SSI)</li>
+          <li>흡연: ×1.6 — Chiang 2022 meta (OR 1.31 SSI, 1.65 wound disruption)</li>
+          <li>BMI ≥40: ×1.3 · ≥50: ×1.5 (지방조직 저관류)</li>
+          <li>스테로이드: ×1.3 (콜라겐 합성 저하)</li>
+        </ul>
+      </section>`
+  },
+  e_ssi_vhr: {
+    title: 'SSI · VHR (Mesh 감염 포함)', badge: 'Baseline 8% · 30일',
+    body: `
+      <section><h4>Baseline 근거 (VHR 특이)</h4>
+        <table class="cutoff-table"><thead><tr><th>SSI 유형</th><th>발생률</th><th>출처</th></tr></thead><tbody>
+        <tr><td>표재성 (Superficial SSI)</td><td>4–10%</td><td>AHSQC</td></tr>
+        <tr><td>심부 (Deep SSI, mesh 침범)</td><td>1–6%</td><td>Wilson 2022</td></tr>
+        <tr><td>장기/공간 (Organ/space)</td><td>1–3%</td><td>AHSQC</td></tr>
+        <tr><td>전체 SSO (Surgical Site Occurrence, seroma·혈종 포함)</td><td>15–30%</td><td>AHSQC (대형 재건)</td></tr>
+        </tbody></table>
+      </section>
+      <section><h4>주요 위험 인자 (배수 반영)</h4>
+        <ul>
+          <li>BMI &gt;35 (mesh 감염 3배)</li>
+          <li>흡연 (mesh 감염 2배)</li>
+          <li>DM 조절 불량 (HbA1c ≥8)</li>
+          <li>재발성·다중 mesh 병력</li>
+          <li>MRSA colonization (미decolonization)</li>
+        </ul>
+      </section>`
+  },
+  e_ssi_ih: {
+    title: 'SSI · IH', badge: 'Baseline 1.5% · 30일',
+    body: `
+      <section><h4>Baseline 근거</h4>
+        <table class="cutoff-table"><thead><tr><th>접근법</th><th>SSI</th><th>출처</th></tr></thead><tbody>
+        <tr><td>복강경 (TAPP/TEP)</td><td>&lt;1% (0-1%)</td><td>SAGES, Wilson 2022</td></tr>
+        <tr><td>개복 Lichtenstein</td><td>1–4%</td><td>Falagas 2005, IJSurgery</td></tr>
+        <tr><td>전체 IH</td><td>~2.94%</td><td>IJSurgery Ashrafi 2024</td></tr>
+        <tr><td>Mesh 감염 (심부)</td><td>0.3–1%</td><td>Akyol 2013</td></tr>
+        </tbody></table>
+        <p style="font-size:12px;margin-top:6px">Baseline <strong>1.5%</strong> = 개복(2.5)와 복강경(0.5)의 가중평균.</p>
+      </section>`
+  },
+  e_resp: {
+    title: '호흡기 합병증 근거', badge: 'Baseline 5% · MBS · 저산소·재삽관·폐렴',
+    body: `
+      <section><h4>Baseline 근거 수치</h4>
+        <table class="cutoff-table"><thead><tr><th>수술군</th><th>발생률</th><th>출처</th></tr></thead><tbody>
+        <tr><td>MBS (Bariatric)</td><td>3–7%</td><td>OSA 유병률 35–94%</td></tr>
+        <tr><td>Gastrectomy 폐렴</td><td>1.6–12.8%</td><td>Chen 2021 meta</td></tr>
+        <tr><td>주요 개복 복부수술 HAP</td><td>2–29%</td><td>Mohri 2008</td></tr>
+        <tr><td>VHR (횡격막 부담)</td><td>3–5%</td><td>대형 재건 특히</td></tr>
+        </tbody></table>
+      </section>
+      <section><h4>배수 근거</h4>
+        <ul>
+          <li>STOP-BANG ≥5 or OSA: ×2.0 — Seet (5배 상승); 저산소·재삽관 위험</li>
+          <li>STOP-BANG 3–4: ×1.5 — 중등도 OSA</li>
+          <li>BMI ≥50 (super-obesity): ×1.7 — 폐용적·기능잔량 저하</li>
+          <li>흡연: ×1.5 — 기도 청소 저하, 무기폐</li>
+          <li>고령 (≥80): ×1.4, (≥70): ×1.2</li>
+          <li>Frailty CFS ≥5: ×1.4</li>
+        </ul>
+      </section>`
+  },
+  e_resp_gc: {
+    title: '호흡기 합병증 · GC (폐렴)', badge: 'Baseline 8% · Chen 2021 meta',
+    body: `
+      <section><h4>Baseline 근거</h4>
+        <p>위암 위절제 후 술후 폐렴 발생률 <strong>1.6–12.8%</strong> (Chen 2021 meta), 중국 코호트 7.2% (Tu 2017, n=5,327). 개복 &gt; 복강경, D2 &gt; D1, 위전절제 &gt; 위아전절제.</p>
+      </section>
+      <section><h4>주요 위험 인자</h4>
+        <ul>
+          <li>COPD: OR 4.72 (Fan 2025)</li>
+          <li>연령 ≥75</li>
+          <li>흡연자·최근 흡연</li>
+          <li>수술시간 ≥4시간</li>
+          <li>Frailty CFS ≥5</li>
+        </ul>
+      </section>`
+  },
+  e_resp_ih: {
+    title: '호흡기 합병증 · IH', badge: 'Baseline 1% · Elective IH · 요폐 포함',
+    body: `
+      <section><h4>Baseline 근거</h4>
+        <p>선택적 IH 수술의 술후 호흡기 합병증은 매우 낮음 (&lt;1%). 대부분 day surgery. 이 카드는 <strong>요폐(urinary retention)를 포함</strong>한 광의의 술후 조기 합병증으로 사용:</p>
+        <ul>
+          <li>척추마취 후 요폐: 5–10% (BPH 남성 · 고령)</li>
+          <li>전신마취 저산소증: &lt;1%</li>
+          <li>고령 IH의 폐렴: 1–2%</li>
+        </ul>
+      </section>`
+  },
+  e_aki: {
+    title: '급성 신손상 (AKI) 근거', badge: 'Baseline 0.5–2.5% · KDIGO stage 1+',
+    body: `
+      <section><h4>Baseline 근거 수치</h4>
+        <table class="cutoff-table"><thead><tr><th>수술군</th><th>AKI 발생률</th><th>출처</th></tr></thead><tbody>
+        <tr><td>주요 개복 복부수술 (meta)</td><td>13.4–16%</td><td>Liu 2025 meta (n=76,000+)</td></tr>
+        <tr><td>GC (위암)</td><td>2–5%</td><td>Long 2016</td></tr>
+        <tr><td>MBS (Bariatric)</td><td>1–3%</td><td>MBSAQIP</td></tr>
+        <tr><td>VHR·IH (선택적)</td><td>&lt;1–2%</td><td>—</td></tr>
+        </tbody></table>
+        <p style="font-size:12px;margin-top:6px">본 대시보드의 낮은 baseline (1–2.5%)은 <strong>선택적 elective</strong> 상황을 반영. 응급/패혈증/저혈량 상황에서는 실제 3–5배 상승.</p>
+      </section>
+      <section><h4>배수 근거</h4>
+        <ul>
+          <li>eGFR &lt;45: ×2.5 — Ostermann 2020, KDIGO 2021 (재손상 취약)</li>
+          <li>eGFR 45–59: ×1.6</li>
+          <li>HbA1c ≥8: ×1.2 — 미세혈관 손상</li>
+          <li>ASA ≥4: ×1.5</li>
+          <li>고령 (≥80): ×1.3</li>
+        </ul>
+      </section>`
+  },
+  e_cv: {
+    title: '주요 심혈관 이벤트 (MACE) 근거', badge: 'Baseline 0.8–2% · 30일 MACE',
+    body: `
+      <section><h4>Baseline 근거 수치</h4>
+        <table class="cutoff-table"><thead><tr><th>인구/수술군</th><th>MACE</th><th>출처</th></tr></thead><tbody>
+        <tr><td>Elective 비심장수술 전체</td><td>0.50%</td><td>Peterson 2021 (n=807,413)</td></tr>
+        <tr><td>주요 비심장수술 (문헌범위)</td><td>1.4–3.9%</td><td>Patel 2015 review</td></tr>
+        <tr><td>45–64세</td><td>1.7%</td><td>Hong 2025</td></tr>
+        <tr><td>65–74세</td><td>2.8%</td><td>Hong 2025</td></tr>
+        <tr><td>75–84세</td><td>4.5%</td><td>Hong 2025</td></tr>
+        <tr><td>≥85세</td><td>6.9%</td><td>Hong 2025</td></tr>
+        </tbody></table>
+      </section>
+      <section><h4>RCRI 배수 (Lee 원본)</h4>
+        <table class="cutoff-table"><thead><tr><th>RCRI 점수</th><th>MACE</th><th>배수 (본 대시보드)</th></tr></thead><tbody>
+        <tr><td>0</td><td>0.4%</td><td>×1.0</td></tr>
+        <tr><td>1</td><td>1.0%</td><td>×1.5</td></tr>
+        <tr><td>2</td><td>2.4%</td><td>×2.5</td></tr>
+        <tr><td>≥3</td><td>5.4%</td><td>×4.0</td></tr>
+        </tbody></table>
+      </section>
+      <section><h4>추가 배수</h4>
+        <ul>
+          <li>eGFR &lt;45: ×1.5 (심신증후군)</li>
+          <li>고령 ≥80: ×1.7 · ≥70: ×1.3</li>
+          <li>Frailty CFS ≥5: ×1.5</li>
+          <li>ASA ≥4: ×2.0 · ASA 3: ×1.4</li>
+        </ul>
+      </section>`
+  },
+  neck: {
+    title: '목둘레 (Neck Circumference)', badge: 'cm · Anthropometric · STOP-BANG N',
+    body: `
+      <section><h4>임상적 의미</h4><p>상기도 폐쇄 위험의 대체 지표. 목둘레 &gt; 40cm(STOP-BANG N 조건)일 때 OSA 위험 극심 상승. 실무에서는 남 &gt; 43cm, 여 &gt; 40cm 경계를 더 흔히 사용합니다.</p></section>
+      <section><h4>측정법</h4><p class="method">줄자로 갑상연골(Cartilage thyroidea)의 바로 아래 수준에서 목을 수평으로 감싸 측정. 턱을 위로 들지 않고 편안하게 숨을 내쉰 상태에서 측정합니다.</p></section>`
+  },
+  gender: {
+    title: '성별 (Sex) · STOP-BANG G', badge: 'Demographic',
+    body: `
+      <section><h4>임상적 의미</h4><p>남성은 STOP-BANG 점수에 G 조건으로 추가(1점). 남성이 OSA 유병률은 더 높지만, 폐경기 이후 남녀 격차가 줄어듭니다.</p></section>
+      <section><h4>대시보드 반영</h4><p class="method">성별이 남성이면 STOP-BANG 체커의 G 항목이 자동 체크되어 점수에 반영됩니다.</p></section>`
+  }
+};
+
+/* ────────────────────── 2. 수술군별 프로토콜 ────────────────────── */
+const PROTOCOL = {
+  mbs: {
+    label: 'MBS · Bariatric / Metabolic Surgery',
+    phases: [
+      {num:'01', title:'수술 전 최적화', sub:'4–8주 전', items:[
+        {t:'금연 4주 이상 · marginal ulcer 예방 필수', lvl:'crit'},
+        {t:'저칼로리식(800–1200 kcal/d) 2–4주 → 간 부피 감소', lvl:'crit'},
+        {t:'STOP-BANG 스크리닝, ≥3이면 야간 SpO₂', info:'stopbang'},
+        {t:'HbA1c &lt;8%, 알부민, 티아민, B12, 25-OH-Vit D 확인', info:'hba1c'},
+        {t:'심리평가 (ASMBS 지침)', lvl:'warn'},
+        {t:'GLP-1 RA (주간제형) <code>1주 전</code> 중단', lvl:'crit'},
+        {t:'SGLT2i <code>3–4일 전</code> 중단 (euglycemic DKA)', lvl:'crit'},
+      ]},
+      {num:'02', title:'수술 당일 · 입원', sub:'D-0', items:[
+        {t:'CPAP 기기 지참 확인, 병실 배치', lvl:'crit'},
+        {t:'Dexamethasone 8 mg IV (PONV·염증 감소)', lvl:'warn'},
+        {t:'금식: 고형식 6h, 맑은 음료 2h', lvl:'warn'},
+        {t:'Metformin·SU·기저 insulin 50–80% 감량', info:'hba1c'},
+        {t:'ACEi/ARB hold, β-blocker 유지'},
+        {t:'VTE 예방: LMWH + IPC (기계·약물 병용)', lvl:'crit'},
+        {t:'다중요법 진통: acetaminophen + NSAIDs + TAP block'},
+      ]},
+      {num:'03', title:'수술 직후 · POD 0–1', sub:'회복실→병동', items:[
+        {t:'반좌위 유지, prophylactic O₂ · SpO₂ 감시', lvl:'crit'},
+        {t:'자기 CPAP 즉시 재개 (OSA)', lvl:'crit'},
+        {t:'마약성 진통제 <code>최소화</code> · 호흡저하 감시', lvl:'crit'},
+        {t:'수 시간 후 clear liquid 시작 (ERAS)'},
+        {t:'조기 이상 (수술 당일 저녁 or POD 1)', lvl:'warn'},
+        {t:'배액관·NG tube 루틴 사용 안 함'},
+        {t:'혈당 QID, 목표 140–180 mg/dL'},
+        {t:'티아민 IV (반복 구토 위험군)', lvl:'warn'},
+      ]},
+      {num:'04', title:'회복·퇴원', sub:'POD 1–3+', items:[
+        {t:'PPI 최소 30일 (RYGB, marginal ulcer 예방)', lvl:'crit'},
+        {t:'Ursodeoxycholic acid 6개월 (담석 예방)', lvl:'warn'},
+        {t:'평생 비타민·미네랄 보충 교육 (High/Strong)', lvl:'crit'},
+        {t:'퇴원 후 연장 VTE 예방 개별화 (10–28일)', lvl:'warn'},
+        {t:'단계적 식이 진행: 유동식→반유동식→일반식'},
+        {t:'담배·NSAIDs 재개 금지 교육 (RYGB)', lvl:'crit'},
+        {t:'2주·6주·3·6·12개월 외래 스케줄'},
+      ]},
+    ],
+    baseRisk: {leak:1.5, vte:1.2, ssi:2.0, resp:5.0, aki:1.0, cv:1.0}
+  },
+  gc: {
+    label: 'GC · Radical Gastrectomy (Gastric Cancer)',
+    phases: [
+      {num:'01', title:'수술 전 최적화', sub:'2–3주 전', items:[
+        {t:'GLIM 영양평가 · 알부민·prealbumin·체중 변화', info:'albumin', lvl:'crit'},
+        {t:'경구영양보충(ONS) 사전 투여 (malnutrition/고위험 필수)', lvl:'crit'},
+        {t:'면역영양(omega-3, arginine) 5–7일 사전 투여', lvl:'warn'},
+        {t:'CFS·근감소증 평가 (65세+): grip strength, gait speed'},
+        {t:'RCRI 계산, ≥2 → BNP/NT-proBNP', info:'rcri'},
+        {t:'금연 최소 4주 이상'},
+        {t:'프리해빌리테이션 (유산소+저항)', lvl:'warn'},
+      ]},
+      {num:'02', title:'수술 당일 · 입원', sub:'D-0', items:[
+        {t:'금식: 고형식 6h, 탄수화물 음료 2h까지'},
+        {t:'예방적 항생제 절개 60분 이내 투여', lvl:'crit'},
+        {t:'정상 체온 유지 (warm air blanket)', lvl:'warn'},
+        {t:'혈당 &lt;180 mg/dL 유지', info:'hba1c'},
+        {t:'VTE 예방: 기계+약물 병용', lvl:'crit'},
+        {t:'경피 배액관·NG tube 루틴 사용 안 함 (개별화)'},
+        {t:'Dexamethasone 8 mg IV, 다중요법 진통'},
+      ]},
+      {num:'03', title:'수술 직후 · POD 0–2', sub:'회복실→병동', items:[
+        {t:'NEWS2 ≥5 → 즉시 담당의 콜', lvl:'crit'},
+        {t:'POD 1 clear liquid, POD 2–3 반유동식 (ERAS-GC)', lvl:'warn'},
+        {t:'조기 이상 POD 1 (문합부 부담 없음)', lvl:'warn'},
+        {t:'문합부 누출 감시: <code>지속 빈맥 &gt;120</code>, 미열, 좌견갑통', lvl:'crit'},
+        {t:'배액관 성상 감시 (혼탁·담즙·음식물 시 즉시 콜)', lvl:'crit'},
+        {t:'Troponin POD 1·2 (RCRI ≥2)', info:'rcri'},
+        {t:'다중요법 진통, 마약성 최소화'},
+        {t:'섬망 예방 (재지남, 낮 활동, 안경·보청기)'},
+      ]},
+      {num:'04', title:'회복·퇴원', sub:'POD 3–7+', items:[
+        {t:'단계적 식이: 반유동→죽→소량 다회식', lvl:'warn'},
+        {t:'덤핑증후군 교육 (저당, 식후 20–30분 누움)', lvl:'crit'},
+        {t:'B12·철·칼슘·Vit D 장기 감시 · 위전절제 특히', lvl:'crit'},
+        {t:'퇴원 시 체중·경구섭취량 문서화'},
+        {t:'섬망·기능 회복 평가 (65세+)'},
+        {t:'항암 후속치료 스케줄 협진'},
+      ]},
+    ],
+    baseRisk: {leak:2.5, vte:1.5, ssi:5.0, resp:8.0, aki:2.5, cv:2.0}
+  },
+  vhr: {
+    label: 'VHR · Ventral Hernia Repair / Abdominal Wall Reconstruction',
+    phases: [
+      {num:'01', title:'수술 전 최적화', sub:'4–12주 전', items:[
+        {t:'금연 최소 4주 (SSO/mesh 감염 결정 인자)', lvl:'crit'},
+        {t:'BMI &gt;35 → 체중감량 프로그램', lvl:'warn'},
+        {t:'HbA1c &lt;8% 목표', info:'hba1c', lvl:'crit'},
+        {t:'MRSA colonization screening + decolonization'},
+        {t:'큰 결손·LOD → botulinum toxin A 사전 주입 검토', lvl:'warn'},
+        {t:'이전 mesh 종류·감염 균주 문서 확인'},
+        {t:'RCRI · BNP (고령·대형 재건)', info:'rcri'},
+      ]},
+      {num:'02', title:'수술 당일 · 입원', sub:'D-0', items:[
+        {t:'예방적 항생제 절개 60분 이내, 3h 초과 시 재투여', lvl:'crit'},
+        {t:'클로르헥시딘 알코올 피부 소독'},
+        {t:'정상 체온·정상 혈당 유지', lvl:'warn'},
+        {t:'VTE 예방 (기계+약물)', lvl:'crit'},
+        {t:'다중요법 진통 (TAP block, ESP block)'},
+        {t:'대형 재건: 술중 배액관·복대 계획'},
+      ]},
+      {num:'03', title:'수술 직후 · POD 0–2', sub:'회복실→병동', items:[
+        {t:'복대(abdominal binder) 착용 교육', lvl:'warn'},
+        {t:'배액관 성상·양 매 8h 기록', lvl:'crit'},
+        {t:'조기 이상 (단, 무리한 복압 상승 회피)'},
+        {t:'상처 vacuum dressing 유지 (고위험 SSI 감소)', lvl:'warn'},
+        {t:'SpO₂·NEWS2 감시', info:'stopbang'},
+        {t:'로봇 접근: 술후 어깨통증·복부팽만감 설명'},
+      ]},
+      {num:'04', title:'회복·퇴원', sub:'POD 2–7+', items:[
+        {t:'Seroma: 무증상 자가흡수, <code>천자 금지</code> (감염 위험)', lvl:'crit'},
+        {t:'상처감염 조기 인지 (POD 3–7 홍반·화농)', lvl:'crit'},
+        {t:'복대 6주 착용 교육'},
+        {t:'복압 상승 활동 회피 4–6주 (기침·변비·중량 들기)'},
+        {t:'Mesh 관련 만성 통증·이상감각 감시'},
+        {t:'재발 감시: 1·3·6·12개월 진찰'},
+      ]},
+    ],
+    baseRisk: {leak:1.0, vte:1.0, ssi:8.0, resp:3.0, aki:1.0, cv:1.5}
+  }  ,
+  ih: {
+    label: 'IH · Inguinal Hernia Repair (Lichtenstein / TAPP / TEP)',
+    phases: [
+      {num:'01', title:'수술 전 최적화', sub:'D-14 ~ D-1', items:[
+        {t:'금연 최소 4주 (SSI·재발 감소)', lvl:'warn'},
+        {t:'HbA1c &lt;8%, 조절 안 되는 DM은 최적화 후', info:'hba1c', lvl:'warn'},
+        {t:'CPIP 위험 상담: 여성·젊은 나이·기존 통증·재발성 (17% 발생률)', lvl:'crit'},
+        {t:'재발성/양측성 → 복강경(TAPP·TEP) 우선 검토 (EHS 2023)', lvl:'warn'},
+        {t:'항응고제·항혈소판 관리 (일측 무합병 선택수술은 대부분 유지 가능)'},
+        {t:'감돈·교액 감별 (통증+구토+장폐색 징후 → 응급수술)', lvl:'crit'},
+        {t:'BPH·배뇨장애 확인 (척추마취 후 요폐 위험)'},
+      ]},
+      {num:'02', title:'수술 당일 · 입원', sub:'D-0 · Day Surgery', items:[
+        {t:'금식: 고형 6h · 맑은 음료 2h'},
+        {t:'예방적 항생제 개별화 — 저위험군 필수 아님 (EHS): 재발·복강경·mesh·고위험군만', lvl:'warn'},
+        {t:'마취 선택: 국소(개복 우선) / 척추 / 전신(복강경)'},
+        {t:'VTE 예방: Caprini ≥3 → LMWH+IPC (대부분 IH 저위험)', info:'caprini'},
+        {t:'다중요법 진통: Acetaminophen + NSAIDs + ilioinguinal 신경차단', lvl:'warn'},
+        {t:'복강경: CO₂ 압력 12 mmHg 이하 · 짧은 수술시간 유지'},
+        {t:'개복 Lichtenstein: 신경(ilioinguinal·iliohypogastric·genital branch) 식별·보존', lvl:'crit'},
+      ]},
+      {num:'03', title:'수술 직후 · POD 0–1', sub:'회복실→퇴원준비', items:[
+        {t:'Day surgery / one-night stay 원칙 (EHS 강력 권고)', lvl:'warn'},
+        {t:'조기 이상 (마취 회복 후 2–4h 이내)', lvl:'warn'},
+        {t:'배뇨 확인 — 척추마취·고령 남성·BPH: 요폐 감시', lvl:'crit'},
+        {t:'통증 재평가 (NRS ≥4 → 다중요법 강화)'},
+        {t:'상처 확인·혈종·seroma 관찰'},
+        {t:'복강경: 어깨통증·복부팽만감 설명 (CO₂ 잔여)'},
+        {t:'퇴원 기준: V/S 안정 · 자가배뇨 · 통증 조절 · 보호자 동반', lvl:'crit'},
+      ]},
+      {num:'04', title:'회복·퇴원', sub:'POD 1–7+', items:[
+        {t:'활동 재개: 통증 허용 범위 내 조기 재개 (EHS: 활동 제한 근거 부족)', lvl:'warn'},
+        {t:'중량 들기 2–4주 회피 (개별화)'},
+        {t:'창상 확인 (홍반·화농·이상 배액 시 외래)'},
+        {t:'재발 감시 (초기 6–12개월 최다), 만져지는 팽창 시 외래', lvl:'warn'},
+        {t:'CPIP 조기 인지: POD 30일+ 지속 통증 → 통증클리닉 협진', lvl:'crit'},
+        {t:'고환·음낭 감시 (부종·통증·크기변화) — 허혈성 부고환염/고환위축 위험', lvl:'warn'},
+        {t:'외래 f/u: 2주·3개월·1년 (재발·CPIP 감시)'},
+      ]},
+    ],
+    baseRisk: {leak:2.3, vte:0.5, ssi:1.5, resp:1.0, aki:0.5, cv:0.8}
+  }
+};
+
+/* ────────────────────── 2b. IH 전용 별도 지표 (재발·CPIP) 참고값 ────────────────────── */
+const IH_EXTRA = {
+  cpip_baseline: 17,  // Chu 2024 meta-analysis (n=29,466)
+  recurrence: {lichtenstein: 3.0, tapp: 1.7, tep: 1.7},
+  urinary_retention: 5, // 척추마취 후 3-10%
+};
+
+// dummy to keep original PROTOCOL closing consistent
+const PROTOCOL_DONE = true;
+
+
+/* ────────────────────── 3. 합병증 대처 지침 ────────────────────── */
+const COMPLICATIONS = {
+  mbs: [
+    {t:'문합부 누출 (Anastomotic Leak)', when:'POD 1–7', color:'',
+      signs:'지속 빈맥 &gt;120, 미열~고열, 좌견갑 방사통, 흉통, SpO₂ 저하, 배액관 성상 변화, 소변량 감소',
+      actions:['활력징후 15–30분 간격 재측정','ABGA + lactate + CRP + WBC 즉시','담당의 콜 (문서화)','금식·수액·항생제 대기','CT with oral contrast or gastrografin swallow 준비']},
+    {t:'폐색전 (PE) / DVT', when:'POD 0–14+', color:'',
+      signs:'원인불명 SpO₂ 저하, 빈맥, 흉통, 편측 하지 부종·통증',
+      actions:['SpO₂ 유지·산소 공급','12-lead ECG (S1Q3T3 확인)','D-dimer, troponin','CT PA 우선 (혈역학 안정 시)','LMWH 치료용량 시작 검토']},
+    {t:'술후 저산소증 (OSA/OHS)', when:'POD 0–1', color:'orange',
+      signs:'SpO₂ &lt;90%, 얕은 호흡, 각성 저하, CO₂ 축적 (졸림)',
+      actions:['반좌위 즉시','자기 CPAP/BiPAP 재개','ABGA로 PaCO₂ 확인','마약성 진통제 중단·재검토','호흡기내과·마취과 상의']},
+    {t:'PONV · 탈수', when:'POD 0–3', color:'amber',
+      signs:'반복 구토, 저혈압, 소변량 감소, 티아민 결핍 (Wernicke)',
+      actions:['5-HT3 antagonist + dexamethasone','IV 티아민 100 mg (필수)','수액 조기 시작','전해질 (K, Mg) 교정','ONS 재개']},
+    {t:'조기 저혈당', when:'POD 0–7', color:'amber',
+      signs:'발한, 진전, 어지럼, BGT &lt;70',
+      actions:['15 g 당류 경구 or D50W IV','15분 후 재측정','SU·insulin 재검토','내분비내과 협진']},
+    {t:'문합부 협착·SBO', when:'POD 14+', color:'orange',
+      signs:'구토 반복, 경구섭취 불가, 복통',
+      actions:['금식·NG 감압','조영검사 or CT','내시경 확장 or 재수술 협의','내부탈장 (Petersen defect) 배제']},
+  ],
+  gc: [
+    {t:'문합부 누출 (E-J, D-J)', when:'POD 3–7', color:'',
+      signs:'지속 빈맥, 발열, CRP 재상승, 배액관 혼탁·타액성·음식물, 좌견갑통',
+      actions:['활력징후 재측정 + NEWS2','ABGA + lactate + CRP + WBC + procalcitonin','금식·NG 감압·항생제','CT with oral contrast','재수술 vs 배액·스텐트 결정']},
+    {t:'수술부위감염 (SSI)', when:'POD 3–10', color:'',
+      signs:'창상 홍반·압통·화농성 배출, 발열',
+      actions:['상처 개방·배양·세척','표재성 vs 심부 vs 장기/공간 분류','항생제 (배양 근거)','필요시 창상 재봉합·VAC']},
+    {t:'술후 폐렴', when:'POD 2–5', color:'',
+      signs:'발열, 객담 증가, SpO₂ 저하, 흉부 청진 이상',
+      actions:['흉부 X-ray, 객담 배양','ABGA','조기 이상·기침·심호흡 훈련','경험적 항생제','호흡기내과 협진 (중증)']},
+    {t:'술후 섬망', when:'POD 1–5', color:'orange',
+      signs:'혼동, 지남력 저하, 야간 각성, 환각',
+      actions:['감염·저산소·저혈당·전해질 배제','비약물적 우선 (재지남, 낮 활동, 밤 수면, 안경·보청기)','다약제 재검토 (벤조·항콜린 중단)','필요시 haloperidol 소량 (QT 확인)']},
+    {t:'술후 출혈', when:'POD 0–3', color:'orange',
+      signs:'창백, 차가운 사지, pulse pressure 좁음, Hb 급강하, 배액관 붉은 성상 지속',
+      actions:['V/S 15분 간격, 소변량 감시','CBC·응고·혈액형·교차시험','수액·수혈 준비','수술장 대기 (재수술)']},
+    {t:'술후 장마비 vs SBO', when:'POD 3–7+', color:'amber',
+      signs:'복부 팽만, 구토, 배설 지연 5일+',
+      actions:['NG 감압 시작','전해질 (K·Mg) 교정','마약성 최소화','CT (기계적 폐색 배제)','재수술 vs 보존 결정']},
+  ],
+  vhr: [
+    {t:'Mesh 감염 (Deep SSI)', when:'POD 5–30+', color:'',
+      signs:'지속 발열, 창상 화농·누공, CRP 재상승',
+      actions:['상처 개방·배양','MRI 또는 CT (mesh 액체 저류)','장기 항생제 (배양)','다학제 (성형·감염) 협진','필요시 mesh 제거 재수술']},
+    {t:'Seroma', when:'POD 3–30', color:'amber',
+      signs:'수술 부위 팽창감, 파동감, 통증',
+      actions:['무증상 → 관찰 (자가흡수)','천자 금지 (감염 위험)','복대 착용 강화','감염 징후 시에만 배액·배양']},
+    {t:'상처감염 (표재성 SSI)', when:'POD 3–10', color:'',
+      signs:'창상 홍반·압통·화농',
+      actions:['배양 채취','국소 세척·개방','항생제 (배양 근거)','당뇨·흡연 재평가']},
+    {t:'복강내 고압 (ACS)', when:'POD 0–2', color:'',
+      signs:'복부 팽만, 요량 감소, PIP 상승, 저혈압, 하지 부종',
+      actions:['방광내 압력 측정 (&gt;20 mmHg 위험)','반복 측정','수액·근이완 검토','필요시 재개복 감압']},
+    {t:'술후 폐렴 (횡격막 부담)', when:'POD 2–5', color:'orange',
+      signs:'SpO₂ 저하, 얕은 호흡, 열',
+      actions:['진통 최적화 (복대 하 호흡 제한)','인센티브 스피로메트리','흉부 X-ray','재활 강화']},
+    {t:'만성 통증·mesh 이상감각', when:'POD 30+', color:'amber',
+      signs:'수술 부위 지속 통증, 이상감각, 조임',
+      actions:['통증 특성 문진 (신경병증성 여부)','국소 마취 진단블록 고려','통증클리닉 협진','재발 감별 (CT)']},
+  ]  ,
+  ih: [
+    {t:'CPIP (Chronic Postoperative Inguinal Pain)', when:'POD 30일+', color:'',
+      signs:'서혜부·음낭·대퇴부 지속 통증, 이상감각·저림·타는듯한 통증 (신경병증성)',
+      actions:['신경병증성 통증 여부 문진 (DN4·LANSS)','국소 마취 진단블록 (ilioinguinal·iliohypogastric·genital branch)','통증클리닉 협진','가바펜틴·프레가발린 시도','난치성: triple neurectomy 검토 (전문센터)']},
+    {t:'재발 (Recurrence)', when:'POD 6개월–5년', color:'orange',
+      signs:'서혜부 팽창감·통증 재출현, Valsalva 시 촉지',
+      actions:['이학적 검사 (기립·Valsalva)','초음파 or CT 확진','1차 재발: 반대측 접근법 (개복→복강경 or 역)','다학제 협의 (전문센터 의뢰)']},
+    {t:'수술부위감염·Mesh 감염', when:'POD 3–30+', color:'',
+      signs:'창상 홍반·화농·발열, 지속 CRP 상승, 만성 누공',
+      actions:['상처 개방·배양','표재성 SSI: 세척·항생제','심부/mesh 감염: MRI or CT','만성 mesh 감염: mesh 제거 검토','재발 우려 → 다학제 협진']},
+    {t:'혈종·Seroma', when:'POD 0–14', color:'amber',
+      signs:'서혜부·음낭 팽창감·파동감·색조 변화 (혈종은 자반)',
+      actions:['크기·통증 평가','대부분 자가흡수 (관찰)','대량 혈종·확대: 압박·냉찜질','천자 금지 (감염 위험, seroma)','응고 이상 재검토']},
+    {t:'요폐 (Urinary Retention)', when:'POD 0–1', color:'amber',
+      signs:'배뇨 불가·불편감, 방광 팽만 촉지, 초음파 방광용적 &gt;500 mL',
+      actions:['방광 스캔으로 확인','도뇨 (일시적)','원인: 척추마취·BPH·통증·수액 과다','α-blocker 검토 (BPH 병력)','48h 이상 지속 시 비뇨의학과 협진']},
+    {t:'고환·음낭 합병증', when:'POD 0–14', color:'orange',
+      signs:'고환 통증·부종·색조 변화, 발열, 정삭 압통',
+      actions:['이학적 검사 + Doppler 초음파 (혈류 확인)','허혈성 부고환염: 소염·항생제·관찰','고환위축은 만성 (수개월 후 크기 감소)','수술기록 확인 (정삭 손상 여부)','비뇨의학과 협진']},
+  ]
+};
+
+// dummy to keep original COMPLICATIONS closing consistent
+const COMPS_DONE = true;
+
+
+/* ────────────────────── 4. STOP-BANG: 팝업 체크 → 자동 계산 → 삽입 ────────────────────── */
+const SB_IDS = ['sb_s','sb_t','sb_o','sb_p','sb_b','sb_a','sb_n','sb_g'];
+
+function sbScore(){
+  return SB_IDS.reduce((s,id)=> s + (document.getElementById(id).checked ? 1 : 0), 0);
+}
+
+function syncAutoSB(){
+  const bmi = +document.getElementById('bmi').value;
+  const age = +document.getElementById('age').value;
+  const neck = +document.getElementById('neck').value;
+  const gen = document.getElementById('gender').value;
+  const b = bmi > 35, a = age > 50, n = neck > 40, g = gen === 'M';
+  document.getElementById('sb_b').checked = b;
+  document.getElementById('sb_a').checked = a;
+  document.getElementById('sb_n').checked = n;
+  document.getElementById('sb_g').checked = g;
+  document.getElementById('sbBStat').textContent = 'BMI ' + bmi;
+  document.getElementById('sbAStat').textContent = age + '세';
+  document.getElementById('sbNStat').textContent = neck + 'cm';
+  document.getElementById('sbGStat').textContent = g ? '남' : '여';
+}
+
+function sbMeta(score){
+  if(score >= 5){
+    return {label:'고위험', color:'var(--danger)',
+            short:'⚠ 고위험 (5–8)',
+            note:'수면다원검사 고려 · CPAP 준비 · 마약성 최소화'};
+  }
+  if(score >= 3){
+    return {label:'중등도', color:'var(--warn)',
+            short:'▲ 중등도 (3–4)',
+            note:'야간 SpO₂ · 반좌위 유지'};
+  }
+  return {label:'저위험', color:'var(--ok)',
+          short:'● 저위험 (0–2)',
+          note:'표준 감시'};
+}
+
+function renderSB(){
+  syncAutoSB();
+  const score = sbScore();
+  const meta = sbMeta(score);
+
+  // 사이드바 (삽입 지점)
+  const el = document.getElementById('sbScore');
+  el.textContent = score;
+  el.style.color = meta.color;
+  const rl = document.getElementById('sbRiskLabel');
+  rl.textContent = meta.short;
+  rl.className = 'sb-risklabel ' + (score >= 5 ? 'lv-danger' : score >= 3 ? 'lv-warn' : 'lv-ok');
+  document.getElementById('sbNote').textContent = score === 0
+    ? '「항목 체크하기」를 눌러 문진 항목을 체크하면 점수가 계산됩니다.'
+    : '팝업에서 항목을 체크할 때마다 점수가 자동 계산되어 위험도에 반영됩니다.';
+
+  // 팝업 내부
+  document.getElementById('sbModalNum').textContent = score;
+  document.getElementById('sbModalNum').style.color = meta.color;
+  const ml = document.getElementById('sbModalLabel');
+  ml.textContent = meta.label + ' · ' + score + '/8';
+  ml.style.color = meta.color;
+  document.getElementById('sbModalNote').textContent = meta.note;
+}
+
+function openSbModal(){
+  renderSB();
+  document.getElementById('sbModal').classList.add('open');
+}
+function closeSbModal(){
+  document.getElementById('sbModal').classList.remove('open');
+}
+document.getElementById('sbOpenBtn').onclick = openSbModal;
+document.getElementById('sbClose').onclick = closeSbModal;
+document.getElementById('sbModal').onclick = (e)=>{ if(e.target.id==='sbModal') closeSbModal(); };
+
+document.getElementById('sbApply').onclick = ()=>{
+  closeSbModal();
+  const el = document.getElementById('sbScore');
+  el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+};
+
+// 팝업 안 체크박스: 체크 시 즉시 점수 계산 + 위험도 반영
+SB_IDS.forEach(id=>{
+  document.getElementById(id).addEventListener('change', ()=>{ renderAll(); });
+});
+
+
+/* ────────────────────── 4b. Caprini VTE: 팝업 체크 → 자동 계산 → 삽입 ────────────────────── */
+const CAP_ITEMS = [
+  // 1점
+  {id:'c1_age41', pts:1, auto:'age41'},
+  {id:'c1_bmi25', pts:1, auto:'bmi25'},
+  {id:'c1_minor', pts:1}, {id:'c1_surg30', pts:1},
+  {id:'c1_vv', pts:1}, {id:'c1_ibd', pts:1}, {id:'c1_sw', pts:1},
+  {id:'c1_ami', pts:1}, {id:'c1_chf', pts:1}, {id:'c1_sep', pts:1},
+  {id:'c1_lung', pts:1}, {id:'c1_copd', pts:1},
+  {id:'c1_ocp', pts:1}, {id:'c1_preg', pts:1},
+  // 2점
+  {id:'c2_age60', pts:2, auto:'age60'},
+  {id:'c2_mal', pts:2, auto:'mal'},
+  {id:'c2_lap', pts:2, auto:'lap'},
+  {id:'c2_art', pts:2}, {id:'c2_cvc', pts:2},
+  {id:'c2_bed', pts:2}, {id:'c2_cast', pts:2},
+  // 3점
+  {id:'c3_age75', pts:3, auto:'age75'},
+  {id:'c3_vte', pts:3, auto:'vteH'},
+  {id:'c3_fam', pts:3}, {id:'c3_fv', pts:3}, {id:'c3_pt', pts:3},
+  {id:'c3_la', pts:3}, {id:'c3_acl', pts:3}, {id:'c3_hcy', pts:3},
+  {id:'c3_hit', pts:3}, {id:'c3_thr', pts:3},
+  // 5점
+  {id:'c5_stk', pts:5}, {id:'c5_trm', pts:5}, {id:'c5_frc', pts:5},
+  {id:'c5_art', pts:5}, {id:'c5_spi', pts:5},
+];
+
+function syncAutoCaprini(){
+  const age = +document.getElementById('age').value;
+  const bmi = +document.getElementById('bmi').value;
+  const vteH = document.getElementById('f_vte').checked;
+  const surg = currentSurg;
+  // 자동 체크 로직
+  const setAuto = (id, cond, stat)=>{
+    const el = document.getElementById(id);
+    if(el) el.checked = cond;
+    if(stat){
+      const se = document.getElementById(id + 's');
+      if(se) se.textContent = stat;
+    }
+  };
+  setAuto('c1_age41', age >= 41 && age <= 60, age + '세');
+  setAuto('c1_bmi25', bmi > 25, 'BMI ' + bmi);
+  setAuto('c2_age60', age >= 61 && age <= 74, age + '세');
+  // 활성 악성종양: 위암 탭에서 자동
+  setAuto('c2_mal', surg === 'gc', surg === 'gc' ? '위암 (자동)' : '');
+  // 45분+ 대수술: 이 대시보드 수술은 대부분 45분 초과 (IH만 개복 Lichtenstein 30-45분 가능)
+  const lap45 = surg !== 'ih';  // MBS/GC/VHR: 항상 참, IH: 개별 확인
+  setAuto('c2_lap', lap45 || false, surg === 'ih' ? '개별 확인 (수술 시간 기준)' : '≥45분 (수술 특성)');
+  setAuto('c3_age75', age >= 75, age + '세');
+  setAuto('c3_vte', vteH, vteH ? '있음' : '');
+}
+
+function capriniScore(){
+  return CAP_ITEMS.reduce((s,it)=> s + (document.getElementById(it.id).checked ? it.pts : 0), 0);
+}
+
+function capMeta(score){
+  if(score >= 7) return {label:'Highest', short:'⚠ Highest (≥7)', color:'var(--danger)', lv:'lv-danger',
+                         note:'기계적 + LMWH + 연장 예방 (10–35일)'};
+  if(score >= 5) return {label:'High', short:'⚠ High (5–6)', color:'var(--danger)', lv:'lv-danger',
+                         note:'기계적 + LMWH · 연장 예방 검토'};
+  if(score >= 3) return {label:'Moderate', short:'▲ Moderate (3–4)', color:'var(--warn)', lv:'lv-warn',
+                         note:'기계적 + LMWH'};
+  if(score >= 2) return {label:'Low', short:'● Low (2)', color:'var(--ok)', lv:'lv-ok',
+                         note:'기계적 예방 (IPC)'};
+  return {label:'Very Low', short:'● Very Low (0–1)', color:'var(--ok)', lv:'lv-ok',
+          note:'조기 이상만'};
+}
+
+function capMultiplier(score){
+  if(score >= 7) return 3.4;
+  if(score >= 5) return 2.6;
+  if(score >= 3) return 1.9;
+  if(score >= 2) return 1.4;
+  return 1.0;
+}
+
+function renderCaprini(){
+  syncAutoCaprini();
+  const score = capriniScore();
+  const meta = capMeta(score);
+  // 사이드바
+  const el = document.getElementById('capScore');
+  el.textContent = score;
+  el.style.color = meta.color;
+  document.getElementById('capMax').textContent = '점';
+  const rl = document.getElementById('capRiskLabel');
+  rl.textContent = meta.short;
+  rl.className = 'cap-risklabel ' + meta.lv;
+  document.getElementById('capNote').textContent =
+    'VTE 위험 배수 ×' + capMultiplier(score).toFixed(1) + ' 적용 → ' + meta.note;
+  // 팝업
+  document.getElementById('capModalNum').textContent = score;
+  document.getElementById('capModalNum').style.color = meta.color;
+  const ml = document.getElementById('capModalLabel');
+  ml.textContent = meta.label + ' · ' + score + '점';
+  ml.style.color = meta.color;
+  document.getElementById('capModalNote').textContent = meta.note;
+}
+
+function openCapModal(){ renderCaprini(); document.getElementById('capModal').classList.add('open'); }
+function closeCapModal(){ document.getElementById('capModal').classList.remove('open'); }
+document.getElementById('capOpenBtn').onclick = openCapModal;
+document.getElementById('capClose').onclick = closeCapModal;
+document.getElementById('capModal').onclick = (e)=>{ if(e.target.id==='capModal') closeCapModal(); };
+document.getElementById('capApply').onclick = ()=>{
+  closeCapModal();
+  const el = document.getElementById('capScore');
+  el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+};
+document.getElementById('capReset').onclick = ()=>{
+  CAP_ITEMS.forEach(it=>{
+    const el = document.getElementById(it.id);
+    if(el && !el.disabled) el.checked = false;
+  });
+  renderAll();
+};
+CAP_ITEMS.forEach(it=>{
+  document.getElementById(it.id).addEventListener('change', ()=>{ renderAll(); });
+});
+
+/* ────────────────────── 4c. Baseline 재보정 (localStorage) ────────────────────── */
+const DEFAULT_BASE = {
+  mbs: {leak:1.5, vte:1.2, ssi:2.0, resp:5.0, aki:1.0, cv:1.0},
+  gc:  {leak:2.5, vte:1.5, ssi:5.0, resp:8.0, aki:2.5, cv:2.0},
+  vhr: {leak:0.5, vte:1.0, ssi:8.0, resp:3.0, aki:1.0, cv:1.5},
+  ih:  {leak:2.3, vte:0.5, ssi:1.5, resp:1.0, aki:0.5, cv:0.8},
+};
+const RISK_META_CAL = [
+  {key:'leak', label:'문합부 누출'},
+  {key:'vte',  label:'VTE (DVT/PE)'},
+  {key:'ssi',  label:'수술부위감염'},
+  {key:'resp', label:'호흡기 합병증'},
+  {key:'aki',  label:'급성 신손상'},
+  {key:'cv',   label:'심혈관 이벤트'},
+];
+const CAL_KEY = 'surgWardCalibration_v1';
+
+function loadCalibration(){
+  try {
+    const raw = localStorage.getItem(CAL_KEY);
+    if(!raw) return null;
+    const d = JSON.parse(raw);
+    if(!d || typeof d !== 'object') return null;
+    return d;
+  } catch(e){ return null; }
+}
+function saveCalibration(d){
+  try { localStorage.setItem(CAL_KEY, JSON.stringify(d)); return true; }
+  catch(e){ return false; }
+}
+function effectiveBase(surg){
+  const cal = loadCalibration();
+  if(cal && cal[surg]) return {...DEFAULT_BASE[surg], ...cal[surg]};
+  return {...DEFAULT_BASE[surg]};
+}
+function calibrationApplied(){
+  const cal = loadCalibration();
+  if(!cal) return false;
+  for(const s of ['mbs','gc','vhr','ih']){
+    if(!cal[s]) continue;
+    for(const k of Object.keys(cal[s])){
+      if(Math.abs(cal[s][k] - DEFAULT_BASE[s][k]) > 0.001) return true;
+    }
+  }
+  return false;
+}
+
+let calCurrentTab = 'mbs';
+function renderCalFields(){
+  const surg = calCurrentTab;
+  const cal = loadCalibration() || {};
+  const cur = cal[surg] || {};
+  document.getElementById('calFields').innerHTML = RISK_META_CAL.map(({key,label})=>{
+    const def = DEFAULT_BASE[surg][key];
+    const val = (cur[key] !== undefined) ? cur[key] : def;
+    return `<div class="cal-field">
+      <label>${label} <span class="sub">기본 ${def}%</span></label>
+      <input type="number" step="0.1" min="0" max="50" data-key="${key}" value="${val}">
+    </div>`;
+  }).join('');
+}
+function calGatherFields(){
+  const surg = calCurrentTab;
+  const out = {};
+  document.querySelectorAll('#calFields input').forEach(el=>{
+    const k = el.dataset.key;
+    const v = parseFloat(el.value);
+    if(!isNaN(v)) out[k] = v;
+  });
+  return {surg, values: out};
+}
+function openCalModal(){
+  calCurrentTab = currentSurg;
+  document.querySelectorAll('.cal-tab').forEach(t=>{
+    t.classList.toggle('active', t.dataset.surg === calCurrentTab);
+  });
+  renderCalFields();
+  document.getElementById('calModal').classList.add('open');
+}
+function closeCalModal(){ document.getElementById('calModal').classList.remove('open'); }
+document.getElementById('calOpenBtn').onclick = openCalModal;
+document.getElementById('calClose').onclick = closeCalModal;
+document.getElementById('calModal').onclick = (e)=>{ if(e.target.id==='calModal') closeCalModal(); };
+document.querySelectorAll('.cal-tab').forEach(t=>{
+  t.onclick = ()=>{
+    // 저장하지 않고 탭 전환 시 현재 입력 임시 유지
+    const {surg, values} = calGatherFields();
+    const cal = loadCalibration() || {};
+    cal[surg] = {...(cal[surg]||{}), ...values};
+    // localStorage에는 저장 안 함 (Save 버튼에서만) — 세션 캐시로만
+    window._calDraft = window._calDraft || {};
+    window._calDraft[surg] = values;
+    calCurrentTab = t.dataset.surg;
+    document.querySelectorAll('.cal-tab').forEach(x=>x.classList.toggle('active', x.dataset.surg === calCurrentTab));
+    // 드래프트에 저장된 값 있으면 우선 표시
+    renderCalFields();
+    if(window._calDraft && window._calDraft[calCurrentTab]){
+      const draft = window._calDraft[calCurrentTab];
+      document.querySelectorAll('#calFields input').forEach(el=>{
+        if(draft[el.dataset.key] !== undefined) el.value = draft[el.dataset.key];
+      });
+    }
+  };
+});
+document.getElementById('calResetOne').onclick = ()=>{
+  document.querySelectorAll('#calFields input').forEach(el=>{
+    el.value = DEFAULT_BASE[calCurrentTab][el.dataset.key];
+  });
+};
+document.getElementById('calResetAll').onclick = ()=>{
+  if(!confirm('저장된 본원 보정값을 모두 삭제하고 문헌 기본값으로 되돌립니다. 진행하시겠습니까?')) return;
+  localStorage.removeItem(CAL_KEY);
+  window._calDraft = {};
+  renderCalFields();
+  renderAll();
+};
+document.getElementById('calSave').onclick = ()=>{
+  const {surg, values} = calGatherFields();
+  const cal = loadCalibration() || {};
+  // 세션 드래프트도 반영
+  if(window._calDraft){
+    Object.keys(window._calDraft).forEach(k=>{
+      cal[k] = {...(cal[k]||{}), ...window._calDraft[k]};
+    });
+  }
+  cal[surg] = {...(cal[surg]||{}), ...values};
+  saveCalibration(cal);
+  window._calDraft = {};
+  closeCalModal();
+  renderAll();
+};
+
+/* ────────────────────── 5. 위험도 계산 ────────────────────── */
+function calcRisk(surg){
+  const age = +document.getElementById('age').value;
+  const bmi = +document.getElementById('bmi').value;
+  const hba1c = +document.getElementById('hba1c').value;
+  const alb = +document.getElementById('alb').value;
+  const egfr = +document.getElementById('egfr').value;
+  const asa = +document.getElementById('asa').value;
+  const stopbang = sbScore();
+
+  const rcri = ['r_ihd','r_chf','r_cvd','r_ins','r_cr','r_hi']
+    .reduce((s,id)=>s+(document.getElementById(id).checked?1:0),0);
+
+  const smk = document.getElementById('f_smk').checked;
+  const osa = document.getElementById('f_osa').checked;
+  const ac = document.getElementById('f_ac').checked;
+  const str = document.getElementById('f_str').checked;
+  const vteH = document.getElementById('f_vte').checked;
+  const fra = document.getElementById('f_fra').checked;
+
+  const base = effectiveBase(surg);
+  let r = {...base};
+
+  // Caprini VTE 배수 (팝업 체크 기반, 자동 항목 포함)
+  const capScoreV = capriniScore();
+  r.vte *= capMultiplier(capScoreV);
+
+  if(hba1c >= 8) { r.leak *= 1.6; r.ssi *= 1.8; r.aki *= 1.2 }
+  else if(hba1c >= 7) { r.leak *= 1.2; r.ssi *= 1.3 }
+  if(alb < 3.0) { r.leak *= 1.7; r.ssi *= 1.5; r.resp *= 1.4 }
+  else if(alb < 3.5) { r.leak *= 1.2; r.ssi *= 1.2 }
+  if(smk) { r.ssi *= 1.6; r.resp *= 1.5; r.leak *= 1.3 }
+  if(bmi >= 50) { r.vte *= 1.8; r.resp *= 1.7; r.ssi *= 1.5 }
+  else if(bmi >= 40) { r.vte *= 1.4; r.resp *= 1.4; r.ssi *= 1.3 }
+  if(osa || stopbang >= 5) { r.resp *= 2.0 }
+  else if(stopbang >= 3) { r.resp *= 1.5 }
+  // VTE 과거력은 Caprini 3점으로 이미 반영됨 (중복 방지)
+  if(egfr < 45) { r.aki *= 2.5; r.cv *= 1.5 }
+  else if(egfr < 60) { r.aki *= 1.6 }
+  if(rcri >= 3) { r.cv *= 4.0 }
+  else if(rcri === 2) { r.cv *= 2.5 }
+  else if(rcri === 1) { r.cv *= 1.5 }
+  if(age >= 80) { r.cv *= 1.7; r.resp *= 1.4; r.aki *= 1.3 }
+  else if(age >= 70) { r.cv *= 1.3; r.resp *= 1.2 }
+  if(fra) { r.cv *= 1.5; r.resp *= 1.4 }
+  if(asa >= 4) { r.cv *= 2.0; r.resp *= 1.7; r.aki *= 1.5 }
+  else if(asa === 3) { r.cv *= 1.4; r.resp *= 1.3 }
+  if(str) { r.ssi *= 1.3 }
+
+  Object.keys(r).forEach(k=>{ r[k] = Math.min(35, Math.round(r[k]*10)/10) });
+  return r;
+}
+
+function riskLevel(v, th){
+  if(v <= th[0]) return 'risk-ok';
+  if(v <= th[1]) return 'risk-warn';
+  return 'risk-high';
+}
+
+const RISK_LABELS_BY_SURG = {
+  mbs: [
+    {key:'leak', label:'문합부 누출',            th:[1.5,4],   sub:'GJ/JJ 문합·SG staple line', evidenceKey:'e_leak_mbs'},
+    {key:'vte',  label:'VTE (DVT/PE)',           th:[1.5,3.5], sub:'90일 증상성',              evidenceKey:'e_vte'},
+    {key:'ssi',  label:'수술부위감염',            th:[3,8],     sub:'30일 전체 SSI',            evidenceKey:'e_ssi'},
+    {key:'resp', label:'호흡기 합병증',           th:[4,10],    sub:'저산소·재삽관·폐렴',        evidenceKey:'e_resp'},
+    {key:'aki',  label:'급성 신손상',             th:[2,5],     sub:'KDIGO stage 1+',           evidenceKey:'e_aki'},
+    {key:'cv',   label:'주요 심혈관 이벤트',       th:[1.5,4],   sub:'30일 MACE',                evidenceKey:'e_cv'},
+  ],
+  gc: [
+    {key:'leak', label:'문합부 누출',            th:[1.5,4],   sub:'E-J/G-J/D-J 문합',         evidenceKey:'e_leak_gc'},
+    {key:'vte',  label:'VTE (DVT/PE)',           th:[1.5,3.5], sub:'90일 증상성',              evidenceKey:'e_vte'},
+    {key:'ssi',  label:'수술부위감염',            th:[3,8],     sub:'30일 전체 SSI',            evidenceKey:'e_ssi'},
+    {key:'resp', label:'호흡기 합병증',           th:[4,10],    sub:'폐렴·재삽관',              evidenceKey:'e_resp_gc'},
+    {key:'aki',  label:'급성 신손상',             th:[2,5],     sub:'KDIGO stage 1+',           evidenceKey:'e_aki'},
+    {key:'cv',   label:'주요 심혈관 이벤트',       th:[1.5,4],   sub:'30일 MACE',                evidenceKey:'e_cv'},
+  ],
+  vhr: [
+    {key:'leak', label:'Enterotomy leak · 근막열개', th:[1,3],   sub:'iatrogenic bowel/장절제 후 문합·근막열개', evidenceKey:'e_leak_vhr'},
+    {key:'vte',  label:'VTE (DVT/PE)',           th:[1.5,3.5], sub:'90일 증상성',              evidenceKey:'e_vte'},
+    {key:'ssi',  label:'수술부위감염',            th:[3,8],     sub:'30일 SSI·mesh 감염 포함',  evidenceKey:'e_ssi_vhr'},
+    {key:'resp', label:'호흡기 합병증',           th:[4,10],    sub:'폐렴·재삽관',              evidenceKey:'e_resp'},
+    {key:'aki',  label:'급성 신손상',             th:[2,5],     sub:'KDIGO stage 1+',           evidenceKey:'e_aki'},
+    {key:'cv',   label:'주요 심혈관 이벤트',       th:[1.5,4],   sub:'30일 MACE',                evidenceKey:'e_cv'},
+  ],
+  ih: [
+    {key:'leak', label:'재발률 (1년)',            th:[2,4],     sub:'수술 문합 없음 · 대체 지표', evidenceKey:'e_leak_ih'},
+    {key:'vte',  label:'VTE (DVT/PE)',           th:[1,2],     sub:'90일 증상성',              evidenceKey:'e_vte_ih'},
+    {key:'ssi',  label:'수술부위감염',            th:[2,4],     sub:'30일 SSI',                evidenceKey:'e_ssi_ih'},
+    {key:'resp', label:'호흡기 합병증',           th:[2,5],     sub:'저산소·요폐 포함',          evidenceKey:'e_resp_ih'},
+    {key:'aki',  label:'급성 신손상',             th:[1,3],     sub:'KDIGO stage 1+',           evidenceKey:'e_aki'},
+    {key:'cv',   label:'주요 심혈관 이벤트',       th:[1,3],     sub:'30일 MACE',                evidenceKey:'e_cv'},
+  ],
+};
+// legacy variable for overallScore
+const RISK_LABELS = RISK_LABELS_BY_SURG.mbs;
+
+function overallScore(r, surg){
+  const w = {leak:2.5, vte:2, ssi:1.5, resp:1.5, aki:1.5, cv:2.5};
+  const labels = RISK_LABELS_BY_SURG[surg || currentSurg] || RISK_LABELS_BY_SURG.mbs;
+  let sum=0, tw=0;
+  labels.forEach(({key})=>{ sum += r[key]*w[key]; tw += w[key] });
+  return sum/tw;
+}
+function overallLabel(v){
+  if(v < 2) return {label:'낮음', color:'var(--ok)'};
+  if(v < 5) return {label:'중등도', color:'var(--warn)'};
+  if(v < 10) return {label:'고위험', color:'var(--danger)'};
+  return {label:'초고위험', color:'var(--danger)'};
+}
+
+/* ────────────────────── 6. 렌더링 ────────────────────── */
+let currentSurg = 'mbs';
+
+function renderAll(){
+  const surg = currentSurg;
+  const proto = PROTOCOL[surg];
+  document.getElementById('surgLabel').textContent = proto.label;
+  renderSB();
+  renderCaprini();
+  // 보정 배지
+  document.getElementById('calBadge').classList.toggle('hidden', !calibrationApplied());
+
+  const r = calcRisk(surg);
+  const labels = RISK_LABELS_BY_SURG[surg] || RISK_LABELS_BY_SURG.mbs;
+  document.getElementById('riskCards').innerHTML = labels.map(({key,label,th,sub,evidenceKey})=>{
+    const v = r[key];
+    const lv = riskLevel(v, th);
+    const w = Math.min(100, (v/15)*100);
+    return `<div class="rcard ${lv}">
+      <div class="rlabel">${label}<button class="info-btn" data-info="${evidenceKey}">i</button></div>
+      <div class="rval">${v.toFixed(1)}<span style="font-size:12px;font-weight:500;margin-left:2px">%</span></div>
+      <div class="rsub">${sub}</div>
+      <div class="rbar" style="--w:${w}%"></div>
+    </div>`;
+  }).join('');
+
+  const ov = overallScore(r, surg);
+  const ovl = overallLabel(ov);
+  const gEl = document.getElementById('overall');
+  gEl.textContent = ov.toFixed(1)+'%';
+  gEl.style.color = ovl.color;
+  const ol = document.getElementById('overallLabel');
+  ol.textContent = ovl.label;
+  ol.style.color = ovl.color;
+
+  document.getElementById('phases').innerHTML = proto.phases.map(p=>`
+    <div class="phase">
+      <div class="phase-head">
+        <div><div class="phase-num">${p.num}</div></div>
+        <div>
+          <div class="phase-title">${p.title}</div>
+          <div class="phase-sub">${p.sub}</div>
+        </div>
+      </div>
+      <ul>
+        ${p.items.map(it=>{
+          const cls = it.lvl ? it.lvl : '';
+          const info = it.info ? `<button class="info-btn" data-info="${it.info}">i</button>` : '';
+          return `<li class="${cls}"><span class="marker"></span><span class="txt">${it.t}</span>${info}</li>`;
+        }).join('')}
+      </ul>
+    </div>`).join('');
+
+  document.getElementById('compGrid').innerHTML = COMPLICATIONS[surg].map(c=>`
+    <div class="comp ${c.color||''}">
+      <h3>${c.t}</h3>
+      <div class="comp-when">${c.when}</div>
+      <div class="comp-sect"><div class="comp-lbl">위험 신호</div><div class="comp-body">${c.signs}</div></div>
+      <div class="comp-sect"><div class="comp-lbl">즉시 대응</div><div class="comp-body"><ol>${c.actions.map(a=>`<li>${a}</li>`).join('')}</ol></div></div>
+    </div>`).join('');
+
+  attachInfo();
+}
+
+/* ────────────────────── 7. 정보 팝업 (ⓘ) ────────────────────── */
+function attachInfo(){
+  document.querySelectorAll('.info-btn').forEach(b=>{
+    b.onclick = (e)=>{
+      e.stopPropagation();
+      const key = b.dataset.info;
+      // STOP-BANG ⓘ → 체크 팝업 열기
+      if(key === 'stopbang'){ openSbModal(); return; }
+      const d = INFO[key];
+      if(!d) return;
+      document.getElementById('mTitle').textContent = d.title;
+      document.getElementById('mBadge').textContent = d.badge;
+      document.getElementById('mBody').innerHTML = d.body;
+      document.getElementById('modal').classList.add('open');
+    };
+  });
+}
+document.getElementById('mClose').onclick = ()=>document.getElementById('modal').classList.remove('open');
+document.getElementById('modal').onclick = (e)=>{ if(e.target.id==='modal') document.getElementById('modal').classList.remove('open'); };
+
+/* ────────────────────── 8. 탭 + 입력 리스너 ────────────────────── */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    currentSurg = t.dataset.surg;
+    renderAll();
+  };
+});
+
+['age','bmi','hba1c','alb','egfr','asa','neck','gender',
+ 'r_ihd','r_chf','r_cvd','r_ins','r_cr','r_hi',
+ 'f_smk','f_osa','f_ac','f_str','f_vte','f_fra'
+].forEach(id=>{
+  document.getElementById(id).addEventListener('input', renderAll);
+  document.getElementById(id).addEventListener('change', renderAll);
+});
+
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape'){
+    document.getElementById('modal').classList.remove('open');
+    closeSbModal();
+    closeCapModal();
+    closeCalModal();
+  }
+});
+
+function updateTs(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('ts').textContent = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+updateTs();
+setInterval(updateTs, 60000);
+
+renderAll();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

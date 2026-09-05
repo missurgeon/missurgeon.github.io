@@ -1,0 +1,1427 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foley Catheter Decision Support · 입원 오더 보조</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F3EE;
+  --panel:#FFFFFF;
+  --ink:#0B1B2B;
+  --ink-2:#22384F;
+  --mute:#6B7683;
+  --line:#E4E0D6;
+  --line-2:#D3CEC0;
+
+  --tier-a:#0F5C5A;
+  --tier-a-soft:#E5F0EE;
+  --tier-b:#C7842A;
+  --tier-b-soft:#FBEEDA;
+  --tier-c:#8A2A1A;
+  --tier-c-soft:#F6DED4;
+
+  --accent:#D1462F;
+  --ok:#2F7A48;
+  --warn:#B8621B;
+  --danger:#8A2A1A;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Noto Sans KR','Inter',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-0.005em;
+  min-height:100vh;
+}
+.app{
+  max-width:1440px;
+  margin:0 auto;
+  padding:24px 28px 60px;
+}
+
+/* ---------- HEADER ---------- */
+.top{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:24px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--line-2);
+  margin-bottom:22px;
+}
+.brand{display:flex; gap:14px; align-items:center}
+.mark{
+  width:44px; height:44px; border-radius:10px;
+  background:var(--ink);
+  color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'JetBrains Mono',monospace;
+  font-weight:700; font-size:16px;
+  letter-spacing:-0.02em;
+  position:relative;
+}
+.mark::after{
+  content:""; position:absolute; right:-3px; bottom:-3px;
+  width:12px; height:12px; border-radius:50%;
+  background:var(--accent);
+  border:2px solid var(--bg);
+}
+.brand h1{
+  font-size:20px; font-weight:800; margin:0 0 2px;
+  letter-spacing:-0.015em;
+}
+.brand .sub{
+  font-size:12px; color:var(--mute);
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+}
+.top .meta{
+  display:flex; gap:20px; align-items:center;
+  font-size:12px; color:var(--mute);
+  font-family:'JetBrains Mono',monospace;
+}
+.top .meta b{color:var(--ink); font-weight:700}
+.top .badge{
+  padding:4px 10px; border-radius:999px;
+  background:var(--tier-a-soft); color:var(--tier-a);
+  font-weight:700; letter-spacing:0.06em; font-size:11px;
+}
+
+/* ---------- LAYOUT ---------- */
+.grid{
+  display:grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap:22px;
+  align-items:start;
+}
+@media (max-width:1120px){ .grid{ grid-template-columns:1fr } }
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow: 0 1px 2px rgba(11,27,43,0.04);
+}
+.card + .card{margin-top:18px}
+.card-head{
+  padding:16px 20px;
+  border-bottom:1px solid var(--line);
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+}
+.card-head h2{
+  font-size:14px; margin:0; font-weight:800;
+  letter-spacing:-0.005em;
+  display:flex; align-items:center; gap:10px;
+}
+.card-head h2 .step{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.18em;
+  background:var(--ink); color:#fff;
+  padding:3px 8px; border-radius:4px;
+  font-weight:700;
+}
+.card-head .hint{
+  font-size:11.5px; color:var(--mute);
+}
+
+/* ---------- FORM ---------- */
+.section{
+  padding:16px 20px;
+  border-bottom:1px dashed var(--line);
+}
+.section:last-child{border-bottom:none}
+.section h3{
+  font-size:11px; letter-spacing:0.16em; text-transform:uppercase;
+  color:var(--tier-a); margin:0 0 12px; font-weight:800;
+  font-family:'JetBrains Mono',monospace;
+  display:flex; align-items:center; gap:8px;
+}
+.row{
+  display:grid; grid-template-columns:repeat(2,1fr); gap:14px;
+  margin-bottom:12px;
+}
+.row-3{grid-template-columns:repeat(3,1fr)}
+.row-1{grid-template-columns:1fr}
+.field{
+  display:flex; flex-direction:column; gap:6px;
+}
+.field label{
+  font-size:12px; color:var(--ink-2); font-weight:600;
+  display:flex; align-items:center; gap:6px;
+}
+.field .desc{
+  font-size:10.5px; color:var(--mute); margin-top:-2px;
+}
+.field input[type="number"],
+.field select,
+.field input[type="text"]{
+  height:38px;
+  border:1px solid var(--line-2);
+  border-radius:8px;
+  padding:0 12px;
+  font-family:inherit; font-size:13px; color:var(--ink);
+  background:#fff;
+  transition:border 0.15s;
+}
+.field input:focus, .field select:focus{
+  outline:none; border-color:var(--ink);
+}
+.field .range-wrap{
+  display:flex; align-items:center; gap:12px;
+}
+.field input[type="range"]{
+  flex:1;
+  accent-color:var(--accent);
+}
+.field .range-val{
+  font-family:'JetBrains Mono',monospace; font-weight:700;
+  min-width:32px; text-align:right; font-size:14px;
+}
+.chip-group{
+  display:flex; flex-wrap:wrap; gap:8px;
+}
+.chip{
+  padding:8px 12px;
+  border:1px solid var(--line-2);
+  background:#fff;
+  border-radius:8px;
+  font-size:12.5px;
+  cursor:pointer;
+  user-select:none;
+  transition:all 0.12s;
+  color:var(--ink-2);
+  font-weight:500;
+  display:inline-flex; align-items:center; gap:6px;
+  position:relative;
+}
+.chip:hover{border-color:var(--ink)}
+.chip.on{
+  background:var(--ink); color:#fff; border-color:var(--ink);
+  font-weight:600;
+}
+.chip.tone-c.on{background:var(--tier-c); border-color:var(--tier-c)}
+.chip.tone-b.on{background:var(--tier-b); border-color:var(--tier-b)}
+.chip input{display:none}
+.chip .weight{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px; opacity:0.85;
+  background:rgba(255,255,255,0.18);
+  padding:2px 6px; border-radius:999px;
+  letter-spacing:0.05em;
+}
+.chip:not(.on) .weight{
+  background:var(--tier-b-soft); color:var(--tier-b);
+}
+.chip.tone-c:not(.on) .weight{
+  background:var(--tier-c-soft); color:var(--tier-c);
+}
+
+/* ---------- INFO PIN (?) ---------- */
+.pin{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:16px; height:16px; border-radius:50%;
+  background:transparent;
+  border:1px solid var(--line-2);
+  color:var(--mute);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; font-weight:700;
+  cursor:pointer;
+  transition:all 0.12s;
+  user-select:none;
+}
+.pin:hover{
+  background:var(--accent); color:#fff; border-color:var(--accent);
+}
+.pin.on{
+  background:var(--ink); color:#fff; border-color:var(--ink);
+}
+.chip .pin{
+  margin-left:2px;
+  background:rgba(255,255,255,0.7);
+}
+.chip.on .pin{
+  background:rgba(255,255,255,0.2); color:#fff; border-color:rgba(255,255,255,0.4);
+}
+
+/* ---------- IPSS BAND ---------- */
+.ipss-band{
+  display:flex; align-items:center; gap:12px;
+  background:var(--tier-a-soft);
+  border-radius:8px;
+  padding:10px 14px;
+  margin-top:6px;
+  font-size:12px;
+}
+.ipss-band .tag{
+  font-family:'JetBrains Mono',monospace;
+  font-weight:800; font-size:11px;
+  padding:3px 8px; border-radius:4px;
+  background:#fff; color:var(--tier-a);
+}
+.ipss-band.moderate{background:var(--tier-b-soft)}
+.ipss-band.moderate .tag{color:var(--tier-b)}
+.ipss-band.severe{background:var(--tier-c-soft)}
+.ipss-band.severe .tag{color:var(--tier-c)}
+.ipss-launch{
+  margin-left:auto; font-size:11px; color:var(--accent);
+  cursor:pointer; text-decoration:underline;
+  font-weight:700;
+}
+
+/* ---------- MODAL ---------- */
+.modal-scrim{
+  position:fixed; inset:0;
+  background:rgba(11,27,43,0.55);
+  display:none;
+  align-items:flex-start; justify-content:center;
+  z-index:100;
+  padding:60px 20px;
+  overflow-y:auto;
+  backdrop-filter:blur(2px);
+}
+.modal-scrim.on{display:flex}
+.modal{
+  background:#fff;
+  border-radius:14px;
+  max-width:720px; width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  overflow:hidden;
+  animation: slideUp 0.2s ease-out;
+}
+@keyframes slideUp{
+  from{opacity:0; transform:translateY(20px)}
+  to{opacity:1; transform:translateY(0)}
+}
+.modal-head{
+  padding:22px 26px 16px;
+  border-bottom:1px solid var(--line);
+  display:flex; justify-content:space-between; align-items:flex-start;
+  gap:16px;
+}
+.modal-head h3{
+  margin:0; font-size:20px; font-weight:800; letter-spacing:-0.01em;
+}
+.modal-head .abbr{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:0.16em;
+  color:var(--accent); text-transform:uppercase; margin-bottom:4px;
+  font-weight:700;
+}
+.modal-close{
+  background:transparent; border:1px solid var(--line-2);
+  width:32px; height:32px; border-radius:8px;
+  font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--mute);
+}
+.modal-close:hover{background:var(--ink); color:#fff; border-color:var(--ink)}
+.modal-body{
+  padding:20px 26px 24px;
+  font-size:13.5px;
+  line-height:1.6;
+  color:var(--ink-2);
+}
+.modal-body h4{
+  margin:16px 0 8px; font-size:12px;
+  letter-spacing:0.14em; text-transform:uppercase;
+  color:var(--tier-a); font-weight:800;
+  font-family:'JetBrains Mono',monospace;
+}
+.modal-body h4:first-child{margin-top:0}
+.modal-body p{margin:0 0 8px}
+.modal-body ul{margin:6px 0 10px; padding-left:20px}
+.modal-body li{margin-bottom:4px}
+.modal-body table{
+  width:100%; border-collapse:collapse; margin:8px 0 12px;
+  font-size:12.5px;
+}
+.modal-body th{
+  text-align:left; padding:8px 10px;
+  background:var(--tier-a-soft); color:var(--tier-a);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase;
+  border-bottom:1px solid var(--line);
+}
+.modal-body td{
+  padding:8px 10px; border-bottom:1px solid var(--line);
+}
+.modal-body .cite{
+  margin-top:12px; padding:10px 12px;
+  background:#FBFAF6;
+  border-left:3px solid var(--accent);
+  font-size:11.5px; color:var(--mute);
+}
+.modal-body .cite b{color:var(--ink)}
+
+/* IPSS calculator (inside modal) */
+.ipss-calc{
+  border:1px solid var(--line);
+  border-radius:10px;
+  overflow:hidden;
+  margin:8px 0 12px;
+}
+.ipss-q{
+  padding:10px 14px;
+  display:grid; grid-template-columns:1fr auto; gap:12px;
+  align-items:center;
+  border-bottom:1px solid var(--line);
+}
+.ipss-q:last-child{border-bottom:none}
+.ipss-q .q-txt{font-size:12.5px; color:var(--ink)}
+.ipss-q .q-txt small{display:block; color:var(--mute); font-size:11px; margin-top:2px}
+.ipss-q select{
+  height:32px; padding:0 10px;
+  border:1px solid var(--line-2); border-radius:6px;
+  background:#fff; font-family:inherit; font-size:12px;
+  min-width:120px;
+}
+.ipss-total{
+  padding:12px 16px;
+  background:var(--ink); color:#fff;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.ipss-total .n{
+  font-family:'JetBrains Mono',monospace;
+  font-size:22px; font-weight:800;
+}
+.ipss-total .band{
+  font-size:11px; padding:4px 10px; border-radius:999px;
+  background:#fff; color:var(--ink);
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:0.08em; font-weight:700;
+}
+.ipss-apply{
+  background:var(--accent); color:#fff; border:none;
+  padding:8px 14px; border-radius:6px; cursor:pointer;
+  font-family:inherit; font-weight:700; font-size:12px;
+  letter-spacing:0.06em; text-transform:uppercase;
+}
+.ipss-apply:hover{background:#B03A24}
+
+/* ---------- OUTPUT PANEL ---------- */
+.verdict{
+  padding:24px 24px 20px;
+  color:#fff;
+  transition:background 0.25s;
+}
+.verdict.tier-A{ background:linear-gradient(160deg,#0F5C5A 0%, #093836 100%) }
+.verdict.tier-B{ background:linear-gradient(160deg,#C7842A 0%, #8B5A11 100%) }
+.verdict.tier-C{ background:linear-gradient(160deg,#8A2A1A 0%, #4E170D 100%) }
+.verdict-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:0.2em;
+  opacity:0.85;
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:12px;
+}
+.verdict h2{
+  font-size:34px; margin:0; font-weight:800;
+  letter-spacing:-0.02em; line-height:1.05;
+}
+.verdict .verdict-sub{
+  margin-top:6px; font-size:14px; opacity:0.9; line-height:1.4;
+}
+.verdict .score-row{
+  margin-top:18px;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+}
+.score-tile{
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:10px;
+  padding:10px 12px;
+}
+.score-tile .k{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:0.15em; opacity:0.8;
+  text-transform:uppercase;
+}
+.score-tile .v{
+  font-size:22px; font-weight:800; margin-top:2px;
+  font-variant-numeric:tabular-nums;
+}
+.score-tile .u{font-size:12px; opacity:0.75; margin-left:4px}
+
+.reasoning{
+  padding:18px 22px;
+  background:#FBFAF6;
+  border-bottom:1px solid var(--line);
+}
+.reasoning h4{
+  font-size:11px; letter-spacing:0.16em; text-transform:uppercase;
+  color:var(--mute); margin:0 0 12px; font-weight:700;
+  font-family:'JetBrains Mono',monospace;
+}
+.reason-list{
+  list-style:none; padding:0; margin:0;
+  display:flex; flex-direction:column; gap:8px;
+}
+.reason-list li{
+  display:grid; grid-template-columns:auto 1fr auto; gap:12px;
+  align-items:center;
+  padding:10px 12px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:8px;
+  font-size:12.5px;
+}
+.reason-list li .dot{
+  width:8px; height:8px; border-radius:50%;
+  background:var(--tier-c);
+}
+.reason-list li.severity-b .dot{background:var(--tier-b)}
+.reason-list li.severity-a .dot{background:var(--tier-a)}
+.reason-list li .txt b{font-weight:700}
+.reason-list li .txt .cite{
+  display:block; color:var(--mute); font-size:11px; margin-top:2px;
+}
+.reason-list li .pts{
+  font-family:'JetBrains Mono',monospace;
+  font-weight:700; font-size:12px;
+  padding:3px 8px; border-radius:4px;
+  background:var(--tier-c-soft); color:var(--tier-c);
+}
+.reason-list li.severity-b .pts{background:var(--tier-b-soft); color:var(--tier-b)}
+.reason-list li.severity-a .pts{background:var(--tier-a-soft); color:var(--tier-a)}
+.reason-empty{
+  padding:14px; text-align:center; color:var(--mute); font-size:12px;
+  background:#fff; border:1px dashed var(--line-2); border-radius:8px;
+}
+
+/* order block */
+.order-block{
+  padding:18px 22px;
+}
+.order-block h4{
+  font-size:11px; letter-spacing:0.16em; text-transform:uppercase;
+  color:var(--mute); margin:0 0 12px; font-weight:700;
+  font-family:'JetBrains Mono',monospace;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.order-block h4 .actions{display:flex; gap:8px}
+.btn{
+  border:1px solid var(--line-2); background:#fff;
+  padding:6px 12px; border-radius:6px;
+  font-size:11px; font-weight:700; color:var(--ink);
+  cursor:pointer; font-family:inherit;
+  letter-spacing:0.05em; text-transform:uppercase;
+  transition:all 0.15s;
+}
+.btn:hover{background:var(--ink); color:#fff; border-color:var(--ink)}
+.btn.primary{background:var(--ink); color:#fff; border-color:var(--ink)}
+.btn.primary:hover{background:var(--accent); border-color:var(--accent)}
+.order-out{
+  background:#0B1B2B; color:#E8E4DA;
+  border-radius:10px;
+  padding:16px 18px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  line-height:1.7;
+  white-space:pre-wrap;
+  min-height:180px;
+}
+.order-out .k{color:#F5A896}
+.order-out .h{color:#8DDBD8; font-weight:700}
+.order-out .flag{color:#F1C46D}
+
+footer{
+  margin-top:26px; padding-top:16px; border-top:1px solid var(--line);
+  display:flex; justify-content:space-between; align-items:flex-start;
+  font-size:11px; color:var(--mute); gap:24px;
+}
+footer .refs b{color:var(--ink)}
+footer .refs{max-width:900px; line-height:1.65}
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="top">
+    <div class="brand">
+      <div class="mark">Fx</div>
+      <div>
+        <h1>Foley Catheter Decision Support</h1>
+        <div class="sub">개별 환자 판단 · 입원 오더 보조</div>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="badge">EVIDENCE-INFORMED</span>
+      <span>Rev. <b>2026-09-04</b></span>
+      <span>User · <b>missurgeon</b></span>
+    </div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+
+    <!-- LEFT: INPUT -->
+    <div>
+      <div class="card">
+        <div class="card-head">
+          <h2><span class="step">INPUT</span> 환자·수술 입력</h2>
+          <span class="hint">항목 옆의 <b style="color:var(--accent)">?</b>를 눌러 설명을 확인하세요</span>
+        </div>
+
+        <!-- Patient identity -->
+        <div class="section">
+          <h3>Identity <span class="pin" data-info="ID">?</span></h3>
+          <div class="row row-3">
+            <div class="field">
+              <label>환자 ID</label>
+              <input type="text" id="pid" value="HYU-2026-0018" placeholder="예: HYU-2026-0018">
+            </div>
+            <div class="field">
+              <label>병실 / 침상</label>
+              <input type="text" id="ward" value="8W-15B">
+            </div>
+            <div class="field">
+              <label>수술일</label>
+              <input type="text" id="opdate" value="2026-09-08">
+            </div>
+          </div>
+        </div>
+
+        <!-- Axis A: patient -->
+        <div class="section">
+          <h3>Axis A · 환자 요인 <span class="pin" data-info="axisA">?</span></h3>
+          <div class="row">
+            <div class="field">
+              <label>연령 <span class="pin" data-info="age">?</span><span id="ageVal" class="range-val" style="margin-left:auto"></span></label>
+              <div class="range-wrap">
+                <input type="range" id="age" min="18" max="90" value="66">
+              </div>
+              <div class="desc">RETAINER I: 65세↑ 남성 POUR 9.5%</div>
+            </div>
+            <div class="field">
+              <label>성별 <span class="pin" data-info="sex">?</span></label>
+              <select id="sex">
+                <option value="M" selected>남성 (Male)</option>
+                <option value="F">여성 (Female)</option>
+              </select>
+              <div class="desc">여성 POUR 2.97% (RETAINER I)</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>
+                <b>IPSS</b> 총점
+                <span class="pin" data-info="IPSS">?</span>
+                <span id="ipssVal" class="range-val" style="margin-left:auto"></span>
+              </label>
+              <div class="range-wrap">
+                <input type="range" id="ipss" min="0" max="35" value="12">
+              </div>
+              <div class="desc">7개 문항 × 0–5점 합산 (0–35)</div>
+              <div id="ipssBand" class="ipss-band">
+                <span class="tag">Mild</span>
+                <span id="ipssBandTxt">0–7 · 하부요로증상 경미</span>
+                <span class="ipss-launch" onclick="openIPSSCalc()">IPSS 계산기 열기 →</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>동반 위험 (다중 선택)</label>
+              <div class="chip-group">
+                <label class="chip tone-c" data-w="C"><input type="checkbox" data-flag="bph"><span>BPH · 요폐 병력</span><span class="weight">C</span><span class="pin" data-info="BPH">?</span></label>
+                <label class="chip tone-b" data-w="B"><input type="checkbox" data-flag="dm"><span>당뇨 (DM)</span><span class="weight">B</span><span class="pin" data-info="DM">?</span></label>
+                <label class="chip tone-b" data-w="B"><input type="checkbox" data-flag="anticho"><span>항콜린제 · 이뇨제 상시</span><span class="weight">B</span><span class="pin" data-info="anticho">?</span></label>
+                <label class="chip tone-b" data-w="B"><input type="checkbox" data-flag="constip"><span>변비</span><span class="weight">B</span><span class="pin" data-info="constip">?</span></label>
+                <label class="chip tone-c" data-w="C"><input type="checkbox" data-flag="selfcath"><span>자가도뇨 (CIC) 이력</span><span class="weight">C</span><span class="pin" data-info="CIC">?</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Axis B: Anatomy -->
+        <div class="section">
+          <h3>Axis B · 해부학적 요인 <span class="pin" data-info="axisB">?</span></h3>
+          <div class="row row-1">
+            <div class="field">
+              <label>해부학적 위험 인자</label>
+              <div class="chip-group">
+                <label class="chip tone-c"><input type="checkbox" data-flag="bladderhernia"><span>Bladder-in-hernia (sliding)</span><span class="weight">C</span><span class="pin" data-info="bladderhernia">?</span></label>
+                <label class="chip tone-c"><input type="checkbox" data-flag="scrotalS23"><span>Scrotal S2–S3</span><span class="weight">C</span><span class="pin" data-info="scrotal">?</span></label>
+                <label class="chip tone-c"><input type="checkbox" data-flag="suprapubic"><span>Suprapubic (M4/M5)</span><span class="weight">C</span><span class="pin" data-info="suprapubic">?</span></label>
+                <label class="chip tone-c"><input type="checkbox" data-flag="losOfDomain"><span>Loss of domain (LOD)</span><span class="weight">C</span><span class="pin" data-info="LOD">?</span></label>
+                <label class="chip tone-b"><input type="checkbox" data-flag="bilateral"><span>양측 (bilateral)</span><span class="weight">B</span><span class="pin" data-info="bilateral">?</span></label>
+                <label class="chip tone-b"><input type="checkbox" data-flag="largeDirect"><span>대형 direct / pantaloon</span><span class="weight">B</span><span class="pin" data-info="direct">?</span></label>
+                <label class="chip tone-b"><input type="checkbox" data-flag="recurrent"><span>재발성 탈장</span><span class="weight">B</span><span class="pin" data-info="recurrent">?</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Axis C: Procedure -->
+        <div class="section">
+          <h3>Axis C · 술기 요인 <span class="pin" data-info="axisC">?</span></h3>
+          <div class="row">
+            <div class="field">
+              <label>수술식 <span class="pin" data-info="procedure">?</span></label>
+              <select id="proc">
+                <option value="rTAPP_uni">rTAPP · 단측 (reducible)</option>
+                <option value="rTAPP_bi" selected>rTAPP · 양측 / 대형</option>
+                <option value="rTAPP_scr">rTAPP · scrotal S2–S3</option>
+                <option value="rIPOM">r-IPOM · 소규모 primary</option>
+                <option value="rRives">r-Rives-Stoppa (retromuscular)</option>
+                <option value="rTAR">r-TAR · component separation</option>
+                <option value="suprapubic">Suprapubic hernia (M4/M5)</option>
+              </select>
+              <div class="desc">술식 자체의 base tier가 자동 설정됩니다</div>
+            </div>
+            <div class="field">
+              <label>예상 수술시간 <span id="durVal" class="range-val" style="margin-left:auto"></span></label>
+              <div class="range-wrap">
+                <input type="range" id="dur" min="30" max="360" step="15" value="150">
+              </div>
+              <div class="desc">분 단위 · 도킹시간 포함</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Axis D: perioperative -->
+        <div class="section">
+          <h3>Axis D · 주술기 요인 <span class="pin" data-info="axisD">?</span></h3>
+          <div class="row">
+            <div class="field">
+              <label>마취 방식 <span class="pin" data-info="anesthesia">?</span></label>
+              <select id="anes">
+                <option value="GA" selected>전신마취 (GA)</option>
+                <option value="NRA">척추/경막외 (NRA)</option>
+                <option value="LA">국소 + 진정 (LA)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>기타</label>
+              <div class="chip-group">
+                <label class="chip tone-b"><input type="checkbox" data-flag="afterhours"><span>Out-of-hours</span><span class="weight">B</span><span class="pin" data-info="afterhours">?</span></label>
+                <label class="chip tone-b"><input type="checkbox" data-flag="pvr100"><span>술전 잔뇨 &gt; 100 mL</span><span class="weight">B</span><span class="pin" data-info="PVR">?</span></label>
+                <label class="chip tone-b"><input type="checkbox" data-flag="fluid1l"><span>계획 IV fluid &gt; 1 L</span><span class="weight">B</span><span class="pin" data-info="fluid">?</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: DECISION -->
+    <div>
+      <div class="card">
+        <div id="verdict" class="verdict tier-B">
+          <div class="verdict-tag">
+            <span>DECISION · TIER <span id="tierLetter">B</span></span>
+            <span id="confidence">CONFIDENCE · MODERATE</span>
+          </div>
+          <h2 id="verdictTitle">선택적 삽입 (In-and-out)</h2>
+          <div class="verdict-sub" id="verdictSub">수술 유도 후 삽입, 종료 시 발관. 회복실에서 잔뇨 모니터링.</div>
+          <div class="score-row">
+            <div class="score-tile">
+              <div class="k">Composite Score</div>
+              <div class="v"><span id="score">0</span><span class="u">/100</span></div>
+            </div>
+            <div class="score-tile">
+              <div class="k">Estimated POUR <span class="pin" data-info="POUR" style="border-color:rgba(255,255,255,0.4); color:#fff; opacity:0.8">?</span></div>
+              <div class="v"><span id="pour">6.0</span><span class="u">%</span></div>
+            </div>
+            <div class="score-tile">
+              <div class="k">Base Tier (술식)</div>
+              <div class="v" id="baseTier">B</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reasoning">
+          <h4>Reasoning · 판정에 기여한 인자</h4>
+          <ul id="reasonList" class="reason-list">
+            <li class="reason-empty">해당 없음. 기본 위험 프로파일.</li>
+          </ul>
+        </div>
+
+        <div class="order-block">
+          <h4>
+            <span>Auto-generated Order (draft) <span class="pin" data-info="TOV">?</span></span>
+            <span class="actions">
+              <button class="btn" onclick="copyOrder()">Copy</button>
+              <button class="btn primary" onclick="window.print()">Print</button>
+            </span>
+          </h4>
+          <div id="orderOut" class="order-out"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="refs">
+      <b>Evidence base</b> · Fafaj et al. JAMA Surg 2022 (RCT, n=491) · Croghan et al. RETAINER I, JAMA Surg 2023 (n=4,151) · Kim SG et al. J Minim Invasive Surg 2021 · Meddings MAP Criteria, BMJ Qual Saf 2019 · Tran HM et al. HerniaSurge Scrotal 2023 · SAGES LVHR · Stabilini et al. HerniaSurge Update, BJS Open 2023.
+      <br><br>
+      본 도구는 개인 연구·교육 목적의 임상 의사결정 보조 소프트웨어이며 개별 환자의 최종 결정은 다학제 판단과 기관 프로토콜을 따른다.
+    </div>
+    <div style="text-align:right; font-family:'JetBrains Mono',monospace; letter-spacing:0.06em;">
+      Decision Support · v1.1<br>
+      <span style="color:var(--accent); font-weight:700">missurgeon lab</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ================== MODAL ================== -->
+<div id="modalScrim" class="modal-scrim" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="abbr" id="modalAbbr">ABBR</div>
+        <h3 id="modalTitle">Title</h3>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+/* ================== INFO / ABBR DICTIONARY ================== */
+const INFO = {
+  ID: {
+    abbr: 'IDENTITY',
+    title: '환자 식별 정보',
+    body: `<p>대시보드에 입력되는 환자·병실·수술일은 <b>오더 draft에 자동 삽입</b>되며 로컬에 저장되지 않는다.</p>
+    <p>실제 사용 시에는 EMR의 환자 배너에서 복사해 사용한다.</p>`
+  },
+  axisA: {
+    abbr: 'AXIS A',
+    title: '환자 요인 (Patient factors)',
+    body: `<p>환자 개인의 <b>수술 전 요폐 위험</b>을 결정하는 축이다. RETAINER I(JAMA Surg 2023)의 다변량 분석에서 독립 위험인자로 확인된 항목을 반영한다.</p>
+    <h4>포함 변수</h4>
+    <ul>
+      <li>연령 · 성별</li>
+      <li>IPSS (하부요로증상 정도)</li>
+      <li>BPH · 요폐 병력 · 자가도뇨 이력</li>
+      <li>당뇨 · 항콜린제 · 이뇨제 · 변비</li>
+    </ul>`
+  },
+  axisB: {
+    abbr: 'AXIS B',
+    title: '해부학적 요인 (Anatomical factors)',
+    body: `<p><b>방광 근접도(bladder proximity)</b>와 수술 조작의 복잡도를 반영하는 축.</p>
+    <p>Bladder-in-hernia, suprapubic, scrotal S2–S3처럼 방광을 preperitoneal에서 견인/분리해야 하는 케이스는 방광 손상 및 요폐 위험이 함께 상승한다.</p>`
+  },
+  axisC: {
+    abbr: 'AXIS C',
+    title: '술기 요인 (Procedural factors)',
+    body: `<p>술식 자체가 갖는 <b>base tier</b>를 결정한다. MAP criteria(BMJ QS 2019)와 SAGES LVHR 가이드라인을 근거로 3-group으로 분류.</p>
+    <table>
+      <tr><th>Group</th><th>정의</th><th>예</th></tr>
+      <tr><td>1 (A)</td><td>catheter 없이 수술 가능</td><td>rTAPP 단측, small IPOM</td></tr>
+      <tr><td>2 (B)</td><td>수술중만 사용, 종료 전 발관</td><td>양측 rTAPP, 중형 IPOM</td></tr>
+      <tr><td>3 (C)</td><td>POD 1–4까지 유치</td><td>r-TAR, suprapubic, r-Rives</td></tr>
+    </table>`
+  },
+  axisD: {
+    abbr: 'AXIS D',
+    title: '주술기 요인 (Perioperative factors)',
+    body: `<p>마취·수액·수술 시간대 등 <b>변경 가능한(modifiable) 요인</b>. 조정으로 POUR을 낮출 수 있는 영역이다.</p>
+    <ul>
+      <li><b>척추/경막외 마취(NRA)</b>: HerniaSurge가 catheter 필요성 상승으로 명시</li>
+      <li><b>Out-of-hours</b>: RETAINER I 독립 위험인자</li>
+      <li><b>과다 IV fluid</b>: 방광 과충만 → 요폐</li>
+      <li><b>술전 잔뇨(PVR) &gt; 100 mL</b>: 배뇨 이상의 signal</li>
+    </ul>`
+  },
+
+  IPSS: {
+    abbr: 'IPSS',
+    title: 'International Prostate Symptom Score (국제전립선증상점수)',
+    body: `<p>WHO/AUA가 채택한 <b>하부요로증상(LUTS) 자가설문 도구</b>. 7개 문항 × 0–5점(하루 몇 회 발생하는지) 합산 → 0–35점.</p>
+    <h4>밴드 분류</h4>
+    <table>
+      <tr><th>점수</th><th>중증도</th><th>Foley 결정 영향</th></tr>
+      <tr><td>0–7</td><td>Mild</td><td>추가 위험 없음 (0 pt)</td></tr>
+      <tr><td>8–19</td><td>Moderate</td><td>+10 pt (Tier B 상향)</td></tr>
+      <tr><td>20–35</td><td>Severe</td><td>+20 pt (Tier C 상향)</td></tr>
+    </table>
+    <p style="margin-top:10px">본 대시보드는 아래의 <b>IPSS 계산기</b>로 7문항을 직접 입력해 총점을 산출할 수 있다.</p>
+    <div style="text-align:center; margin-top:12px">
+      <button class="ipss-apply" onclick="openIPSSCalc()">IPSS 계산기 열기</button>
+    </div>
+    <div class="cite"><b>Reference:</b> Barry MJ, Fowler FJ Jr, O'Leary MP, et al. The American Urological Association symptom index for benign prostatic hyperplasia. J Urol. 1992;148(5):1549-1557. · RETAINER I (JAMA Surg 2023)에서 preoperative risk stratification 도구로 채택.</div>`
+  },
+
+  age: {
+    abbr: 'AGE',
+    title: '연령 (Age)',
+    body: `<p>가장 잘 검증된 POUR 위험인자. RETAINER I 다변량 분석에서 <b>독립 위험인자</b>로 확인되었다.</p>
+    <h4>연령별 POUR 발생률 (RETAINER I, 남성)</h4>
+    <ul>
+      <li>&lt; 65세: 4.0%</li>
+      <li>≥ 65세: <b>9.5%</b> (2.4배)</li>
+    </ul>
+    <p>본 도구의 가중치: 60–64세 <b>+5</b>, 65–74세 <b>+10</b>, 75세 이상 <b>+15</b>.</p>`
+  },
+  sex: {
+    abbr: 'SEX',
+    title: '성별 (Sex)',
+    body: `<p>여성의 POUR 발생률은 <b>2.97%</b>로 남성 5.8%의 절반 수준(RETAINER I).</p>
+    <p>따라서 여성이면서 저위험 술식(rTAPP 단측, r-IPOM 소규모)일 때는 <b>-5 pt 보정</b>. 단 suprapubic·복벽재건에서는 방광 근접도가 우선하여 보정하지 않는다.</p>`
+  },
+
+  BPH: {
+    abbr: 'BPH',
+    title: 'Benign Prostatic Hyperplasia (양성 전립선비대증)',
+    body: `<p>전립선 조직의 양성 비대로 인해 요도 협착·잔뇨·야뇨·요폐가 발생하는 남성 노령기 질환.</p>
+    <h4>Foley 결정에서의 의미</h4>
+    <p>Kim SG(2021)의 국내 laparoscopic IHR 344례에서 BPH 병력의 단변량 OR = <b>6.51</b> (95% CI 2.56–16.56, p&lt;0.001). 다변량에서는 연령과의 공선성으로 소실되었으나 <b>독립적 counseling 가치</b>는 유지된다.</p>
+    <p>본 도구 가중치: <b>+15</b> (Tier C 축).</p>`
+  },
+  DM: {
+    abbr: 'DM',
+    title: 'Diabetes Mellitus (당뇨)',
+    body: `<p>자율신경계 이상으로 <b>diabetic cystopathy</b>(방광 감각 저하, 잔뇨 증가)를 유발할 수 있다.</p>
+    <p>Devin CL et al. SAGES 2017(n=354)에서 DM의 단변량 OR = <b>5.2</b>.</p>
+    <p>본 도구 가중치: <b>+8</b>.</p>`
+  },
+  anticho: {
+    abbr: 'ANTICHOLINERGIC · DIURETIC',
+    title: '항콜린제 · 이뇨제',
+    body: `<p><b>항콜린제</b>(예: oxybutynin, tolterodine, TCA, 1세대 항히스타민, 파킨슨 약물 일부)는 detrusor 수축을 억제해 <b>요폐를 유발</b>한다. RETAINER I에서 다변량 <b>독립 위험인자</b>로 확인.</p>
+    <p><b>이뇨제</b>는 술중 방광 과충만을 유발해 POUR 위험을 높인다.</p>
+    <p>가능하면 <b>수술 전날 저녁부터 중단</b>을 권고한다. 본 도구 가중치: <b>+10</b>.</p>`
+  },
+  constip: {
+    abbr: 'CONSTIPATION',
+    title: '변비',
+    body: `<p>만성 변비는 골반저·detrusor 기능 부전과 상관. RETAINER I 다변량 <b>독립 위험인자</b>.</p>
+    <p>본 도구 가중치: <b>+5</b>. 술 전 관장 등 대장 준비로 완화 가능.</p>`
+  },
+  CIC: {
+    abbr: 'CIC',
+    title: 'Clean Intermittent Catheterization (자가도뇨) 이력',
+    body: `<p>과거 <b>자가 청결 간헐 도뇨</b>를 시행한 이력이 있는 환자. 근본적 배뇨장애를 시사하며 POUR 위험이 매우 높다.</p>
+    <p>본 도구 가중치: <b>+20</b> (거의 확실히 Tier C).</p>`
+  },
+
+  bladderhernia: {
+    abbr: 'BLADDER-IN-HERNIA',
+    title: '방광이 탈장낭에 포함된 경우 (Sliding bladder hernia)',
+    body: `<p>대형 direct inguinal hernia에서 방광의 일부(주로 사구관)가 <b>sliding component</b>로 탈장낭 벽을 이루는 경우. 전체 서혜부탈장의 1–4%.</p>
+    <h4>Foley 결정에서의 의미</h4>
+    <ul>
+      <li>수술 중 방광 손상 위험 → catheter로 감압하여 시야 확보</li>
+      <li>Fixation 시 tacker/staple이 방광에 삽입될 위험 감소</li>
+      <li>RETAINER I <b>다변량 독립 위험인자</b></li>
+    </ul>
+    <p>본 도구 가중치: <b>+20</b> (자동 Tier C).</p>`
+  },
+  scrotal: {
+    abbr: 'SCROTAL S2–S3',
+    title: 'Scrotal Hernia (음낭 탈장, S2–S3 giant)',
+    body: `<p>HerniaSurge 2023 scrotal 분류:</p>
+    <table>
+      <tr><th>등급</th><th>정의</th></tr>
+      <tr><td>S1</td><td>대퇴 상부 1/3까지</td></tr>
+      <tr><td>S2</td><td>대퇴 중간 1/3까지</td></tr>
+      <tr><td>S3</td><td>대퇴 하부 1/3 이하 (giant)</td></tr>
+    </table>
+    <p>S2–S3에서는 방광 손상 4% 이상(Bansal series), 수술시간 길어짐, 술후 요폐 발생률 증가. HerniaSurge 2023이 <b>catheterization을 upgraded 권고</b>로 명시.</p>
+    <p>본 도구 가중치: <b>+15</b>.</p>`
+  },
+  suprapubic: {
+    abbr: 'SUPRAPUBIC M4/M5',
+    title: 'Suprapubic Hernia (치골상 탈장)',
+    body: `<p>EHS 분류 <b>M4 · M5</b>(치골 상연에서 4 cm 이내). 방광이 preperitoneal 공간을 차지하고 있어 <b>방광 견인·박리가 필수</b>이다.</p>
+    <p>SAGES LVHR: "탈장 위치가 catheter 여부를 결정한다"고 명시. 본 도구는 <b>+15</b>, 술식 자체를 base Tier C로 자동 배정.</p>`
+  },
+  LOD: {
+    abbr: 'LOD',
+    title: 'Loss of Domain (복강내용의 30% 이상 탈장)',
+    body: `<p>탈장낭에 <b>복강 내용의 30% 이상</b>이 만성적으로 위치한 상태. 재환원 시 급성 복부구획증후군 위험.</p>
+    <p>Sabbagh 방법(CT 볼륨 측정)으로 정의된다.</p>
+    <p>대개 r-TAR/component separation과 함께 수술 → 자동 Tier C. 본 도구 가중치: <b>+10</b>.</p>`
+  },
+  bilateral: {
+    abbr: 'BILATERAL',
+    title: '양측 (Bilateral) 탈장',
+    body: `<p>양측 rTAPP는 단측 대비 <b>수술시간·방광 조작 시간</b>이 증가한다. Foley base tier B 상향 요인.</p>
+    <p>본 도구 가중치: <b>+8</b>.</p>`
+  },
+  direct: {
+    abbr: 'DIRECT / PANTALOON',
+    title: '대형 direct / pantaloon 탈장',
+    body: `<p><b>Direct(내측형)</b> 탈장은 방광에 인접하고, <b>pantaloon</b>은 direct + indirect의 조합.</p>
+    <p>Hesselbach's triangle 내측 박리에서 방광 침범 위험 증가. 본 도구 가중치: <b>+6</b>.</p>`
+  },
+  recurrent: {
+    abbr: 'RECURRENT',
+    title: '재발성 탈장',
+    body: `<p>이전 수술로 유착·방광 노출 위험이 있다. Devin(SAGES 2017): 재발 수술의 단변량 OR <b>3.5</b> (p=0.008).</p>
+    <p>본 도구 가중치: <b>+6</b>.</p>`
+  },
+
+  procedure: {
+    abbr: 'PROCEDURE',
+    title: '수술식별 Base Tier',
+    body: `<table>
+      <tr><th>수술식</th><th>Base Tier</th><th>Base POUR</th></tr>
+      <tr><td>rTAPP 단측</td><td>A · Skip</td><td>4.0%</td></tr>
+      <tr><td>rTAPP 양측 / 대형</td><td>B · In-and-out</td><td>6.5%</td></tr>
+      <tr><td>rTAPP scrotal S2–S3</td><td>C · Indwelling</td><td>14.0%</td></tr>
+      <tr><td>r-IPOM 소규모</td><td>B · In-and-out</td><td>5.0%</td></tr>
+      <tr><td>r-Rives-Stoppa</td><td>C · Indwelling</td><td>11.0%</td></tr>
+      <tr><td>r-TAR</td><td>C · Indwelling</td><td>18.0%</td></tr>
+      <tr><td>Suprapubic M4/M5</td><td>C · Indwelling</td><td>15.0%</td></tr>
+    </table>
+    <h4>약자</h4>
+    <ul>
+      <li><b>rTAPP</b>: robotic Trans-Abdominal Pre-Peritoneal repair</li>
+      <li><b>r-IPOM</b>: robotic IntraPeritoneal Onlay Mesh</li>
+      <li><b>r-TAR</b>: robotic Transversus Abdominis Release</li>
+    </ul>`
+  },
+
+  anesthesia: {
+    abbr: 'ANESTHESIA',
+    title: '마취 방식',
+    body: `<ul>
+      <li><b>GA (General Anesthesia)</b>: 전신마취. 기본값.</li>
+      <li><b>NRA (Neuraxial Regional Anesthesia)</b>: 척추 · 경막외마취. Sacral autonomic block → detrusor 억제. HerniaSurge는 이 경우 catheter 필요성 상승을 명시.</li>
+      <li><b>LA (Local Anesthesia + sedation)</b>: 국소마취. 방광 기능 보존이 가장 좋다.</li>
+    </ul>
+    <p>NRA 선택 시 본 도구 가중치: <b>+8</b>.</p>`
+  },
+  afterhours: {
+    abbr: 'OUT-OF-HOURS',
+    title: '정규 외 시간 수술',
+    body: `<p>야간·주말·공휴일 수술. RETAINER I 다변량 <b>독립 위험인자</b>. 대체로 응급성·인력 여건과 관련.</p>
+    <p>본 도구 가중치: <b>+5</b>.</p>`
+  },
+  PVR: {
+    abbr: 'PVR',
+    title: 'Post-Void Residual (술전 잔뇨량)',
+    body: `<p>배뇨 직후 방광에 남은 소변량. 초음파(bladder scanner)로 측정.</p>
+    <ul>
+      <li>정상: &lt; 50 mL</li>
+      <li>경계: 50–100 mL</li>
+      <li><b>비정상: &gt; 100 mL</b> — 배뇨장애 signal</li>
+    </ul>
+    <p>본 도구는 &gt; 100 mL에서 <b>+10</b>.</p>`
+  },
+  fluid: {
+    abbr: 'IV FLUID',
+    title: '계획 IV Fluid > 1 L',
+    body: `<p>과다한 술중 수액은 방광을 과충만시켜 <b>detrusor overstretch</b>를 유발, 술후 POUR 위험 상승.</p>
+    <p>Enhanced Recovery(ERAS)에서는 <b>goal-directed fluid therapy</b>로 총량 제한 권고. 본 도구 가중치: <b>+5</b>.</p>`
+  },
+
+  POUR: {
+    abbr: 'POUR',
+    title: 'Post-Operative Urinary Retention (수술 후 요폐)',
+    body: `<p>정의(RETAINER I): <b>수술 후 1주일 이내 자발배뇨 불가능하여 방광 감압을 위한 catheterization이 필요한 경우</b>. Bladder scan은 진단의 25%에서만 사용됨.</p>
+    <h4>진단 기준</h4>
+    <ul>
+      <li>배뇨 실패 (failure to void) — 82.9%</li>
+      <li>Suprapubic 통증 — 48%</li>
+      <li>Palpable bladder — 28%</li>
+      <li>Bladder scan &gt; 500 mL — 8–13%</li>
+    </ul>
+    <h4>결과</h4>
+    <ul>
+      <li>UTI 발생 24–35%</li>
+      <li>재입원 원인의 51.8%</li>
+      <li>Day-case 실패 원인의 27.8%</li>
+    </ul>
+    <div class="cite"><b>Reference:</b> Croghan SM et al. RETAINER I, JAMA Surg 2023 (n=4,151, 32개국).</div>`
+  },
+
+  TOV: {
+    abbr: 'TOV / CAUTI',
+    title: 'Trial-of-Void & CAUTI',
+    body: `<h4>TOV (Trial-of-Void)</h4>
+    <p>유치 catheter 제거 후 자발배뇨 성공 여부를 시험하는 절차. 대개 POD 1 오전에 시행:</p>
+    <ol>
+      <li>Catheter 발관</li>
+      <li>4시간 이내 자발배뇨 시도</li>
+      <li>Bladder scan → PVR 측정</li>
+      <li>PVR &lt; 150 mL + 자발배뇨 &gt; 200 mL 2회 → <b>Pass</b></li>
+      <li>PVR &gt; 200 mL 반복 → <b>Fail</b> → 24–48h 재유치, 비뇨의학 협진</li>
+    </ol>
+    <h4>CAUTI (Catheter-Associated UTI)</h4>
+    <p>유치 catheter의 <b>가장 흔한 감염 합병증</b>. 위험은 유치 기간에 비례:</p>
+    <ul>
+      <li>24h 이내: &lt; 1%</li>
+      <li>48h 이후: 하루당 5–10% 누적</li>
+      <li>1주 유치: &gt; 25%</li>
+    </ul>
+    <p>따라서 catheter 사용 시 <b>매일 필요성 재평가 · 최단 기간 유치</b>가 원칙 (CDC 2024 guideline).</p>`
+  }
+};
+
+/* ================== MODAL LOGIC ================== */
+function openModal(key){
+  const info = INFO[key];
+  if (!info) return;
+  document.getElementById('modalAbbr').textContent = info.abbr;
+  document.getElementById('modalTitle').textContent = info.title;
+  document.getElementById('modalBody').innerHTML = info.body;
+  document.getElementById('modalScrim').classList.add('on');
+}
+function closeModal(){
+  document.getElementById('modalScrim').classList.remove('on');
+}
+document.addEventListener('keydown', e=>{ if (e.key==='Escape') closeModal(); });
+
+/* Bind info pins */
+document.querySelectorAll('.pin[data-info]').forEach(el=>{
+  el.addEventListener('click', e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    openModal(el.dataset.info);
+  });
+});
+
+/* ================== IPSS CALCULATOR (in-modal) ================== */
+function openIPSSCalc(){
+  const qs = [
+    "지난 한 달간, 소변을 다 본 후 <b>완전히 배뇨되지 않은 느낌</b>이 얼마나 자주 있었습니까?",
+    "지난 한 달간, 소변을 본 뒤 <b>2시간 이내 다시 소변</b>을 봐야 했던 적이 얼마나 자주 있었습니까?",
+    "지난 한 달간, 소변을 보는 도중 <b>소변 줄기가 끊어졌다가</b> 다시 나온 경우가 얼마나 자주 있었습니까?",
+    "지난 한 달간, 소변을 <b>참기 어려운 경우</b>가 얼마나 자주 있었습니까?",
+    "지난 한 달간, <b>소변 줄기가 약하다</b>고 느낀 적이 얼마나 자주 있었습니까?",
+    "지난 한 달간, 소변을 시작할 때 <b>힘을 주어야</b> 나왔던 적이 얼마나 자주 있었습니까?",
+    "지난 한 달간, 잠자리에 든 후 아침에 일어날 때까지 <b>몇 번이나 소변을 보러</b> 일어났습니까? (0=없음, 5=5회 이상)"
+  ];
+  const options = [
+    ['0','전혀 없음'],
+    ['1','5회 중 1회 미만'],
+    ['2','절반보다 훨씬 적게'],
+    ['3','약 절반'],
+    ['4','절반보다 많이'],
+    ['5','거의 항상']
+  ];
+  const optionsQ7 = [
+    ['0','0회'],['1','1회'],['2','2회'],['3','3회'],['4','4회'],['5','5회 이상']
+  ];
+
+  let html = `
+    <h4>IPSS 7-Question 자가설문</h4>
+    <p style="color:var(--mute); font-size:12px">각 문항 0–5점, 총 0–35점. 응답 후 <b>총점 반영</b>을 누르면 대시보드로 자동 입력됩니다.</p>
+    <div class="ipss-calc" id="ipssCalc">
+  `;
+  qs.forEach((q,i)=>{
+    const opts = (i===6 ? optionsQ7 : options)
+      .map(o=>`<option value="${o[0]}">${o[0]} · ${o[1]}</option>`).join('');
+    html += `
+      <div class="ipss-q">
+        <div class="q-txt">
+          <b>Q${i+1}.</b> ${q}
+        </div>
+        <select data-q="${i}" onchange="updateIPSSCalc()">${opts}</select>
+      </div>
+    `;
+  });
+  html += `</div>
+    <div class="ipss-total">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.16em; opacity:0.7; text-transform:uppercase">TOTAL SCORE</div>
+        <div class="n"><span id="ipssCalcTotal">0</span> / 35</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px">
+        <span class="band" id="ipssCalcBand">MILD</span>
+        <button class="ipss-apply" onclick="applyIPSSCalc()">총점 반영 →</button>
+      </div>
+    </div>
+    <div class="cite" style="margin-top:12px"><b>Reference:</b> Barry MJ et al. J Urol. 1992;148:1549. 국문 번역은 대한비뇨의학회 IPSS-K 참조.</div>
+  `;
+
+  document.getElementById('modalAbbr').textContent = 'IPSS · CALCULATOR';
+  document.getElementById('modalTitle').textContent = 'IPSS 계산기';
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalScrim').classList.add('on');
+  updateIPSSCalc();
+}
+function updateIPSSCalc(){
+  const selects = document.querySelectorAll('#ipssCalc select');
+  let total = 0;
+  selects.forEach(s=>total += +s.value);
+  document.getElementById('ipssCalcTotal').textContent = total;
+  const b = ipssBand(total);
+  const badge = document.getElementById('ipssCalcBand');
+  badge.textContent = b.name.toUpperCase();
+  badge.style.background = b.cls==='severe' ? '#F6DED4' :
+                           b.cls==='moderate' ? '#FBEEDA' : '#E5F0EE';
+  badge.style.color = b.cls==='severe' ? '#8A2A1A' :
+                      b.cls==='moderate' ? '#C7842A' : '#0F5C5A';
+}
+function applyIPSSCalc(){
+  const total = +document.getElementById('ipssCalcTotal').textContent;
+  const slider = document.getElementById('ipss');
+  slider.value = total;
+  slider.dispatchEvent(new Event('input'));
+  closeModal();
+}
+
+/* ================== STATE ================== */
+const state = {
+  age:66, sex:'M', ipss:12,
+  flags: new Set(),
+  proc:'rTAPP_bi',
+  dur:150,
+  anes:'GA'
+};
+
+const procMeta = {
+  rTAPP_uni:  {label:'rTAPP 단측',           baseTier:'A', basePOUR:4.0,  bladderProximity:1},
+  rTAPP_bi:   {label:'rTAPP 양측/대형',      baseTier:'B', basePOUR:6.5,  bladderProximity:2},
+  rTAPP_scr:  {label:'rTAPP scrotal S2–S3',  baseTier:'C', basePOUR:14.0, bladderProximity:3},
+  rIPOM:      {label:'r-IPOM 소규모',        baseTier:'B', basePOUR:5.0,  bladderProximity:1},
+  rRives:     {label:'r-Rives-Stoppa',       baseTier:'C', basePOUR:11.0, bladderProximity:2},
+  rTAR:       {label:'r-TAR / component sep',baseTier:'C', basePOUR:18.0, bladderProximity:3},
+  suprapubic: {label:'Suprapubic M4/M5',     baseTier:'C', basePOUR:15.0, bladderProximity:3}
+};
+
+function ipssBand(v){
+  if (v <= 7)  return {name:'Mild',      cls:'',         text:'0–7 · 경미'};
+  if (v <= 19) return {name:'Moderate',  cls:'moderate', text:'8–19 · 중등도 LUTS'};
+  return                {name:'Severe',    cls:'severe',   text:'20–35 · 심한 LUTS'};
+}
+
+/* ================== SCORE ENGINE ================== */
+function computeDecision(){
+  const reasons = [];
+  let score = 0;
+
+  const p = procMeta[state.proc];
+  let baseScore = {A:15, B:45, C:75}[p.baseTier];
+  score += baseScore;
+  reasons.push({
+    sev: p.baseTier==='C' ? 'c' : p.baseTier==='B' ? 'b' : 'a',
+    text: `<b>Base tier · ${p.baseTier}</b> — ${p.label}`,
+    cite: p.baseTier==='C' ? 'SAGES LVHR · MAP Group 3' :
+          p.baseTier==='B' ? 'MAP Group 2 (in-and-out)' :
+                             'MAP Group 1 (skip 가능)',
+    pts: `+${baseScore}`
+  });
+
+  if (state.age >= 75){
+    score += 15;
+    reasons.push({sev:'c', text:`<b>연령 ${state.age}세</b> — 75세 이상`, cite:'RETAINER I: 65+ POUR 9.5%', pts:'+15'});
+  } else if (state.age >= 65){
+    score += 10;
+    reasons.push({sev:'b', text:`<b>연령 ${state.age}세</b> — 65–74`, cite:'RETAINER I 독립 위험인자', pts:'+10'});
+  } else if (state.age >= 60){
+    score += 5;
+    reasons.push({sev:'a', text:`<b>연령 ${state.age}세</b> — 60–64`, cite:'경계선 위험', pts:'+5'});
+  }
+
+  if (state.sex === 'F' && !state.flags.has('suprapubic') && p.baseTier==='A'){
+    score -= 5;
+    reasons.push({sev:'a', text:`<b>여성</b> — POUR 위험 낮음`, cite:'RETAINER I: 여성 2.97%', pts:'-5'});
+  }
+
+  const band = ipssBand(state.ipss);
+  if (state.ipss >= 20){
+    score += 20;
+    reasons.push({sev:'c', text:`<b>IPSS ${state.ipss} · Severe</b> — 심한 LUTS`, cite:'RETAINER II nomogram signal', pts:'+20'});
+  } else if (state.ipss >= 8){
+    score += 10;
+    reasons.push({sev:'b', text:`<b>IPSS ${state.ipss} · Moderate</b> — 중등도 LUTS`, cite:'IPSS 8–19 위험 증가', pts:'+10'});
+  }
+
+  const flagRules = {
+    bph:            {w:15, sev:'c', label:'BPH · 요폐 병력',           cite:'Kim SG 2021 OR 6.51 (단변량)'},
+    selfcath:       {w:20, sev:'c', label:'자가도뇨 (CIC) 이력',      cite:'RETAINER I 독립 위험인자'},
+    bladderhernia:  {w:20, sev:'c', label:'Bladder-in-hernia',        cite:'RETAINER I 독립 · 방광 손상 위험'},
+    scrotalS23:     {w:15, sev:'c', label:'Scrotal S2–S3',            cite:'HerniaSurge 2023 upgraded'},
+    suprapubic:     {w:15, sev:'c', label:'Suprapubic M4/M5',         cite:'방광 preperitoneal dissection 필수'},
+    losOfDomain:    {w:10, sev:'c', label:'Loss of domain',            cite:'재재건 · 방광 재접근'},
+    dm:             {w:8,  sev:'b', label:'당뇨 (DM)',                 cite:'Devin SAGES 2017 OR 5.2'},
+    anticho:        {w:10, sev:'b', label:'항콜린제 · 이뇨제 상시',      cite:'RETAINER I 독립 위험인자'},
+    constip:        {w:5,  sev:'b', label:'변비',                       cite:'RETAINER I 독립 위험인자'},
+    bilateral:      {w:8,  sev:'b', label:'양측 rTAPP',                cite:'수술시간 상승'},
+    largeDirect:    {w:6,  sev:'b', label:'대형 direct / pantaloon',   cite:'방광 근접 상승'},
+    recurrent:      {w:6,  sev:'b', label:'재발성 탈장',                cite:'유착 · 방광 노출 위험'},
+    afterhours:     {w:5,  sev:'b', label:'Out-of-hours',              cite:'RETAINER I 독립 위험인자'},
+    pvr100:         {w:10, sev:'b', label:'술 전 잔뇨 > 100 mL',        cite:'수술 전 배뇨 이상'},
+    fluid1l:        {w:5,  sev:'b', label:'계획 IV fluid > 1 L',       cite:'과다 수액 → POUR 증가'}
+  };
+  state.flags.forEach(f=>{
+    const r = flagRules[f];
+    if (!r) return;
+    score += r.w;
+    reasons.push({sev:r.sev, text:`<b>${r.label}</b>`, cite:r.cite, pts:`+${r.w}`});
+  });
+
+  if (state.dur >= 180){
+    score += 12;
+    reasons.push({sev:'c', text:`<b>수술시간 ${state.dur}분</b> — 3시간 이상`, cite:'MAP Group 3 기준', pts:'+12'});
+  } else if (state.dur >= 120){
+    score += 6;
+    reasons.push({sev:'b', text:`<b>수술시간 ${state.dur}분</b>`, cite:'중간 길이', pts:'+6'});
+  }
+
+  if (state.anes === 'NRA'){
+    score += 8;
+    reasons.push({sev:'b', text:`<b>척추/경막외 마취 (NRA)</b>`, cite:'HerniaSurge: NRA는 catheter 필요성 상승', pts:'+8'});
+  }
+
+  score = Math.min(100, Math.max(0, score));
+
+  let tier;
+  if (score >= 60 || p.baseTier === 'C') tier = 'C';
+  else if (score >= 30 || p.baseTier === 'B') tier = 'B';
+  else tier = 'A';
+
+  let pour = p.basePOUR;
+  pour += Math.max(0, (state.age - 55)) * 0.15;
+  if (state.ipss >= 20) pour += 4;
+  else if (state.ipss >= 8) pour += 1.5;
+  if (state.flags.has('bph')) pour += 2;
+  if (state.flags.has('selfcath')) pour += 3;
+  if (state.flags.has('bladderhernia')) pour += 2;
+  if (state.sex === 'F' && !state.flags.has('suprapubic')) pour *= 0.55;
+  pour = Math.min(45, Math.max(1.5, pour));
+
+  return {tier, score, pour, reasons, base: p.baseTier, procLabel: p.label};
+}
+
+const tierMeta = {
+  A: {title:'Foley 생략',        sub:'술 전 배뇨 확인 후 삽입하지 않는다. 회복실에서 자발배뇨·잔뇨 모니터링.', conf:'HIGH'},
+  B: {title:'선택적 삽입 (In-and-out)', sub:'수술 유도 후 삽입, 종료 시 발관. 회복실 4시간 무배뇨 시 재삽입 고려.', conf:'MODERATE'},
+  C: {title:'표준 유치 · POD 0–1 발관 시도', sub:'유치 catheter 삽입, TOV(Trial-of-void)는 POD 1 오전. 실패 시 24–48시간 재유치.', conf:'HIGH'}
+};
+
+function render(){
+  const r = computeDecision();
+  const v = document.getElementById('verdict');
+  v.classList.remove('tier-A','tier-B','tier-C');
+  v.classList.add('tier-'+r.tier);
+  document.getElementById('tierLetter').textContent = r.tier;
+  document.getElementById('confidence').textContent = 'CONFIDENCE · ' + tierMeta[r.tier].conf;
+  document.getElementById('verdictTitle').textContent = tierMeta[r.tier].title;
+  document.getElementById('verdictSub').textContent = tierMeta[r.tier].sub;
+  document.getElementById('score').textContent = r.score;
+  document.getElementById('pour').textContent = r.pour.toFixed(1);
+  document.getElementById('baseTier').textContent = r.base;
+
+  const rl = document.getElementById('reasonList');
+  if (r.reasons.length === 0){
+    rl.innerHTML = '<li class="reason-empty">해당 없음. 기본 위험 프로파일.</li>';
+  } else {
+    rl.innerHTML = r.reasons.map(x => `
+      <li class="severity-${x.sev}">
+        <span class="dot"></span>
+        <span class="txt">${x.text}<span class="cite">${x.cite}</span></span>
+        <span class="pts">${x.pts}</span>
+      </li>
+    `).join('');
+  }
+
+  renderOrder(r);
+}
+
+function renderOrder(r){
+  const pid = document.getElementById('pid').value;
+  const ward = document.getElementById('ward').value;
+  const opdate = document.getElementById('opdate').value;
+  const now = new Date().toISOString().slice(0,16).replace('T',' ');
+
+  const orderByTier = {
+    A: `<span class="h">FOLEY ORDER · TIER A (SKIP)</span>
+<span class="k">□</span> 도뇨관 삽입 <span class="flag">보류(Do NOT insert)</span>
+<span class="k">□</span> 수술 직전 자발배뇨 확인 (Void within 30 min pre-op)
+<span class="k">□</span> 회복실 자발배뇨 목표 시간: 4시간
+<span class="k">□</span> 4시간 무배뇨 시: bladder scan → PVR &gt; 500 mL 이거나 8h 무배뇨 → straight cath
+<span class="k">□</span> CAUTI risk: 낮음. Foley 유치 회피.`,
+    B: `<span class="h">FOLEY ORDER · TIER B (SELECTIVE · IN-AND-OUT)</span>
+<span class="k">□</span> 수술 유도(anesthesia induction) 후 <span class="flag">14 Fr Foley 삽입</span>
+<span class="k">□</span> 수술 종료 시 <span class="flag">즉시 발관</span> (before leaving OR)
+<span class="k">□</span> 회복실 자발배뇨 목표: 4시간
+<span class="k">□</span> 4h 무배뇨 or PVR &gt; 400 mL → 재삽입, 24h 이내 재발관
+<span class="k">□</span> CAUTI 감시: 24h &lt; 유지, 필요성 매 shift 재평가`,
+    C: `<span class="h">FOLEY ORDER · TIER C (INDWELLING · POD 0–1)</span>
+<span class="k">□</span> 수술 유도 후 <span class="flag">16 Fr Foley 유치</span>
+<span class="k">□</span> 수술 중 소변량 시간당 기록 · closed drainage
+<span class="k">□</span> POD 1 오전 07:00 <span class="flag">TOV (Trial-of-void)</span>
+<span class="k">□</span> TOV 실패 (PVR &gt; 200 mL 반복) → 24–48h 재유치, 비뇨의학 협진
+<span class="k">□</span> 최종 발관 기준: PVR &lt; 150 mL, 자발배뇨 &gt; 200 mL 2회
+<span class="k">□</span> CAUTI 예방: 매일 필요성 재평가, POD 2 이후 유치 시 감염 감시`
+  };
+
+  document.getElementById('orderOut').innerHTML =
+`<span class="k">PATIENT   :</span> ${pid}   <span class="k">WARD:</span> ${ward}
+<span class="k">OP DATE   :</span> ${opdate}   <span class="k">GEN AT:</span> ${now}
+<span class="k">PROCEDURE :</span> ${r.procLabel}
+<span class="k">DECISION  :</span> TIER ${r.tier}   <span class="k">SCORE:</span> ${r.score}/100   <span class="k">POUR est:</span> ${r.pour.toFixed(1)}%
+────────────────────────────────────────────────────
+${orderByTier[r.tier]}
+────────────────────────────────────────────────────
+Signed __________________________  MD  Date ____________`;
+}
+
+function copyOrder(){
+  const txt = document.getElementById('orderOut').innerText;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const b = event.target;
+    const orig = b.textContent;
+    b.textContent = 'Copied ✓';
+    setTimeout(()=>{ b.textContent = orig; }, 1400);
+  });
+}
+
+/* ================== EVENT BINDING ================== */
+function bindRange(id, key, unit){
+  const el = document.getElementById(id);
+  const out = document.getElementById(id+'Val');
+  const upd = ()=>{
+    state[key] = +el.value;
+    out.textContent = el.value + (unit || '');
+    render();
+  };
+  el.addEventListener('input', upd);
+  upd();
+}
+bindRange('age','age','세');
+bindRange('ipss','ipss','');
+bindRange('dur','dur','분');
+
+document.getElementById('ipss').addEventListener('input', e=>{
+  const b = ipssBand(+e.target.value);
+  const band = document.getElementById('ipssBand');
+  band.classList.remove('moderate','severe');
+  if (b.cls) band.classList.add(b.cls);
+  band.querySelector('.tag').textContent = b.name;
+  document.getElementById('ipssBandTxt').textContent = b.text;
+});
+document.getElementById('ipss').dispatchEvent(new Event('input'));
+
+document.getElementById('sex').addEventListener('change', e=>{state.sex=e.target.value; render()});
+document.getElementById('proc').addEventListener('change', e=>{state.proc=e.target.value; render()});
+document.getElementById('anes').addEventListener('change', e=>{state.anes=e.target.value; render()});
+
+document.querySelectorAll('.chip input[type="checkbox"]').forEach(cb=>{
+  cb.addEventListener('change', e=>{
+    const flag = e.target.dataset.flag;
+    const chip = e.target.closest('.chip');
+    if (e.target.checked){
+      state.flags.add(flag); chip.classList.add('on');
+    } else {
+      state.flags.delete(flag); chip.classList.remove('on');
+    }
+    render();
+  });
+});
+
+['pid','ward','opdate'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>render());
+});
+
+render();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

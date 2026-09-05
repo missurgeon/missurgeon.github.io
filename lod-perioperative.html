@@ -1,0 +1,3742 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    
+    <title>복벽탈장(LOD) 수술 주술기 대시보드</title>
+    <style>
+      :root {
+        --bg: #f7f8fa;
+        --card: #ffffff;
+        --border: #e5e7eb;
+        --border-strong: #cbd5e1;
+        --text: #0f172a;
+        --muted: #64748b;
+        --primary: #1e40af;
+        --primary-2: #1d4ed8;
+        --primary-soft: #eff6ff;
+        --success: #16a34a;
+        --success-soft: #dcfce7;
+        --warning: #ea580c;
+        --warning-soft: #fff7ed;
+        --critical: #dc2626;
+        --critical-soft: #fef2f2;
+        --purple: #7c3aed;
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 6px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          'Noto Sans KR',
+          'Malgun Gothic',
+          'Apple SD Gothic Neo',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        font-size: 16px;
+        line-height: 1.55;
+        text-align: left;
+      }
+
+      /* ── 상단 히어로 바 ── */
+      .hero {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: #0f172a;
+        color: #fff;
+        padding: 14px 24px;
+        box-shadow: var(--shadow-lg);
+      }
+      .hero-inner {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        align-items: center;
+      }
+      .hero h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+      }
+      .hero .sub {
+        font-size: 13px;
+        color: #cbd5e1;
+        margin-top: 2px;
+      }
+      .hero .ver {
+        display: inline-block;
+        background: #1e40af;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 999px;
+        margin-left: 8px;
+      }
+      .patient-fill {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .patient-fill label {
+        display: flex;
+        flex-direction: column;
+        font-size: 11px;
+        color: #94a3b8;
+      }
+      .patient-fill input {
+        background: #1e293b;
+        color: #fff;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        padding: 6px 8px;
+        font-size: 13px;
+        width: 100px;
+        font-family: inherit;
+      }
+      .patient-fill input:focus {
+        outline: 2px solid #60a5fa;
+        outline-offset: 0;
+      }
+
+      /* ── 레이아웃 ── */
+      .layout {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: 20px;
+        padding: 20px 24px 120px;
+      }
+
+      /* ── 사이드바 ── */
+      .sidebar {
+        position: sticky;
+        top: 88px;
+        align-self: start;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 10px;
+        box-shadow: var(--shadow);
+        max-height: calc(100% - 100px);
+      }
+      .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--text);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        min-height: 44px;
+      }
+      .sidebar a:hover {
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+      .sidebar a.active {
+        background: var(--primary);
+        color: #fff;
+      }
+      .sidebar .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 6px 4px;
+      }
+
+      /* ── 메인 ── */
+      main {
+        min-width: 0;
+      }
+      section.card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        padding: 22px 24px;
+        margin-bottom: 20px;
+        scroll-margin-top: 100px;
+      }
+      section.card > h2 {
+        margin: 0 0 14px;
+        font-size: 20px;
+        font-weight: 800;
+        padding-left: 12px;
+        border-left: 4px solid var(--primary);
+        line-height: 1.3;
+      }
+      section.card > h2 .num {
+        display: inline-block;
+        background: var(--primary);
+        color: #fff;
+        padding: 1px 8px;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      section.card > h2.warn {
+        border-left-color: var(--warning);
+      }
+      section.card > h2.warn .num {
+        background: var(--warning);
+      }
+      section.card > h2.crit {
+        border-left-color: var(--critical);
+      }
+      section.card > h2.crit .num {
+        background: var(--critical);
+      }
+      section.card > h2.calc {
+        border-left-color: var(--purple);
+      }
+      section.card > h2.calc .num {
+        background: var(--purple);
+      }
+      section.card > h2.ok {
+        border-left-color: var(--success);
+      }
+      section.card > h2.ok .num {
+        background: var(--success);
+      }
+
+      .lead {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 0 0 14px;
+      }
+
+      /* ── 체크박스 ── */
+      .chk-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .chk {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 14px;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        cursor: pointer;
+        min-height: 44px;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .chk:hover {
+        background: #eef2ff;
+        border-color: #c7d2fe;
+      }
+      .chk input[type='checkbox'] {
+        width: 20px;
+        height: 20px;
+        margin: 2px 0 0 0;
+        flex-shrink: 0;
+        accent-color: var(--primary);
+      }
+      .chk .txt {
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+      .chk .why {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 2px;
+      }
+      .chk.checked {
+        background: var(--success-soft);
+        border-color: #86efac;
+      }
+      .chk.checked .txt::after {
+        content: ' ✓';
+        color: var(--success);
+        font-weight: 800;
+      }
+
+            /* 적용조건 상단 뱃지 */
+            .apply-4 {
+              display: grid;
+              grid-template-columns: repeat(4, 1fr);
+              gap: 10px;
+            }
+            .apply-group-label {
+              font-size: 12px;
+              font-weight: 800;
+              color: var(--muted);
+              letter-spacing: 0.5px;
+              margin: 14px 0 6px;
+              text-transform: uppercase;
+            }
+            /* 맞춤 권고 카드 */
+            .reco-wrap {
+              margin-top: 14px;
+              display: grid;
+              gap: 8px;
+            }
+            .reco {
+              display: none;
+              border-left: 4px solid var(--primary);
+              background: var(--primary-soft);
+              border-radius: 8px;
+              padding: 10px 14px 10px 12px;
+              font-size: 13.5px;
+              line-height: 1.5;
+              color: #1e3a8a;
+            }
+            .reco.show {
+              display: block;
+              animation: recoIn 0.2s ease-out;
+            }
+            @keyframes recoIn {
+              from { opacity: 0; transform: translateY(-3px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            .reco .r-title {
+              font-weight: 800;
+              font-size: 13.5px;
+              margin-bottom: 4px;
+              color: var(--primary);
+              display: flex;
+              align-items: center;
+              gap: 6px;
+            }
+            .reco .r-title .r-tag {
+              background: var(--primary);
+              color: #fff;
+              font-size: 10px;
+              padding: 1px 6px;
+              border-radius: 4px;
+              font-weight: 800;
+            }
+            .reco ul {
+              margin: 4px 0 0;
+              padding-left: 18px;
+            }
+            .reco li {
+              margin: 2px 0;
+            }
+            .reco.warn {
+              border-left-color: var(--warning);
+              background: var(--warning-soft);
+              color: #7c2d12;
+            }
+            .reco.warn .r-title { color: var(--warning); }
+            .reco.warn .r-title .r-tag { background: var(--warning); }
+            .reco.crit {
+              border-left-color: var(--critical);
+              background: var(--critical-soft);
+              color: #7f1d1d;
+            }
+            .reco.crit .r-title { color: var(--critical); }
+            .reco.crit .r-title .r-tag { background: var(--critical); }
+
+            /* ── 팝업 내 인터랙티브 환산 스티커 ── */
+            .conv-sticker {
+              margin: 12px 0;
+              padding: 12px 14px;
+              background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+              border: 2px dashed #d97706;
+              border-radius: 10px;
+              font-size: 13px;
+              box-shadow: 0 2px 6px rgba(217, 119, 6, 0.15);
+            }
+            .conv-sticker .cs-title {
+              font-weight: 800;
+              font-size: 13px;
+              color: #78350f;
+              margin-bottom: 8px;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+            }
+            .conv-sticker .cs-title .cs-badge {
+              background: #d97706;
+              color: #fff;
+              font-size: 10px;
+              padding: 2px 6px;
+              border-radius: 999px;
+              font-weight: 800;
+              letter-spacing: 0.3px;
+            }
+            .conv-sticker .cs-row {
+              display: grid;
+              grid-template-columns: 1fr auto 1fr;
+              gap: 8px;
+              align-items: center;
+            }
+            .conv-sticker .cs-side {
+              background: #fff;
+              border: 1px solid #d97706;
+              border-radius: 8px;
+              padding: 6px 8px;
+              display: flex;
+              flex-direction: column;
+              gap: 3px;
+            }
+            .conv-sticker .cs-side label {
+              font-size: 10.5px;
+              font-weight: 700;
+              color: #78350f;
+              text-transform: uppercase;
+              letter-spacing: 0.3px;
+            }
+            .conv-sticker .cs-side input {
+              border: none;
+              font-size: 20px;
+              font-weight: 800;
+              font-family: 'SF Mono', Menlo, monospace;
+              padding: 2px 4px;
+              width: 100%;
+              color: #7c2d12;
+              background: transparent;
+              text-align: center;
+              min-height: 34px;
+            }
+            .conv-sticker .cs-side input:focus {
+              outline: 2px solid #d97706;
+              border-radius: 4px;
+              background: #fffbeb;
+            }
+            .conv-sticker .cs-arrow {
+              font-size: 18px;
+              font-weight: 800;
+              color: #d97706;
+            }
+            .conv-sticker .cs-verdict {
+              margin-top: 10px;
+              padding: 8px 10px;
+              background: #fff;
+              border-radius: 8px;
+              text-align: center;
+              font-size: 13px;
+              font-weight: 700;
+              border: 1px solid #fde68a;
+              min-height: 34px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+            }
+            .conv-sticker .cs-verdict.g0 { color: #166534; background: #dcfce7; border-color: #86efac; }
+            .conv-sticker .cs-verdict.g1 { color: #854d0e; background: #fef9c3; border-color: #fde047; }
+            .conv-sticker .cs-verdict.g2 { color: #9a3412; background: #ffedd5; border-color: #fdba74; }
+            .conv-sticker .cs-verdict.g3, .conv-sticker .cs-verdict.g4 { color: #991b1b; background: #fee2e2; border-color: #fca5a5; }
+            .conv-sticker .cs-quick {
+              margin-top: 8px;
+              font-size: 11px;
+              color: #78350f;
+              text-align: center;
+              line-height: 1.5;
+            }
+            .conv-sticker .cs-quick b { color: #7c2d12; }
+            .conv-sticker .cs-quick .qp {
+              display: inline-block;
+              background: #fff;
+              padding: 2px 8px;
+              border-radius: 999px;
+              margin: 2px 3px;
+              border: 1px solid #fde68a;
+              cursor: pointer;
+              font-weight: 700;
+            }
+            .conv-sticker .cs-quick .qp:hover { background: #fef3c7; }
+
+            /* ── 의학용어 툴팁 시스템 ── */
+            .term {
+              cursor: pointer;
+              border-bottom: 1.5px dotted var(--primary);
+              color: var(--primary);
+              font-weight: 700;
+              padding: 0 1px;
+              transition: background 0.15s;
+            }
+            .term:hover, .term:focus {
+              background: var(--primary-soft);
+              outline: none;
+              border-radius: 3px;
+            }
+            .term::after {
+              content: 'ⓘ';
+              font-size: 0.75em;
+              margin-left: 2px;
+              vertical-align: super;
+              opacity: 0.7;
+            }
+            /* 툴팁 모달 (범용) */
+            .term-modal-back {
+              display: none;
+              position: fixed;
+              inset: 0;
+              background: rgba(15, 23, 42, 0.6);
+              z-index: 100;
+              align-items: center;
+              justify-content: center;
+              padding: 20px;
+            }
+            .term-modal-back.show { display: flex; }
+            .term-modal {
+              background: #fff;
+              border-radius: 16px;
+              max-width: 720px;
+              width: 100%;
+              max-height: calc(100vh - 40px);
+              overflow-y: auto;
+              padding: 24px 28px;
+              box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+              position: relative;
+            }
+            .term-modal h3 {
+              margin: 0 0 4px;
+              font-size: 22px;
+              color: var(--primary);
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            }
+            .term-modal .abbr {
+              background: var(--primary);
+              color: #fff;
+              font-size: 12px;
+              padding: 3px 8px;
+              border-radius: 4px;
+              font-weight: 800;
+              letter-spacing: 0.5px;
+            }
+            .term-modal .full {
+              color: var(--muted);
+              font-size: 13px;
+              font-style: italic;
+              margin: 0 0 14px;
+            }
+            .term-modal .close-x {
+              position: absolute;
+              right: 14px;
+              top: 14px;
+              background: #f1f5f9;
+              border: none;
+              width: 36px;
+              height: 36px;
+              border-radius: 50%;
+              font-size: 20px;
+              cursor: pointer;
+              font-weight: 700;
+              color: var(--text);
+            }
+            .term-modal .close-x:hover { background: #e2e8f0; }
+            .term-modal .def-box {
+              background: var(--primary-soft);
+              border-left: 4px solid var(--primary);
+              padding: 12px 14px;
+              border-radius: 8px;
+              margin: 10px 0 14px;
+              font-size: 15px;
+              line-height: 1.55;
+            }
+            .term-modal h4 {
+              margin: 16px 0 6px;
+              font-size: 15px;
+              font-weight: 800;
+              color: var(--text);
+              padding-left: 8px;
+              border-left: 3px solid var(--warning);
+            }
+            .term-modal .steps {
+              counter-reset: step;
+              padding-left: 0;
+              list-style: none;
+              margin: 8px 0;
+            }
+            .term-modal .steps li {
+              counter-increment: step;
+              padding: 10px 12px 10px 44px;
+              position: relative;
+              background: #f8fafc;
+              border-radius: 8px;
+              margin-bottom: 6px;
+              font-size: 14px;
+              line-height: 1.5;
+              border: 1px solid var(--border);
+            }
+            .term-modal .steps li::before {
+              content: counter(step);
+              position: absolute;
+              left: 10px;
+              top: 50%;
+              transform: translateY(-50%);
+              background: var(--warning);
+              color: #fff;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 800;
+              font-size: 13px;
+            }
+            .term-modal table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 8px 0;
+              font-size: 13.5px;
+            }
+            .term-modal table th, .term-modal table td {
+              border: 1px solid var(--border);
+              padding: 6px 10px;
+              text-align: left;
+            }
+            .term-modal table th {
+              background: #f1f5f9;
+              font-weight: 700;
+              font-size: 12.5px;
+            }
+            .term-modal .tip {
+              background: #fef3c7;
+              border-left: 4px solid var(--warning);
+              padding: 10px 12px;
+              border-radius: 6px;
+              margin-top: 12px;
+              font-size: 13.5px;
+              color: #78350f;
+              line-height: 1.5;
+            }
+            .term-modal .tip b { color: #9a3412; }
+            .term-modal .warn-box {
+              background: var(--critical-soft);
+              border-left: 4px solid var(--critical);
+              padding: 10px 12px;
+              border-radius: 6px;
+              margin-top: 10px;
+              font-size: 13.5px;
+              color: #7f1d1d;
+              line-height: 1.5;
+            }
+            .term-modal .ref {
+              font-size: 11.5px;
+              color: var(--muted);
+              margin-top: 14px;
+              padding-top: 10px;
+              border-top: 1px dashed var(--border);
+              font-style: italic;
+            }
+            .term-modal ul { padding-left: 20px; margin: 6px 0; }
+            .term-modal ul li { margin: 3px 0; line-height: 1.5; font-size: 14px; }
+
+            /* 실무 매뉴얼 버튼 (섹션 내 배치) */
+            .howto-btn {
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              margin-left: 8px;
+              padding: 4px 10px;
+              background: var(--purple);
+              color: #fff;
+              border: none;
+              border-radius: 6px;
+              font-size: 12px;
+              font-weight: 700;
+              cursor: pointer;
+              font-family: inherit;
+            }
+            .howto-btn:hover { filter: brightness(1.1); }
+
+            /* ── EMR 복사 버튼 (섹션 헤더 우측) ── */
+            section.card > h2 {
+              display: flex;
+              align-items: center;
+              flex-wrap: wrap;
+              gap: 8px;
+            }
+            .emr-copy {
+              margin-left: auto;
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              padding: 7px 12px;
+              background: var(--success);
+              color: #fff;
+              border: none;
+              border-radius: 8px;
+              font-size: 13px;
+              font-weight: 700;
+              cursor: pointer;
+              font-family: inherit;
+              min-height: 36px;
+              transition: background 0.15s;
+            }
+            .emr-copy:hover { background: #15803d; }
+            .emr-copy:active { transform: translateY(1px); }
+            .emr-copy.copied {
+              background: var(--primary);
+              animation: pulseCopy 0.5s ease-out;
+            }
+            @keyframes pulseCopy {
+              0% { transform: scale(1); }
+              50% { transform: scale(1.06); }
+              100% { transform: scale(1); }
+            }
+            .emr-copy::before {
+              content: '📋';
+              font-size: 14px;
+            }
+            .emr-copy.copied::before { content: '✅'; }
+
+            /* 전체 요약 툴바 (히어로 아래 고정) */
+            .emr-toolbar {
+              max-width: 1400px;
+              margin: 0 auto 16px;
+              padding: 12px 24px;
+              display: flex;
+              gap: 10px;
+              flex-wrap: wrap;
+              align-items: center;
+              background: linear-gradient(135deg, #ecfccb 0%, #d9f99d 100%);
+              border: 2px solid #84cc16;
+              border-radius: 12px;
+              box-shadow: var(--shadow);
+            }
+            .emr-toolbar .label {
+              font-size: 13px;
+              font-weight: 800;
+              color: #365314;
+              margin-right: 4px;
+            }
+            .emr-toolbar .btn-all {
+              padding: 10px 18px;
+              background: #365314;
+              color: #fff;
+              border: none;
+              border-radius: 8px;
+              font-size: 14px;
+              font-weight: 800;
+              cursor: pointer;
+              font-family: inherit;
+              min-height: 44px;
+            }
+            .emr-toolbar .btn-all:hover { background: #1a2e05; }
+            .emr-toolbar .btn-preview {
+              padding: 10px 14px;
+              background: #fff;
+              color: #365314;
+              border: 1.5px solid #84cc16;
+              border-radius: 8px;
+              font-size: 13px;
+              font-weight: 700;
+              cursor: pointer;
+              font-family: inherit;
+              min-height: 44px;
+            }
+            .emr-toolbar .btn-preview:hover { background: #f7fee7; }
+            .emr-toolbar .status {
+              font-size: 12px;
+              color: #365314;
+              margin-left: auto;
+              font-weight: 600;
+              opacity: 0.7;
+            }
+
+            /* EMR 미리보기 모달 */
+            .emr-preview-back {
+              display: none;
+              position: fixed;
+              inset: 0;
+              background: rgba(15, 23, 42, 0.6);
+              z-index: 100;
+              align-items: center;
+              justify-content: center;
+              padding: 20px;
+            }
+            .emr-preview-back.show { display: flex; }
+            .emr-preview {
+              background: #fff;
+              border-radius: 16px;
+              max-width: 780px;
+              width: 100%;
+              max-height: calc(100vh - 40px);
+              overflow: hidden;
+              display: flex;
+              flex-direction: column;
+              padding: 0;
+              box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            }
+            .emr-preview-head {
+              padding: 18px 22px 12px;
+              border-bottom: 1px solid var(--border);
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 10px;
+            }
+            .emr-preview-head h3 {
+              margin: 0;
+              font-size: 18px;
+              color: var(--success);
+            }
+            .emr-preview-head .btn-x {
+              background: #f1f5f9;
+              border: none;
+              width: 34px;
+              height: 34px;
+              border-radius: 50%;
+              cursor: pointer;
+              font-size: 18px;
+              font-weight: 700;
+            }
+            .emr-preview textarea {
+              flex: 1;
+              margin: 14px 22px;
+              padding: 14px 16px;
+              border: 1px solid var(--border-strong);
+              border-radius: 8px;
+              font-family: 'SF Mono', Menlo, Consolas, monospace;
+              font-size: 13px;
+              line-height: 1.55;
+              resize: none;
+              min-height: 340px;
+              max-height: 55vh;
+              background: #f8fafc;
+              color: #0f172a;
+            }
+            .emr-preview textarea:focus { outline: 2px solid var(--success); border-color: var(--success); }
+            .emr-preview-foot {
+              padding: 12px 22px 18px;
+              display: flex;
+              gap: 10px;
+              justify-content: flex-end;
+              border-top: 1px solid var(--border);
+            }
+            .emr-preview-foot .btn {
+              padding: 10px 18px;
+              border-radius: 8px;
+              border: none;
+              font-family: inherit;
+              font-weight: 700;
+              cursor: pointer;
+              font-size: 14px;
+              min-height: 44px;
+            }
+            .emr-preview-foot .btn-copy {
+              background: var(--success);
+              color: #fff;
+            }
+            .emr-preview-foot .btn-copy:hover { background: #15803d; }
+            .emr-preview-foot .btn-close {
+              background: #f1f5f9;
+              color: var(--text);
+              border: 1px solid var(--border-strong);
+            }
+
+            /* 토스트 알림 */
+            .emr-toast {
+              position: fixed;
+              bottom: 100px;
+              left: 50%;
+              transform: translateX(-50%) translateY(20px);
+              background: var(--success);
+              color: #fff;
+              padding: 12px 20px;
+              border-radius: 10px;
+              font-weight: 700;
+              font-size: 14px;
+              box-shadow: 0 8px 24px rgba(22, 163, 74, 0.35);
+              opacity: 0;
+              pointer-events: none;
+              transition: opacity 0.2s, transform 0.2s;
+              z-index: 200;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            }
+            .emr-toast.show {
+              opacity: 1;
+              transform: translateX(-50%) translateY(0);
+            }
+
+      .banner {
+        margin-top: 14px;
+        padding: 14px 18px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 16px;
+        border: 1.5px solid transparent;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .banner.gray {
+        background: #f1f5f9;
+        color: #334155;
+        border-color: #cbd5e1;
+      }
+      .banner.orange {
+        background: var(--warning-soft);
+        color: #9a3412;
+        border-color: #fdba74;
+      }
+      .banner.red {
+        background: var(--critical-soft);
+        color: #991b1b;
+        border-color: #fca5a5;
+      }
+      .pulse {
+        position: relative;
+      }
+      .pulse::before {
+        content: '';
+        position: absolute;
+        left: 14px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.7;
+      }
+
+      /* 진행률 바 */
+      .progress {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 12px 0 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .progress .bar {
+        flex: 1;
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .progress .fill {
+        height: 100%;
+        background: var(--success);
+        width: 0;
+        transition: width 0.25s;
+      }
+      .progress .pct {
+        min-width: 70px;
+        text-align: right;
+        color: var(--text);
+      }
+
+      /* ── 폼 스타일 ── */
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .field label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #334155;
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        padding: 10px 12px;
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        font-size: 15px;
+        font-family: inherit;
+        min-height: 44px;
+        background: #fff;
+      }
+      .field textarea {
+        min-height: 64px;
+        resize: vertical;
+      }
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        outline: 2px solid var(--primary);
+        outline-offset: 0;
+        border-color: var(--primary);
+      }
+      .field .hint {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      /* ── 버튼 ── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: none;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        min-height: 44px;
+        min-width: 44px;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--primary-2);
+      }
+      .btn-warn {
+        background: var(--warning);
+        color: #fff;
+      }
+      .btn-warn:hover {
+        filter: brightness(0.95);
+      }
+      .btn-crit {
+        background: var(--critical);
+        color: #fff;
+      }
+      .btn-crit:hover {
+        filter: brightness(0.95);
+      }
+      .btn-ghost {
+        background: #f1f5f9;
+        color: var(--text);
+        border: 1px solid var(--border-strong);
+      }
+      .btn-ghost:hover {
+        background: #e2e8f0;
+      }
+
+      /* ── 모니터링 표 ── */
+      table.mon {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 14px;
+        margin-top: 8px;
+      }
+      table.mon th,
+      table.mon td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+      }
+      table.mon thead th {
+        background: #f1f5f9;
+        font-weight: 700;
+        font-size: 13px;
+        color: #334155;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      table.mon tr:last-child td {
+        border-bottom: none;
+      }
+      table.mon .item-name {
+        font-weight: 700;
+        width: 22%;
+      }
+      table.mon .freq {
+        width: 38%;
+        color: #334155;
+      }
+      table.mon .lastcheck {
+        width: 22%;
+        font-size: 13px;
+        color: var(--muted);
+        font-family: 'SF Mono', Menlo, monospace;
+      }
+      table.mon .status {
+        width: 8%;
+        text-align: center;
+        font-size: 20px;
+      }
+      table.mon .action {
+        width: 10%;
+        text-align: right;
+      }
+      .now-btn {
+        background: var(--primary-soft);
+        color: var(--primary);
+        border: 1px solid #bfdbfe;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        min-height: 36px;
+      }
+      .now-btn:hover {
+        background: #dbeafe;
+      }
+
+      /* ── 트리거 카드 ── */
+      .trigger-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .trigger {
+        padding: 14px 16px;
+        background: #f8fafc;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        cursor: pointer;
+        user-select: none;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        min-height: 80px;
+        transition: all 0.15s;
+      }
+      .trigger .icon {
+        font-size: 22px;
+        line-height: 1;
+      }
+      .trigger .body {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+      .trigger.on {
+        background: var(--critical-soft);
+        border-color: var(--critical);
+        color: #7f1d1d;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+      }
+      .trigger.on .icon {
+        color: var(--critical);
+      }
+
+      /* 경고 배너 */
+      .alarm-banner {
+        display: none;
+        margin-top: 16px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        background: var(--critical);
+        color: #fff;
+        font-size: 17px;
+        font-weight: 800;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
+      }
+      .alarm-banner.show {
+        display: flex;
+      }
+
+      /* 자동행동 세트 */
+      .action-set {
+        display: none;
+        margin-top: 14px;
+        border: 2px solid var(--critical);
+        border-radius: 12px;
+        background: #fff;
+        padding: 18px;
+      }
+      .action-set.show {
+        display: block;
+      }
+      .action-set-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+      }
+      .action-set-head .title {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--critical);
+      }
+      .countdown {
+        font-family: 'SF Mono', Menlo, monospace;
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--critical);
+        background: var(--critical-soft);
+        padding: 4px 12px;
+        border-radius: 8px;
+        border: 1px solid #fca5a5;
+      }
+      .countdown.warn {
+        color: #7c2d12;
+        background: #fed7aa;
+        border-color: #f97316;
+      }
+      .action-steps {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .action-steps li {
+        display: grid;
+        grid-template-columns: 24px 1fr 140px;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px dashed var(--border);
+      }
+      .action-steps li:last-child {
+        border-bottom: none;
+      }
+      .action-steps input[type='checkbox'] {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--critical);
+      }
+      .action-steps .step-num {
+        font-weight: 800;
+        color: var(--critical);
+        font-size: 15px;
+      }
+      .action-steps input[type='time'] {
+        padding: 6px 8px;
+        border: 1px solid var(--border-strong);
+        border-radius: 6px;
+        font-size: 13px;
+        min-height: 36px;
+      }
+      .action-steps li.done .step-label {
+        text-decoration: line-through;
+        color: var(--muted);
+      }
+
+      /* ── NEWS2 계산기 ── */
+      .news2-grid {
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        gap: 20px;
+      }
+      .news2-inputs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .news2-result {
+        background: #f8fafc;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+      }
+      .news2-score {
+        font-size: 64px;
+        font-weight: 900;
+        line-height: 1;
+        margin: 8px 0;
+        font-family: 'SF Mono', Menlo, monospace;
+      }
+      .news2-label {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .news2-response {
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 800;
+        width: 100%;
+      }
+      .lvl-0 {
+        background: var(--success-soft);
+        color: #166534;
+        border: 1.5px solid #86efac;
+      }
+      .lvl-1 {
+        background: #fef9c3;
+        color: #854d0e;
+        border: 1.5px solid #fde047;
+      }
+      .lvl-2 {
+        background: var(--warning-soft);
+        color: #9a3412;
+        border: 1.5px solid #fdba74;
+      }
+      .lvl-3 {
+        background: var(--critical-soft);
+        color: #991b1b;
+        border: 1.5px solid #fca5a5;
+      }
+
+      /* ── IAP 해석기 ── */
+      .iap-grid {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 20px;
+      }
+      .iap-controls {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px;
+      }
+      .iap-scale {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .iap-tier {
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+        font-size: 14px;
+        background: #fff;
+        border-color: var(--border);
+      }
+      .iap-tier.active {
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .iap-tier .range {
+        font-family: 'SF Mono', Menlo, monospace;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .iap-tier.active.t0 {
+        background: var(--success-soft);
+        border-color: var(--success);
+        color: #166534;
+      }
+      .iap-tier.active.t1 {
+        background: #fef9c3;
+        border-color: #eab308;
+        color: #854d0e;
+      }
+      .iap-tier.active.t2 {
+        background: var(--warning-soft);
+        border-color: var(--warning);
+        color: #9a3412;
+      }
+      .iap-tier.active.t3,
+      .iap-tier.active.t4 {
+        background: var(--critical-soft);
+        border-color: var(--critical);
+        color: #991b1b;
+      }
+      .abcs-alert {
+        display: none;
+        margin-top: 14px;
+        padding: 14px 16px;
+        background: var(--critical);
+        color: #fff;
+        border-radius: 10px;
+        font-weight: 800;
+        font-size: 15px;
+      }
+      .abcs-alert.show {
+        display: block;
+      }
+      .toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+      .toggle input {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--warning);
+      }
+
+      /* ── 감별진단 매트릭스 ── */
+      .sx-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .sx-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border: 2px solid var(--border);
+        border-radius: 999px;
+        background: #f8fafc;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        min-height: 44px;
+      }
+      .sx-chip.on {
+        background: var(--primary-soft);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .sx-chip input {
+        display: none;
+      }
+      .ddx-list {
+        display: grid;
+        gap: 8px;
+      }
+      .ddx-item {
+        padding: 14px 16px;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+        opacity: 0.55;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 14px;
+        align-items: center;
+      }
+      .ddx-item.match {
+        opacity: 1;
+        border-color: var(--warning);
+        background: var(--warning-soft);
+      }
+      .ddx-item .rank {
+        background: #f1f5f9;
+        color: #64748b;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 15px;
+      }
+      .ddx-item.match .rank {
+        background: var(--warning);
+        color: #fff;
+      }
+      .ddx-item .name {
+        font-weight: 800;
+        font-size: 15px;
+      }
+      .ddx-item .tools {
+        font-size: 13px;
+        color: #334155;
+        margin-top: 2px;
+      }
+      .ddx-note {
+        padding: 12px 14px;
+        background: #fef3c7;
+        border-left: 4px solid var(--warning);
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #78350f;
+        margin-bottom: 14px;
+      }
+
+      /* ── 침상 안정 ── */
+      .bed-triple {
+        display: none;
+        margin-top: 14px;
+        padding: 14px 16px;
+        background: var(--primary-soft);
+        border: 1.5px solid #bfdbfe;
+        border-radius: 10px;
+      }
+      .bed-triple.show {
+        display: block;
+      }
+      .bed-triple .items {
+        display: grid;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .bed-triple .items label {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 10px;
+        background: #fff;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .bed-triple input {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--primary);
+      }
+      .evidence-box {
+        margin-top: 14px;
+        padding: 12px 14px;
+        background: #fef2f2;
+        border-left: 4px solid var(--critical);
+        border-radius: 8px;
+        font-size: 13.5px;
+        color: #7f1d1d;
+      }
+      .evidence-box b {
+        color: var(--critical);
+      }
+
+      /* ── 약물 주의 ── */
+      .drug-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .drug {
+        padding: 14px 16px;
+        border: 1.5px solid var(--warning);
+        background: var(--warning-soft);
+        border-radius: 10px;
+      }
+      .drug .name {
+        font-weight: 800;
+        font-size: 15px;
+        color: #9a3412;
+        margin-bottom: 4px;
+      }
+      .drug .body {
+        font-size: 13.5px;
+        color: #7c2d12;
+        line-height: 1.5;
+      }
+
+      /* ── 플로팅 긴급 버튼 ── */
+      .float-emg {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 80;
+        background: var(--critical);
+        color: #fff;
+        padding: 16px 22px;
+        border-radius: 999px;
+        box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4);
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+        border: none;
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: inherit;
+      }
+      .float-emg:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(220, 38, 38, 0.5);
+      }
+      .float-emg .dot {
+        width: 10px;
+        height: 10px;
+        background: #fff;
+        border-radius: 50%;
+      }
+
+      /* ── 모달 ── */
+      .modal-back {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        z-index: 90;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-back.show {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 16px;
+        max-width: 640px;
+        width: 100%;
+        max-height: calc(100% - 40px);
+        overflow-y: auto;
+        padding: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+      .modal h3 {
+        margin: 0 0 6px;
+        font-size: 20px;
+        color: var(--critical);
+      }
+      .modal .close {
+        float: right;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--muted);
+        padding: 4px 10px;
+      }
+
+      /* ── 푸터 ── */
+      footer {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px 24px 40px;
+        color: var(--muted);
+        font-size: 12.5px;
+        line-height: 1.6;
+        font-style: italic;
+      }
+      footer .info {
+        font-style: normal;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+      footer a {
+        color: var(--primary);
+      }
+
+      /* ── 반응형 ── */
+      @media (max-width: 1024px) {
+        .form-grid,
+        .news2-grid,
+        .iap-grid,
+        .drug-grid {
+          grid-template-columns: 1fr;
+        }
+        .news2-inputs {
+          grid-template-columns: 1fr 1fr;
+        }
+        .trigger-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .apply-4 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+          padding: 16px;
+        }
+        .sidebar {
+          position: static;
+          max-height: none;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+        .sidebar a {
+          min-height: 40px;
+          padding: 8px 12px;
+          font-size: 13px;
+        }
+        .sidebar .divider {
+          display: none;
+        }
+        .patient-fill input {
+          width: 80px;
+        }
+        .hero-inner {
+          grid-template-columns: 1fr;
+        }
+        table.mon .lastcheck,
+        table.mon .action {
+          display: none;
+        }
+      }
+      @media (max-width: 600px) {
+        .chk-row,
+        .trigger-grid,
+        .apply-4 {
+          grid-template-columns: 1fr;
+        }
+        .news2-inputs {
+          grid-template-columns: 1fr;
+        }
+        .action-steps li {
+          grid-template-columns: 24px 1fr;
+        }
+        .action-steps input[type='time'] {
+          grid-column: 2;
+        }
+        .hero h1 {
+          font-size: 17px;
+        }
+        .hero .sub {
+          font-size: 12px;
+        }
+        section.card {
+          padding: 18px 16px;
+        }
+        section.card > h2 {
+          font-size: 17px;
+        }
+        .float-emg {
+          padding: 12px 18px;
+          font-size: 13px;
+          right: 16px;
+          bottom: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    
+    <header class="hero" role="banner">
+      <div class="hero-inner">
+        <div>
+          <h1>복벽탈장(LOD) 수술 주술기 대시보드 <span class="ver">v1.0 · 2026-09-04</span></h1>
+          <div class="sub">심혈관 위험 고령 환자 이상징후 조기 감지 및 처치 안내 · 근거: LOD 증례 M&amp;M 분석</div>
+        </div>
+        <div class="patient-fill" aria-label="환자 정보 입력">
+          <label>환자ID<input id="pt-id" type="text" placeholder="00-00-00"></label>
+          <label>성명<input id="pt-name" type="text" placeholder="홍길동"></label>
+          <label>POD<input id="pt-pod" type="text" placeholder="1"></label>
+          <label>담당의<input id="pt-doc" type="text" placeholder="이름"></label>
+        </div>
+      </div>
+          </header>
+
+          <!-- EMR 통합 요약 툴바 -->
+          <div class="emr-toolbar" role="region" aria-label="EMR 요약 도구">
+            <span class="label">📋 EMR 요약:</span>
+            <button type="button" class="btn-all" id="emr-all">전체 요약 복사</button>
+            <button type="button" class="btn-preview" id="emr-preview-btn">미리보기 · 편집</button>
+            <span class="status" id="emr-status">각 섹션 우측의 📋 버튼으로 개별 복사도 가능</span>
+          </div>
+
+          <div class="layout">
+      
+      <nav class="sidebar" aria-label="섹션 이동">
+        <a href="#s-apply" data-nav="">🎯 적용 대상 판정</a>
+        <div class="divider"></div>
+        <a href="#s1" data-nav="">🔵 [1] 수술 전</a>
+        <a href="#s2" data-nav="">🟣 [2] 수술 중</a>
+        <a href="#s3" data-nav="">🟠 [3] 수술 후 모니터링</a>
+        <a href="#s4" data-nav="">⚠ [4] 에스컬레이션 트리거</a>
+        <div class="divider"></div>
+        <a href="#s5" data-nav="">🧮 [5] NEWS2 계산기</a>
+        <a href="#s6" data-nav="">📊 [6] IAP 해석기</a>
+        <a href="#s7" data-nav="">🔍 [7] 감별진단</a>
+        <div class="divider"></div>
+        <a href="#s8" data-nav="">🛏 [8] 침상 안정</a>
+        <a href="#s9" data-nav="">💊 [9] 약물 주의</a>
+      </nav>
+
+      
+      <main>
+        
+              <section class="card" id="s-apply">
+                <h2 class="warn"><span class="num">🎯</span>적용 대상 판정<button type="button" class="emr-copy" data-emr="apply" aria-label="적용 대상 EMR 복사">EMR 복사</button></h2>
+                <p class="lead">아래 항목 중 <b>하나라도</b> 해당되면 본 프로토콜을 적용합니다. <b>4개 이상</b>이면 초고위험군입니다. 항목을 체크하면 <b>맞춤 권고사항</b>이 아래에 자동 표시됩니다.</p>
+
+                <div class="apply-group-label">▎기본 위험요인</div>
+                <div class="apply-4">
+                  <label class="chk" data-apply="" data-key="age75"><input type="checkbox"><span class="txt">75세 이상</span></label>
+                  <label class="chk" data-apply="" data-key="af"><input type="checkbox"><span class="txt">AF / 심혈관질환 기왕력</span></label>
+                  <label class="chk" data-apply="" data-key="lod"><input type="checkbox"><span class="txt">LOD / 대형 복벽탈장</span></label>
+                  <label class="chk" data-apply="" data-key="med"><input type="checkbox"><span class="txt">베타차단제 · 항응고제 복용</span></label>
+                </div>
+
+                <div class="apply-group-label">▎동반질환 (해당 시 체크)</div>
+                <div class="apply-4">
+                  <label class="chk" data-apply="" data-key="dm"><input type="checkbox"><span class="txt">당뇨병(DM)</span></label>
+                  <label class="chk" data-apply="" data-key="copd"><input type="checkbox"><span class="txt">COPD / 만성 호흡기</span></label>
+                  <label class="chk" data-apply="" data-key="ckd"><input type="checkbox"><span class="txt">CKD / 신부전</span></label>
+                  <label class="chk" data-apply="" data-key="ca"><input type="checkbox"><span class="txt">활동성 암 / 항암 치료</span></label>
+                </div>
+
+                <div id="apply-banner" class="banner gray" role="status" aria-live="polite">⚪ 일반 프로토콜 적용</div>
+
+                <!-- ── 맞춤 권고사항 자동 표시 영역 ── -->
+                <div class="reco-wrap" id="reco-wrap" aria-live="polite">
+
+                  <div class="reco" data-reco="age75">
+                    <div class="r-title"><span class="r-tag">75세↑</span>고령 맞춤 권고</div>
+                    <ul>
+                      <li><b>수액 감량</b>: goal-directed로 관리, 예방적 크리스탈로이드 <b>1~1.5 mL/kg/h</b> 이내</li>
+                      <li><b>마취과 사전 논의</b>: 낮은 MAC/약물 감량, MAP <b>≥ 65 mmHg</b> 유지, 저체온 방지</li>
+                      <li><b>RCRI / NSQIP 위험점수</b> 산출 · 차트 명기</li>
+                      <li>수술 후 <b>섬망 예방</b>: HELP 프로토콜, 진정제 최소화, 조기 이동 계획</li>
+                    </ul>
+                  </div>
+
+                  <div class="reco warn" data-reco="af">
+                    <div class="r-title"><span class="r-tag">AF/CVD</span>심혈관 위험 맞춤 권고</div>
+                    <ul>
+                      <li><b>연속 Telemetry</b> POD 0–2 (간헐 체크 금지)</li>
+                      <li><b>hs-Troponin</b> 베이스라인 + POD 1·2 정기 + 증상 시 즉시 및 3h 후 반복</li>
+                      <li>수술 전 <b>K⁺ ≥ 4.0, Mg²⁺ ≥ 2.0 mEq/L</b> 유지 — RVR 유발 예방</li>
+                      <li>심장내과 사전 협진 · <b>수술 전후 심초음파</b> 준비</li>
+                    </ul>
+                  </div>
+
+                  <div class="reco warn" data-reco="lod">
+                    <div class="r-title"><span class="r-tag">LOD</span>거대 탈장 특화 권고</div>
+                    <ul>
+                      <li>수술 종료 전 <b>방광 IAP 최초 측정</b> 필수 → 인수인계 명문화</li>
+                      <li>POD 0–1 <b>q6h IAP</b>, 의심 소견 시 <b>q4h</b></li>
+                      <li>복벽 폐쇄 후 <b>기도압(plateau) 상승</b> 여부 마취기록에 명기</li>
+                      <li>과도한 일차봉합보다 <b>component separation / staged closure</b> 검토</li>
+                    </ul>
+                  </div>
+
+                  <div class="reco warn" data-reco="med">
+                    <div class="r-title"><span class="r-tag">복용약물</span>베타차단제·항응고제 관리</div>
+                    <ul>
+                      <li><b>베타차단제 수술 당일 지속 투여</b> — 중단 시 rebound 빈맥</li>
+                      <li>수술 후 SBP &lt; 100 상태에서 <b>rate-control 추가 투여 재고</b></li>
+                      <li><b>항응고제 중단/재개 스케줄</b>을 오더에 명문화 (와파린 5일, DOAC 24–48h)</li>
+                      <li>브릿징 필요 여부 심장/혈액내과 협진</li>
+                    </ul>
+                  </div>
+
+                  <div class="reco" data-reco="dm">
+                    <div class="r-title"><span class="r-tag">DM</span>당뇨병 주술기 관리</div>
+                    <ul>
+                      <li>주술기 <b>혈당 목표 140–180 mg/dL</b> (저혈당 회피 우선)</li>
+                      <li>수술 당일 아침 <b>경구 혈당강하제 중단</b>, SGLT2i는 <b>수술 3일 전 중단</b>(DKA 위험)</li>
+                      <li>메트포민 신기능 저하 시 중단, 조영제 사용 시 재검토</li>
+                      <li>수술 중·후 <b>q4h 혈당 측정</b> + 인슐린 슬라이딩 스케일</li>
+                      <li>창상 감염 위험 ↑ — 무균술 강화, HbA1c ≥ 8% 시 감염과 협진</li>
+                    </ul>
+                  </div>
+
+                  <div class="reco" data-reco="copd">
+                    <div class="r-title"><span class="r-tag">COPD</span>호흡기 위험 관리</div>
+                    <ul>
+                      <li>수술 전 <b>흡입 기관지확장제</b> 최적화 · 금연 확인 (최소 4주)</li>
+                      <li>수술 후 <b>인센티브 스파이로메트리</b> q1h(각성 시) + 조기 이상 운동</li>
+                      <li>LOD 폐쇄 후 <b>기도압 상승 + 저산소</b>는 AbCS의 조기 신호</li>
+                      <li>목표 SpO₂: 만성 <b>CO₂ 저류자 88–92%</b>, 그 외 &gt; 94%</li>
+                      <li>흉부물리요법 · 폐렴 예방 번들 적용</li>
+                    </ul>
+                  </div>
+
+                  <div class="reco" data-reco="ckd">
+                    <div class="r-title"><span class="r-tag">CKD</span>신부전 주술기 관리</div>
+                    <ul>
+                      <li>eGFR 확인 · <b>신독성 약물 회피</b> (NSAIDs, 아미노글리코사이드, 조영제)</li>
+                      <li>조영제 필요 시 <b>N-acetylcysteine + 등장식염수 수화</b></li>
+                      <li><b>수액 균형 엄격 관리</b> (과부하 ↔ 저관류 이중 위험)</li>
+                      <li>수술 전 <b>K⁺ &lt; 5.5</b> 확인, 대사성 산증 교정</li>
+                      <li>투석 환자: 수술 <b>24h 전 마지막 투석</b> · 신장내과 협진</li>
+                    </ul>
+                  </div>
+
+                  <div class="reco" data-reco="ca">
+                    <div class="r-title"><span class="r-tag">암</span>활동성 암 / 항암 치료 중</div>
+                    <ul>
+                      <li>최근 항암 치료력 확인 → <b>골수억제 시기 회피</b>, ANC &lt; 1,000 시 수술 연기 검토</li>
+                      <li><b>VTE 고위험</b> — 기계적 예방 + 저용량 헤파린(출혈 위험 고려) 병용</li>
+                      <li>혈액응고 이상 · 영양 상태(알부민, 프리알부민) 사전 평가</li>
+                      <li>면역치료 중이면 <b>면역관련 부작용(irAE)</b> 사전 확인 · 종양내과 협진</li>
+                      <li>포트/카테터 감염 위험 관리 · 창상 치유 지연 대비</li>
+                    </ul>
+                  </div>
+
+                </div>
+
+              </section>
+
+        
+        <section class="card" id="s1">
+          <h2><span class="num">1</span>수술 전 필수 확인<button type="button" class="emr-copy" data-emr="preop" aria-label="수술 전 EMR 복사">EMR 복사</button></h2>
+          <p class="lead">수술 후 급성 변화를 정확히 해석하려면 <b>베이스라인 데이터</b>가 반드시 있어야 합니다.</p>
+          <div class="chk-row" id="preop-list">
+            <label class="chk" data-preop="" title="비교 대조 없이는 급성 변화 해석 불가">
+              <input type="checkbox">
+              <span class="txt">베이스라인 12유도 ECG<span class="why">수술 후 비교 대조 필수</span></span>
+            </label>
+            <label class="chk" data-preop="">
+              <input type="checkbox">
+              <span class="txt">베이스라인 <span class="term" data-term="hstni" tabindex="0" role="button" aria-label="hs-TnI 설명">hs-Troponin I</span><span class="why">POD 상승 해석 기준점</span></span>
+            </label>
+            <label class="chk" data-preop="">
+              <input type="checkbox">
+              <span class="txt">심초음파 / BNP / CBC / 전해질(K·Mg) / 신기능<span class="why">AF-RVR 유발인자 교정</span></span>
+            </label>
+            <label class="chk" data-preop="">
+              <input type="checkbox">
+              <span class="txt"><span class="term" data-term="rcri" tabindex="0" role="button" aria-label="RCRI 설명">RCRI</span> 또는 <span class="term" data-term="nsqip" tabindex="0" role="button" aria-label="NSQIP 설명">NSQIP</span> 위험점수 산출·기록 <button class="howto-btn" data-howto="rcri" type="button">📖 산출법</button><span class="why">위험 계층화 문서화</span></span>
+            </label>
+            <label class="chk" data-preop="">
+              <input type="checkbox">
+              <span class="txt">베타차단제 수술 당일 지속 투여<span class="why">⚠ 중단 시 <span class="term" data-term="rebound" tabindex="0" role="button" aria-label="rebound 빈맥 설명">rebound 빈맥</span></span></span>
+            </label>
+            <label class="chk" data-preop="">
+              <input type="checkbox">
+              <span class="txt">항응고제 중단/재개 스케줄 명문화<span class="why">출혈 vs 색전 균형</span></span>
+            </label>
+            <label class="chk" data-preop="">
+              <input type="checkbox">
+              <span class="txt">입실 장소 결정: ICU 또는 Step-down<span class="why">고위험군 원칙 · 일반병동은 예외</span></span>
+            </label>
+            <label class="chk" data-preop="">
+              <input type="checkbox">
+              <span class="txt">보호자 사전 설명: 중환자실 전실 가능성<span class="why">동의·소통 문서화</span></span>
+            </label>
+          </div>
+          <div class="progress">
+            <span class="pct" id="preop-pct">0 / 8 완료</span>
+            <div class="bar"><div class="fill" id="preop-fill"></div></div>
+          </div>
+        </section>
+
+        
+        <section class="card" id="s2">
+          <h2 class="calc"><span class="num">2</span>수술 중 → 병동 인수인계<button type="button" class="emr-copy" data-emr="intra" aria-label="수술 중 인수인계 EMR 복사">EMR 복사</button></h2>
+          <p class="lead">병동으로 넘어오기 전, 아래 항목이 <b>인수인계 기록</b>에 명시되어야 합니다.</p>
+          <div class="form-grid">
+            <div class="field">
+              <label>수술 시간 (분)</label><input type="number" id="op-time" placeholder="예: 180">
+            </div>
+            <div class="field"><label>EBL (mL)</label><input type="number" id="op-ebl" placeholder="예: 300"></div>
+            <div class="field">
+              <label>수액·수혈량 (mL)</label><input type="number" id="op-fluid" placeholder="예: 2500">
+            </div>
+            <div class="field">
+              <label>최저 혈압 SBP/DBP</label><input type="text" id="op-lowbp" placeholder="예: 85/50">
+            </div>
+            <div class="field">
+              <label>최고 심박수 (bpm)</label><input type="number" id="op-hihr" placeholder="예: 125">
+            </div>
+            <div class="field">
+                    <label>수술 종료 전 <span class="term" data-term="iap" tabindex="0" role="button" aria-label="IAP 설명">방광 IAP</span> (mmHg) <button class="howto-btn" data-howto="iap" type="button">📖 측정법</button></label><input type="number" id="op-iap" placeholder="예: 10" step="0.5">
+                    <div class="hint" style="font-size:11px;color:var(--muted);margin-top:2px">⚠ mmHg 기준. 자로 cmH₂O 측정 시 <b>÷ 1.36</b>하여 입력</div>
+                  </div>
+                </div>
+          <div class="chk-row" style="margin-top: 12px">
+            <label class="chk" data-op=""><input type="checkbox"><span class="txt"><span class="term" data-term="map" tabindex="0" role="button" aria-label="MAP 설명">MAP</span> &lt; 65 mmHg 10분 이상 지속 여부</span></label>
+            <label class="chk" data-op=""><input type="checkbox"><span class="txt">복벽 폐쇄 후 기도압(plateau) 상승 여부</span></label>
+          </div>
+          <div class="field" style="margin-top: 12px">
+            <label>예상 위험 시나리오 (한 줄 기록)</label>
+            <textarea id="op-scenario" placeholder="예: IAH로 인한 순환저하 가능성 / AF-RVR → 심근허혈 가능성"></textarea>
+          </div>
+          <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap">
+            <button class="btn btn-primary" id="handoff-btn">인수인계 완료 확인</button>
+            <span id="handoff-status" style="align-self: center; font-size: 14px; font-weight: 700"></span>
+          </div>
+        </section>
+
+        
+        <section class="card" id="s3">
+          <h2 class="warn"><span class="num">3</span>수술 후 모니터링 (POD 0–3)<button type="button" class="emr-copy" data-emr="mon" aria-label="수술 후 모니터링 EMR 복사">EMR 복사</button></h2>
+          <p class="lead">
+            각 항목의 <b>[지금 확인]</b>을 누르면 시각이 기록되며, 권장 주기를 초과하면 상태등이 🟡 → 🔴로 변합니다.
+          </p>
+          <table class="mon" role="table">
+            <thead>
+              <tr>
+                <th>항목</th>
+                <th>빈도 / 기준</th>
+                <th>마지막 확인</th>
+                <th>상태</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="mon-body">
+              <tr data-mon="tele" data-threshold="60">
+                <td class="item-name">연속 Telemetry</td>
+                <td class="freq">POD 0–2 <b>연속</b></td>
+                <td class="lastcheck">—</td>
+                <td class="status">🟢</td>
+                <td class="action"><button class="now-btn">지금 확인</button></td>
+              </tr>
+              <tr data-mon="vs" data-threshold="60">
+                <td class="item-name">활력징후 + NEWS2</td>
+                <td class="freq">POD 0 = <b>q1h</b> / POD 1–2 = q2–4h</td>
+                <td class="lastcheck">—</td>
+                <td class="status">🟢</td>
+                <td class="action"><button class="now-btn">지금 확인</button></td>
+              </tr>
+              <tr data-mon="trop" data-threshold="360">
+                <td class="item-name">hs-Troponin</td>
+                <td class="freq">POD 1·2 정기 + 증상 시 <b>즉시 + 3h 후</b></td>
+                <td class="lastcheck">—</td>
+                <td class="status">🟢</td>
+                <td class="action"><button class="now-btn">지금 확인</button></td>
+              </tr>
+              <tr data-mon="ecg" data-threshold="240">
+                <td class="item-name">12유도 ECG</td>
+                <td class="freq">빈맥·부정맥·통증 시 <b>즉시</b></td>
+                <td class="lastcheck">—</td>
+                <td class="status">🟢</td>
+                <td class="action"><button class="now-btn">지금 확인</button></td>
+              </tr>
+              <tr data-mon="iap" data-threshold="360">
+                <td class="item-name"><span class="term" data-term="iap" tabindex="0" role="button" aria-label="IAP 설명">방광 IAP</span> (LOD) <button class="howto-btn" data-howto="iap" type="button" style="padding:2px 6px;font-size:10px">📖</button></td>
+                <td class="freq">POD 0–1 = <b>q6h</b>, 의심 시 q4h</td>
+                <td class="lastcheck">—</td>
+                <td class="status">🟢</td>
+                <td class="action"><button class="now-btn">지금 확인</button></td>
+              </tr>
+              <tr data-mon="uop" data-threshold="60">
+                <td class="item-name">소변량</td>
+                <td class="freq">시간당 (<b>&lt;0.5 mL/kg/h × 2h = 경고</b>)</td>
+                <td class="lastcheck">—</td>
+                <td class="status">🟢</td>
+                <td class="action"><button class="now-btn">지금 확인</button></td>
+              </tr>
+              <tr data-mon="lab" data-threshold="720">
+                <td class="item-name">Lactate, Hb/Hct, 전해질</td>
+                <td class="freq">POD 1·2 및 임상 변화 시</td>
+                <td class="lastcheck">—</td>
+                <td class="status">🟢</td>
+                <td class="action"><button class="now-btn">지금 확인</button></td>
+              </tr>
+              <tr data-mon="drain" data-threshold="240">
+                <td class="item-name">Drain 양상</td>
+                <td class="freq"><b>q4h</b></td>
+                <td class="lastcheck">—</td>
+                <td class="status">🟢</td>
+                <td class="action"><button class="now-btn">지금 확인</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        
+        <section class="card" id="s4">
+          <h2 class="crit"><span class="num">4</span>에스컬레이션 트리거<button type="button" class="emr-copy" data-emr="trig" aria-label="에스컬레이션 EMR 복사">EMR 복사</button></h2>
+          <p class="lead">
+            아래 항목 중 <b>하나라도 해당</b>되면 즉시 눌러 주십시오. <b>상급 의사 대면 평가 30분 이내 필수</b>.
+          </p>
+          <div class="trigger-grid" id="trigger-grid">
+            <div class="trigger" data-trig="">
+              <span class="icon">⚠</span><span class="body"><b>HR ≥ 110</b> 지속 또는 <b>신발현 AF-RVR</b></span>
+            </div>
+            <div class="trigger" data-trig="">
+              <span class="icon">⚠</span><span class="body"><b>SBP &lt; 100 mmHg</b> 또는 기저 대비 <b>20% 하락</b></span>
+            </div>
+            <div class="trigger" data-trig="">
+              <span class="icon">⚠</span><span class="body">명치·상복부 통증 (고령 여성 = <b>anginal equivalent</b>)</span>
+            </div>
+            <div class="trigger" data-trig="">
+              <span class="icon">⚠</span><span class="body"><b>NEWS2 ≥ 5</b></span>
+            </div>
+            <div class="trigger" data-trig="">
+              <span class="icon">⚠</span><span class="body"><b>IAP ≥ 12</b>(IAH) / <b>≥ 20 + 장기장애</b>(AbCS)</span>
+            </div>
+                <div class="trigger" data-trig="">
+                    <span class="icon">⚠</span><span class="body">소변량 감소, 의식 변화, <b>SpO₂ 하락</b></span>
+                  </div>
+                </div>
+                <div style="margin-top:10px;font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 12px">
+                  <span>💡 용어 클릭:</span>
+                  <span class="term" data-term="afrvr" tabindex="0" role="button">AF-RVR</span>
+                  <span class="term" data-term="anginal" tabindex="0" role="button">anginal equivalent</span>
+                  <span class="term" data-term="news2" tabindex="0" role="button">NEWS2</span>
+                  <span class="term" data-term="iah" tabindex="0" role="button">IAH</span>
+                  <span class="term" data-term="abcs" tabindex="0" role="button">AbCS</span>
+                  <span class="term" data-term="iap" tabindex="0" role="button">IAP</span>
+                </div>
+
+          <div class="alarm-banner" id="alarm-banner">
+            <span style="font-size: 22px">🚨</span>
+            <span>상급 의사 대면 평가 30분 이내 필수 — 자동 행동 세트를 아래에서 실행하십시오</span>
+          </div>
+
+          <div class="action-set" id="action-set" role="region" aria-label="자동 행동 세트">
+            <div class="action-set-head">
+              <div class="title">🚨 자동 행동 세트 (모두 기록)</div>
+              <div>
+                <span class="countdown" id="countdown">30:00</span>
+                <button class="btn btn-ghost" style="min-height: 36px; padding: 8px 12px; margin-left: 6px" id="reset-timer">
+                  타이머 리셋
+                </button>
+              </div>
+            </div>
+            <ul class="action-steps" id="action-steps">
+              <li>
+                <input type="checkbox" aria-label="1단계 완료"><span class="step-label"><span class="step-num">①</span> 12유도 ECG</span><input type="time" aria-label="1단계 시각">
+              </li>
+              <li>
+                <input type="checkbox" aria-label="2단계 완료"><span class="step-label"><span class="step-num">②</span> hs-TnI 채혈</span><input type="time" aria-label="2단계 시각">
+              </li>
+              <li>
+                <input type="checkbox" aria-label="3단계 완료"><span class="step-label"><span class="step-num">③</span> Lactate</span><input type="time" aria-label="3단계 시각">
+              </li>
+              <li>
+                <input type="checkbox" aria-label="4단계 완료"><span class="step-label"><span class="step-num">④</span> POCUS (심장·IVC·복강유리액)</span><input type="time" aria-label="4단계 시각">
+              </li>
+              <li>
+                <input type="checkbox" aria-label="5단계 완료"><span class="step-label"><span class="step-num">⑤</span> 방광 IAP 측정</span><input type="time" aria-label="5단계 시각">
+              </li>
+              <li>
+                <input type="checkbox" aria-label="6단계 완료"><span class="step-label"><span class="step-num">⑥</span> 상급자 대면 평가 요청</span><input type="time" aria-label="6단계 시각">
+              </li>
+              <li>
+                <input type="checkbox" aria-label="7단계 완료"><span class="step-label"><span class="step-num">⑦</span> ICU 전실 검토</span><input type="time" aria-label="7단계 시각">
+              </li>
+            </ul>
+            <div style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap">
+              <button class="btn btn-crit" id="finish-action">모든 조치 완료</button>
+              <button class="btn btn-ghost" id="cancel-trigger">트리거 해제</button>
+            </div>
+          </div>
+        </section>
+
+        
+        <section class="card" id="s5">
+          <h2 class="calc"><span class="num">5</span><span class="term" data-term="news2" tabindex="0" role="button" aria-label="NEWS2 설명">NEWS2</span> 계산기 <button class="howto-btn" data-howto="news2" type="button">📖 측정 매뉴얼</button><button type="button" class="emr-copy" data-emr="news2" aria-label="NEWS2 EMR 복사">EMR 복사</button></h2>
+          <p class="lead">각 값을 입력하면 <b>실시간으로 점수와 대응 등급</b>이 계산됩니다.</p>
+          <div class="news2-grid">
+            <div class="news2-inputs">
+              <div class="field">
+                <label>호흡수 (breaths/min)</label>
+                <input type="number" id="n-rr" placeholder="예: 18">
+              </div>
+              <div class="field">
+                <label>SpO₂ (%)</label>
+                <input type="number" id="n-spo2" placeholder="예: 96">
+              </div>
+              <div class="field">
+                <label>산소 투여</label>
+                <select id="n-o2">
+                  <option value="0">실내공기(Air)</option>
+                  <option value="2">산소 투여 중(Oxygen)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>수축기 혈압 (mmHg)</label>
+                <input type="number" id="n-sbp" placeholder="예: 120">
+              </div>
+              <div class="field">
+                <label>심박수 (bpm)</label>
+                <input type="number" id="n-hr" placeholder="예: 80">
+              </div>
+              <div class="field">
+                <label>의식 상태</label>
+                <select id="n-cns">
+                  <option value="0">Alert</option>
+                  <option value="3">C/V/P/U (변화)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>체온 (°C)</label>
+                <input type="number" id="n-temp" placeholder="예: 36.8" step="0.1">
+              </div>
+            </div>
+            <div class="news2-result">
+              <div class="news2-label">총점</div>
+              <div class="news2-score" id="news2-score">0</div>
+              <div class="news2-response lvl-0" id="news2-resp">🟢 통상 관찰</div>
+            </div>
+          </div>
+        </section>
+
+        
+        <section class="card" id="s6">
+          <h2 class="warn"><span class="num">6</span><span class="term" data-term="iap" tabindex="0" role="button" aria-label="IAP 설명">IAP</span> 해석기 (복강 내압) <button class="howto-btn" data-howto="iap" type="button">📖 방광압 측정법</button><button type="button" class="emr-copy" data-emr="iap" aria-label="IAP EMR 복사">EMR 복사</button></h2>
+          <p class="lead">방광 내압 값을 입력하면 <b>등급과 다음 조치</b>가 자동으로 결정됩니다.</p>
+          <div class="iap-grid">
+            <div class="iap-controls">
+              <div class="field">
+                <label style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                  <span>방광 내압 <span id="iap-unit-label">(mmHg)</span></span>
+                  <span style="display:inline-flex;background:#f1f5f9;border-radius:8px;padding:2px;font-size:12px;font-weight:700">
+                    <button type="button" id="iap-unit-mmhg" class="iap-unit-btn active" style="border:none;padding:5px 12px;border-radius:6px;cursor:pointer;background:var(--primary);color:#fff;font-family:inherit;font-weight:700">mmHg</button>
+                    <button type="button" id="iap-unit-cmh2o" class="iap-unit-btn" style="border:none;padding:5px 12px;border-radius:6px;cursor:pointer;background:transparent;color:var(--muted);font-family:inherit;font-weight:700">cmH₂O</button>
+                  </span>
+                </label>
+                <input type="number" id="iap-input" placeholder="예: 14" step="0.5">
+                <div class="hint" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+                  <span>Foley · 앙와위 · 호기말 측정</span>
+                  <span id="iap-convert" style="font-weight:700;color:var(--primary);font-family:'SF Mono',Menlo,monospace">— </span>
+                </div>
+                <div class="hint" style="margin-top:4px"><button class="howto-btn" data-howto="iap" type="button" style="padding:2px 6px;font-size:11px;background:var(--warning)">📖 상세 SOP</button> · <b>1 mmHg = 1.36 cmH₂O</b></div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="iap-organ">
+                <span><b>장기 기능 장애 동반</b> (핍뇨 · 저혈압 · 대사성 산증 · 저산소 등)</span>
+              </label>
+              <div class="abcs-alert" id="abcs-alert">
+                🚨 AbCS 확진 조건 충족 — 즉시 감압술(개복 또는 감압 도관) 검토
+              </div>
+            </div>
+            <div class="iap-scale">
+              <div class="iap-tier t0" data-tier="0"><span>🟢 정상</span><span class="range">&lt; 12 mmHg · &lt; 16 cmH₂O</span></div>
+              <div class="iap-tier t1" data-tier="1"><span>🟡 IAH Grade I</span><span class="range">12–15 · 16–20 cm</span></div>
+              <div class="iap-tier t2" data-tier="2">
+                <span>🟠 IAH Grade II · 감시 강화</span><span class="range">16–20 · 22–27 cm</span>
+              </div>
+              <div class="iap-tier t3" data-tier="3">
+                <span>🔴 IAH Grade III · 감압 고려</span><span class="range">21–25 · 28–34 cm</span>
+              </div>
+              <div class="iap-tier t4" data-tier="4">
+                <span>🔴 IAH Grade IV / AbCS · 즉시 감압</span><span class="range">&gt; 25 · &gt; 34 cm</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        
+        <section class="card" id="s7">
+          <h2><span class="num">7</span>감별진단 매트릭스<button type="button" class="emr-copy" data-emr="ddx" aria-label="감별진단 EMR 복사">EMR 복사</button></h2>
+          <div class="ddx-note">⚠ 닻내림 금지 — 아래 감별질환을 <b>동시에</b> 평가해야 합니다.</div>
+          <p class="lead">현재 환자에게 관찰되는 증상을 선택하면, 우선 감별질환이 자동으로 강조됩니다.</p>
+          <div class="sx-grid" id="sx-grid">
+            <label class="sx-chip" data-sx="tachy"><input type="checkbox">빈맥</label>
+            <label class="sx-chip" data-sx="hypo"><input type="checkbox">저혈압</label>
+            <label class="sx-chip" data-sx="epig"><input type="checkbox">명치/상복부 통증</label>
+            <label class="sx-chip" data-sx="hypox"><input type="checkbox">저산소</label>
+            <label class="sx-chip" data-sx="ams"><input type="checkbox">의식 저하</label>
+            <label class="sx-chip" data-sx="uop"><input type="checkbox">소변량 감소</label>
+            <label class="sx-chip" data-sx="dist"><input type="checkbox">복부 팽만</label>
+          </div>
+          <div class="ddx-list" id="ddx-list">
+            <div class="ddx-item" data-ddx="acs">
+              <div class="rank">1</div>
+              <div>
+                <div class="name">심근허혈 / ACS</div>
+                <div class="tools">ECG 추적 · hs-TnI 0h/3h · 심초음파</div>
+              </div>
+            </div>
+            <div class="ddx-item" data-ddx="abcs">
+              <div class="rank">2</div>
+              <div>
+                <div class="name">AbCS (복강구획증후군)</div>
+                <div class="tools">방광 IAP 측정 — <b>측정 없이 감별 불가</b></div>
+              </div>
+            </div>
+            <div class="ddx-item" data-ddx="bleed">
+              <div class="rank">3</div>
+              <div>
+                <div class="name">수술 후 출혈</div>
+                <div class="tools">Hb/Hct 추적 · drain량 · POCUS / CT</div>
+              </div>
+            </div>
+            <div class="ddx-item" data-ddx="pe">
+              <div class="rank">4</div>
+              <div>
+                <div class="name">폐색전증 (PE)</div>
+                <div class="tools">D-dimer · CT-PA</div>
+              </div>
+            </div>
+            <div class="ddx-item" data-ddx="sep">
+              <div class="rank">5</div>
+              <div>
+                <div class="name">저혈량 / 패혈증</div>
+                <div class="tools">Lactate · 수액반응 · 배양</div>
+              </div>
+            </div>
+            <div class="ddx-item" data-ddx="af">
+              <div class="rank">6</div>
+              <div>
+                <div class="name">AF-RVR 이차성</div>
+                <div class="tools">K·Mg 확인 · TSH · 감별 인자 교정</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        
+        <section class="card" id="s8">
+          <h2 class="warn"><span class="num">8</span>침상 안정 규정<button type="button" class="emr-copy" data-emr="bed" aria-label="침상 안정 EMR 복사">EMR 복사</button></h2>
+          <ul style="padding-left: 20px; margin: 0 0 12px; line-height: 1.7">
+            <li>혈역학 불안정 시 침상 안정은 <b>처방(order)으로 기록</b>합니다 (구두 지시 금지).</li>
+            <li><b>3중 고지</b> 필수: 간호기록 + 침상 표지 + 보호자 안내.</li>
+            <li>배변은 기저귀·침상 배변 원칙. <b>보조 없는 이동 절대 금지</b>.</li>
+            <li>이동 필요 시 의료진 승인 + 이동 전 활력징후 확인.</li>
+          </ul>
+          <button class="btn btn-warn" id="bed-activate">🛏 침상 안정 처방 활성화</button>
+          <div class="bed-triple" id="bed-triple">
+            <b>3중 고지 체크리스트</b>
+            <div class="items">
+              <label><input type="checkbox" data-triple=""> 간호기록 등재 완료</label>
+              <label><input type="checkbox" data-triple=""> 침상 표지 부착 완료</label>
+              <label><input type="checkbox" data-triple=""> 보호자 안내 완료</label>
+            </div>
+            <div style="margin-top: 10px; font-size: 13px; color: var(--muted)">
+              활성화 시각: <span id="bed-timestamp">—</span>
+            </div>
+          </div>
+          <div class="evidence-box">
+            <b>증례 근거:</b> 21:00 침상안정 지시 → 21:28 휠체어 이동 중 심정지 발생. <b>28분의 공백</b>이 사건의 직접
+            방아쇠였습니다.
+          </div>
+        </section>
+
+        
+        <section class="card" id="s9">
+          <h2 class="warn"><span class="num">9</span>약물 주의<button type="button" class="emr-copy" data-emr="drug" aria-label="약물 주의 EMR 복사">EMR 복사</button></h2>
+          <div class="drug-grid">
+            <div class="drug">
+              <div class="name">⚠ 베타차단제 조기 재개</div>
+              <div class="body">
+                경구 가능 시 조기 재개. 단, <b>SBP &lt; 100</b> 상태에서 rate-control 목적 <b>추가 투여는 금지</b>.
+                (증례: 15:24 Concor 투여 → 19:00 저혈압 출현)
+              </div>
+            </div>
+            <div class="drug">
+              <div class="name">⚠ 항응고제 재개</div>
+              <div class="body">출혈 위험 vs AF 색전 위험을 <b>POD 1에 재평가</b>하고 명문화. 담당의 서명 필수.</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    
+    <button class="float-emg" id="float-emg" aria-label="긴급 에스컬레이션 열기">
+      <span class="dot"></span>
+      🚨 긴급 에스컬레이션
+    </button>
+
+    
+    <div class="modal-back" id="modal-back" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal">
+        <button class="close" id="modal-close" aria-label="닫기">×</button>
+        <h3 id="modal-title">🚨 자동 행동 세트 (7단계)</h3>
+        <p style="color: var(--muted); font-size: 14px; margin-top: 0">
+          상급 의사 대면 평가 <b>30분 이내</b> · 모든 조치 시행 및 기록.
+        </p>
+        <ol style="padding-left: 20px; line-height: 1.9; font-size: 15px">
+          <li><b>12유도 ECG</b> — 기존과 비교</li>
+          <li><b>hs-TnI 채혈</b> — 0h + 3h 후 반복</li>
+          <li><b>Lactate</b> — 조직 관류 평가</li>
+          <li><b>POCUS</b> — 심장, IVC, 복강 유리액</li>
+          <li><b>방광 IAP 측정</b> — Foley 이용, 필수</li>
+          <li><b>상급자 대면 평가 요청</b> — 30분 이내</li>
+          <li><b>ICU 전실 검토</b> — 관리 수준 상향</li>
+        </ol>
+        <div style="margin-top: 14px;
+            padding: 12px 14px;
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            border-radius: 8px;
+            font-size: 13.5px;">
+          <b>감별 병행:</b> ACS · AbCS · 출혈 · PE · 저혈량/패혈증 — <b>동시에 평가</b>하십시오 (닻내림 금지).
+        </div>
+        <div style="margin-top: 14px; text-align: right">
+          <button class="btn btn-primary" id="modal-goto">섹션 [4]로 이동</button>
+        </div>
+      </div>
+    </div>
+
+          <!-- 용어 설명 / 실무 매뉴얼 팝업 -->
+          <div class="term-modal-back" id="term-modal-back" role="dialog" aria-modal="true" aria-labelledby="term-modal-title">
+            <div class="term-modal">
+              <button class="close-x" id="term-modal-close" aria-label="닫기">×</button>
+              <h3 id="term-modal-title"><span class="abbr" id="term-abbr">TERM</span> <span id="term-name">용어명</span></h3>
+              <p class="full" id="term-full">전체 명칭</p>
+              <div id="term-body"></div>
+            </div>
+          </div>
+
+          <!-- EMR 미리보기·편집 모달 -->
+          <div class="emr-preview-back" id="emr-preview-back" role="dialog" aria-modal="true" aria-labelledby="emr-preview-title">
+            <div class="emr-preview">
+              <div class="emr-preview-head">
+                <h3 id="emr-preview-title">📋 EMR 요약 미리보기 · 편집 후 복사</h3>
+                <button type="button" class="btn-x" id="emr-preview-close" aria-label="닫기">×</button>
+              </div>
+              <textarea id="emr-preview-text" spellcheck="false" aria-label="EMR 요약 텍스트"></textarea>
+              <div class="emr-preview-foot">
+                <button type="button" class="btn btn-close" id="emr-preview-cancel">닫기</button>
+                <button type="button" class="btn btn-copy" id="emr-preview-copy">📋 클립보드로 복사</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 복사 완료 토스트 -->
+          <div class="emr-toast" id="emr-toast" role="status" aria-live="polite">✅ <span id="emr-toast-text">EMR 요약이 클립보드에 복사되었습니다</span></div>
+
+          <footer>
+      본 대시보드는 특정 증례의 M&amp;M 분석에 근거한 내부 환자안전 도구이며 법적 판단을 대신하지 않는다. 각 환자의 임상
+      상황에 따라 담당 의료진의 판단을 우선한다.
+      <div class="info">
+        근거: LOD 증례 M&amp;M 분석 (83세 여성, AF, POD 1 심정지) · 대응 원본: A4 1페이지 체크리스트 v1.0 · 대시보드
+        v1.0 / 2026-09-04
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        'use strict';
+        const LS = {
+          get(k, d) {
+            try {
+              const v = localStorage.getItem(k);
+              return v == null ? d : JSON.parse(v);
+            } catch (e) {
+              return d;
+            }
+          },
+          set(k, v) {
+            try {
+              localStorage.setItem(k, JSON.stringify(v));
+            } catch (e) {}
+          },
+        };
+
+        // ── 환자 정보 저장/복원
+        ['pt-id', 'pt-name', 'pt-pod', 'pt-doc'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.value = LS.get('lod-' + id, '');
+          el.addEventListener('input', () => LS.set('lod-' + id, el.value));
+        });
+
+        // ── 사이드바 스무스 스크롤 & 활성 표시
+        const navLinks = document.querySelectorAll('.sidebar a[data-nav]');
+        navLinks.forEach((a) => {
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = document.querySelector(a.getAttribute('href'));
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              navLinks.forEach((x) => x.classList.remove('active'));
+              a.classList.add('active');
+            }
+          });
+        });
+        const sectionsAll = Array.from(document.querySelectorAll('section.card'));
+        window.addEventListener(
+          'scroll',
+          () => {
+            const y = window.scrollY + 140;
+            let cur = sectionsAll[0];
+            sectionsAll.forEach((s) => {
+              if (s.offsetTop <= y) cur = s;
+            });
+            if (cur) {
+              navLinks.forEach((a) => {
+                a.classList.toggle('active', a.getAttribute('href') === '#' + cur.id);
+              });
+            }
+          },
+          { passive: true },
+        );
+
+        // ── 체크박스 시각 상태 토글 유틸
+        function bindChecks(selector, storeKey) {
+          const chks = document.querySelectorAll(selector);
+          const saved = LS.get(storeKey, []);
+          chks.forEach((label, i) => {
+            const cb = label.querySelector('input[type=checkbox]');
+            if (saved[i]) cb.checked = true;
+            label.classList.toggle('checked', cb.checked);
+            cb.addEventListener('change', () => {
+              label.classList.toggle('checked', cb.checked);
+              LS.set(
+                storeKey,
+                Array.from(chks).map((l) => l.querySelector('input').checked),
+              );
+              if (typeof updateApply === 'function' && selector.includes('apply')) updateApply();
+              if (selector.includes('preop')) updatePreop();
+            });
+          });
+          return chks;
+        }
+
+        // ── 적용 대상 판정 + 맞춤 권고사항 자동 표시
+        const applyChks = bindChecks('[data-apply]', 'lod-apply');
+        const applyBanner = document.getElementById('apply-banner');
+        const recoWrap = document.getElementById('reco-wrap');
+        function updateApply() {
+          const checkedKeys = Array.from(applyChks)
+            .filter((l) => l.querySelector('input').checked)
+            .map((l) => l.getAttribute('data-key'));
+          const n = checkedKeys.length;
+          applyBanner.className = 'banner';
+          if (n === 0) {
+            applyBanner.classList.add('gray');
+            applyBanner.textContent = '⚪ 일반 프로토콜 적용';
+          } else if (n < 4) {
+            applyBanner.classList.add('orange');
+            applyBanner.textContent = '🟠 고위험군 (' + n + '개 해당) — 본 대시보드 프로토콜 적용';
+          } else {
+            applyBanner.classList.add('red');
+            applyBanner.textContent = '🔴 초고위험군 (' + n + '개 해당) — ICU 또는 Step-down 입실 강력 권고';
+          }
+          if (recoWrap) {
+            recoWrap.querySelectorAll('.reco').forEach((card) => {
+              const key = card.getAttribute('data-reco');
+              if (checkedKeys.includes(key)) card.classList.add('show');
+              else card.classList.remove('show');
+            });
+          }
+        }
+        updateApply();
+
+        // ── 수술 전 진행률
+        const preopChks = bindChecks('[data-preop]', 'lod-preop');
+        const preopFill = document.getElementById('preop-fill');
+        const preopPct = document.getElementById('preop-pct');
+        function updatePreop() {
+          if (!preopFill || !preopPct) return;
+          const total = preopChks.length;
+          const done = Array.from(preopChks).filter((l) => l.querySelector('input').checked).length;
+          preopFill.style.width = (done / total) * 100 + '%';
+          preopPct.textContent = done + ' / ' + total + ' 완료';
+          preopFill.style.background =
+            done === total ? 'var(--success)' : done >= total * 0.5 ? 'var(--warning)' : 'var(--critical)';
+        }
+        updatePreop();
+
+        // ── 인수인계 체크박스
+        bindChecks('[data-op]', 'lod-op');
+        ['op-time', 'op-ebl', 'op-fluid', 'op-lowbp', 'op-hihr', 'op-iap', 'op-scenario'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.value = LS.get('lod-' + id, '');
+          el.addEventListener('input', () => {
+            LS.set('lod-' + id, el.value);
+                  if (id === 'op-iap' && el.value) {
+                    const ii = document.getElementById('iap-input');
+                    if (ii) {
+                      // 수술 중 입력은 항상 mmHg 기준 → IAP 해석기도 mmHg로 강제
+                      setIapUnit('mmHg');
+                      ii.value = el.value;
+                      updateIAP();
+                    }
+                  }
+          });
+        });
+
+        const handoffBtn = document.getElementById('handoff-btn');
+        const handoffStatus = document.getElementById('handoff-status');
+        if (handoffBtn) handoffBtn.addEventListener('click', () => {
+          const ids = ['op-time', 'op-ebl', 'op-fluid', 'op-lowbp', 'op-hihr', 'op-iap'];
+          const missing = ids.filter((id) => !document.getElementById(id).value.trim());
+          ids.forEach((id) => {
+            const el = document.getElementById(id);
+            el.style.borderColor = el.value.trim() ? 'var(--border-strong)' : 'var(--critical)';
+            el.style.background = el.value.trim() ? '#fff' : 'var(--critical-soft)';
+          });
+          if (missing.length === 0) {
+            handoffStatus.textContent = '✅ 인수인계 완료 — 모든 항목 기록됨';
+            handoffStatus.style.color = 'var(--success)';
+          } else {
+            handoffStatus.textContent = '⚠ 미완료 ' + missing.length + '개 항목 (붉게 표시됨)';
+            handoffStatus.style.color = 'var(--critical)';
+          }
+        });
+
+        // ── 수술 후 모니터링 표
+        const monRows = document.querySelectorAll('#mon-body tr[data-mon]');
+        function updateMonStatus() {
+          const now = Date.now();
+          monRows.forEach((row) => {
+            const key = 'lod-mon-' + row.dataset.mon;
+            const last = LS.get(key, null);
+            const threshold = parseInt(row.dataset.threshold, 10);
+            const lastcheckCell = row.querySelector('.lastcheck');
+            const statusCell = row.querySelector('.status');
+            if (!last) {
+              lastcheckCell.textContent = '—';
+              statusCell.textContent = '🟢';
+            } else {
+              const t = new Date(last);
+              const mins = Math.floor((now - last) / 60000);
+              lastcheckCell.textContent = t.toTimeString().slice(0, 5) + ' (' + mins + '분 전)';
+              if (mins > threshold * 1.5) statusCell.textContent = '🔴';
+              else if (mins > threshold) statusCell.textContent = '🟡';
+              else statusCell.textContent = '🟢';
+            }
+          });
+        }
+        monRows.forEach((row) => {
+          row.querySelector('.now-btn').addEventListener('click', () => {
+            LS.set('lod-mon-' + row.dataset.mon, Date.now());
+            updateMonStatus();
+          });
+        });
+        updateMonStatus();
+        setInterval(updateMonStatus, 60000);
+
+        // ── 에스컬레이션 트리거
+        const triggers = document.querySelectorAll('[data-trig]');
+        const alarmBanner = document.getElementById('alarm-banner');
+        const actionSet = document.getElementById('action-set');
+        function updateTriggers() {
+          const anyOn = Array.from(triggers).some((t) => t.classList.contains('on'));
+          if (alarmBanner) alarmBanner.classList.toggle('show', anyOn);
+          if (actionSet) actionSet.classList.toggle('show', anyOn);
+          if (anyOn && !timerRunning) startTimer();
+          if (!anyOn) stopTimer();
+        }
+        triggers.forEach((t) => {
+          t.addEventListener('click', () => {
+            t.classList.toggle('on');
+            updateTriggers();
+          });
+          t.setAttribute('role', 'button');
+          t.setAttribute('tabindex', '0');
+          t.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              t.click();
+            }
+          });
+        });
+
+        // 카운트다운
+        let timerId = null, timerRunning = false, secondsLeft = 1800;
+        const countdownEl = document.getElementById('countdown');
+        function fmt(s) {
+          const m = Math.floor(Math.abs(s) / 60);
+          const sec = Math.abs(s) % 60;
+          return (s < 0 ? '-' : '') + String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+        }
+        function tickTimer() {
+          secondsLeft--;
+          if (!countdownEl) return;
+          countdownEl.textContent = fmt(secondsLeft);
+          if (secondsLeft <= 300) countdownEl.classList.add('warn');
+          if (secondsLeft <= 0) {
+            countdownEl.style.background = 'var(--critical)';
+            countdownEl.style.color = '#fff';
+          }
+        }
+        function startTimer() {
+          timerRunning = true;
+          secondsLeft = 1800;
+          if (countdownEl) {
+            countdownEl.textContent = fmt(secondsLeft);
+            countdownEl.classList.remove('warn');
+            countdownEl.style.background = '';
+            countdownEl.style.color = '';
+          }
+          if (timerId) clearInterval(timerId);
+          timerId = setInterval(tickTimer, 1000);
+        }
+        function stopTimer() {
+          timerRunning = false;
+          if (timerId) { clearInterval(timerId); timerId = null; }
+        }
+        const rt = document.getElementById('reset-timer');
+        if (rt) rt.addEventListener('click', () => startTimer());
+        const ct = document.getElementById('cancel-trigger');
+        if (ct) ct.addEventListener('click', () => {
+          triggers.forEach((t) => t.classList.remove('on'));
+          updateTriggers();
+        });
+        const fa = document.getElementById('finish-action');
+        if (fa) fa.addEventListener('click', () => {
+          const steps = document.querySelectorAll('#action-steps li');
+          let done = 0;
+          steps.forEach((li) => {
+            if (li.querySelector('input[type=checkbox]').checked) {
+              li.classList.add('done');
+              done++;
+            }
+          });
+          alert('완료된 조치: ' + done + ' / ' + steps.length + '\n기록을 EMR에 옮겨 주십시오.');
+        });
+        document.querySelectorAll('#action-steps li').forEach((li) => {
+          const cb = li.querySelector('input[type=checkbox]');
+          cb.addEventListener('change', () => li.classList.toggle('done', cb.checked));
+        });
+
+        // ── NEWS2 계산기
+        const nEls = {
+          rr: document.getElementById('n-rr'),
+          spo2: document.getElementById('n-spo2'),
+          o2: document.getElementById('n-o2'),
+          sbp: document.getElementById('n-sbp'),
+          hr: document.getElementById('n-hr'),
+          cns: document.getElementById('n-cns'),
+          temp: document.getElementById('n-temp'),
+        };
+        const scoreEl = document.getElementById('news2-score');
+        const respEl = document.getElementById('news2-resp');
+        function scoreRR(v){if(!v)return 0;v=+v;if(v<=8)return 3;if(v<=11)return 1;if(v<=20)return 0;if(v<=24)return 2;return 3;}
+        function scoreSpO2(v){if(!v)return 0;v=+v;if(v<=91)return 3;if(v<=93)return 2;if(v<=95)return 1;return 0;}
+        function scoreSBP(v){if(!v)return 0;v=+v;if(v<=90)return 3;if(v<=100)return 2;if(v<=110)return 1;if(v<=219)return 0;return 3;}
+        function scoreHR(v){if(!v)return 0;v=+v;if(v<=40)return 3;if(v<=50)return 1;if(v<=90)return 0;if(v<=110)return 1;if(v<=130)return 2;return 3;}
+        function scoreTemp(v){if(!v)return 0;v=+v;if(v<=35)return 3;if(v<36)return 1;if(v<=38)return 0;if(v<=39)return 1;return 2;}
+        function calcNews2() {
+          if (!scoreEl || !respEl) return;
+          const total =
+            scoreRR(nEls.rr.value) +
+            scoreSpO2(nEls.spo2.value) +
+            (+nEls.o2.value || 0) +
+            scoreSBP(nEls.sbp.value) +
+            scoreHR(nEls.hr.value) +
+            (+nEls.cns.value || 0) +
+            scoreTemp(nEls.temp.value);
+          scoreEl.textContent = total;
+          let lvl, txt;
+          if (total <= 2) { lvl='lvl-0'; txt='🟢 통상 관찰'; scoreEl.style.color='var(--success)'; }
+          else if (total <= 4) { lvl='lvl-1'; txt='🟡 재측정 + 전공의 30분 내 평가'; scoreEl.style.color='#a16207'; }
+          else if (total <= 6) { lvl='lvl-2'; txt='🟠 상급 의사 대면 평가 + q1h + ICU 협진'; scoreEl.style.color='var(--warning)'; }
+          else { lvl='lvl-3'; txt='🔴 ICU 전실 원칙 + Rapid Response Team'; scoreEl.style.color='var(--critical)'; }
+          respEl.className = 'news2-response ' + lvl;
+          respEl.textContent = txt;
+        }
+        Object.values(nEls).forEach((el) => { if (el) el.addEventListener('input', calcNews2); });
+        calcNews2();
+
+              // ── IAP 해석기 (단위 토글: mmHg ↔ cmH₂O · 1 mmHg = 1.36 cmH₂O)
+              const iapInput = document.getElementById('iap-input');
+              const iapOrgan = document.getElementById('iap-organ');
+              const iapTiers = document.querySelectorAll('.iap-tier');
+              const abcsAlert = document.getElementById('abcs-alert');
+              const iapUnitLabel = document.getElementById('iap-unit-label');
+              const iapConvert = document.getElementById('iap-convert');
+              const btnMmHg = document.getElementById('iap-unit-mmhg');
+              const btnCm = document.getElementById('iap-unit-cmh2o');
+              let iapUnit = 'mmHg'; // 'mmHg' | 'cmH2O'
+              const CM_PER_MMHG = 1.36;
+
+              function setIapUnit(u) {
+                iapUnit = u;
+                if (iapUnitLabel) iapUnitLabel.textContent = u === 'mmHg' ? '(mmHg)' : '(cmH₂O)';
+                if (btnMmHg && btnCm) {
+                  const on = 'background:var(--primary);color:#fff';
+                  const off = 'background:transparent;color:var(--muted)';
+                  btnMmHg.style.cssText = 'border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:700;' + (u === 'mmHg' ? on : off);
+                  btnCm.style.cssText = 'border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:700;' + (u === 'cmH2O' ? on : off);
+                  btnMmHg.classList.toggle('active', u === 'mmHg');
+                  btnCm.classList.toggle('active', u === 'cmH2O');
+                }
+                if (iapInput) iapInput.setAttribute('placeholder', u === 'mmHg' ? '예: 14' : '예: 20');
+                updateIAP();
+              }
+
+              function updateIAP() {
+                if (!iapInput) return;
+                const raw = parseFloat(iapInput.value);
+                // 항상 mmHg로 환산해서 판정
+                let vMmHg = NaN;
+                let vCm = NaN;
+                if (!isNaN(raw)) {
+                  if (iapUnit === 'mmHg') { vMmHg = raw; vCm = raw * CM_PER_MMHG; }
+                  else { vCm = raw; vMmHg = raw / CM_PER_MMHG; }
+                }
+                let tier = -1;
+                if (!isNaN(vMmHg)) {
+                  if (vMmHg < 12) tier = 0;
+                  else if (vMmHg <= 15) tier = 1;
+                  else if (vMmHg <= 20) tier = 2;
+                  else if (vMmHg <= 25) tier = 3;
+                  else tier = 4;
+                }
+                iapTiers.forEach((el, i) => el.classList.toggle('active', i === tier));
+
+                // 환산값 표시
+                if (iapConvert) {
+                  if (isNaN(vMmHg)) iapConvert.textContent = '— ';
+                  else if (iapUnit === 'mmHg') iapConvert.textContent = '= ' + vCm.toFixed(1) + ' cmH₂O';
+                  else iapConvert.textContent = '= ' + vMmHg.toFixed(1) + ' mmHg';
+                }
+
+                // AbCS: mmHg 기준 판정
+                const abcsCondition = !isNaN(vMmHg) && vMmHg >= 20 && iapOrgan && iapOrgan.checked;
+                if (abcsAlert) abcsAlert.classList.toggle('show', abcsCondition);
+              }
+
+              if (iapInput) iapInput.addEventListener('input', updateIAP);
+              if (iapOrgan) iapOrgan.addEventListener('change', updateIAP);
+              if (btnMmHg) btnMmHg.addEventListener('click', () => setIapUnit('mmHg'));
+              if (btnCm) btnCm.addEventListener('click', () => setIapUnit('cmH2O'));
+              setIapUnit('mmHg');
+
+        // ── 감별진단 매트릭스
+        const sxMap = {
+          tachy: ['acs','abcs','bleed','pe','sep','af'],
+          hypo: ['acs','abcs','bleed','pe','sep'],
+          epig: ['acs','abcs','bleed'],
+          hypox: ['pe','acs','sep'],
+          ams: ['sep','acs','pe','abcs'],
+          uop: ['abcs','sep','bleed'],
+          dist: ['abcs','bleed'],
+        };
+        const sxChips = document.querySelectorAll('.sx-chip');
+        const ddxItems = document.querySelectorAll('.ddx-item');
+        function updateDdx() {
+          const active = Array.from(sxChips).filter((c) => c.querySelector('input').checked).map((c) => c.dataset.sx);
+          const counts = {};
+          active.forEach((sx) => (sxMap[sx] || []).forEach((d) => (counts[d] = (counts[d] || 0) + 1)));
+          const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).map((x) => x[0]);
+          ddxItems.forEach((item) => {
+            const key = item.dataset.ddx;
+            const isMatch = counts[key] > 0;
+            item.classList.toggle('match', isMatch);
+            if (isMatch) {
+              const rank = sorted.indexOf(key) + 1;
+              item.querySelector('.rank').textContent = rank;
+            } else {
+              const defaultRanks = { acs:1, abcs:2, bleed:3, pe:4, sep:5, af:6 };
+              item.querySelector('.rank').textContent = defaultRanks[key];
+            }
+          });
+        }
+        sxChips.forEach((c) => {
+          const cb = c.querySelector('input');
+          // <label>이 input을 자동 토글하므로 change 이벤트만 청취
+          cb.addEventListener('change', () => {
+            c.classList.toggle('on', cb.checked);
+            updateDdx();
+          });
+        });
+
+        // ── 침상 안정 활성화
+        const bedBtn = document.getElementById('bed-activate');
+        const bedTriple = document.getElementById('bed-triple');
+        const bedTs = document.getElementById('bed-timestamp');
+        if (bedBtn) bedBtn.addEventListener('click', () => {
+          bedTriple.classList.add('show');
+          const now = new Date();
+          bedTs.textContent = now.toLocaleString('ko-KR');
+          bedBtn.textContent = '🛏 침상 안정 처방 활성됨 ✓';
+          bedBtn.style.background = 'var(--success)';
+        });
+
+        // ── 플로팅 긴급 버튼 · 모달
+        const modal = document.getElementById('modal-back');
+        const fe = document.getElementById('float-emg');
+        const mc = document.getElementById('modal-close');
+        const mg = document.getElementById('modal-goto');
+        if (fe && modal) fe.addEventListener('click', () => modal.classList.add('show'));
+        if (mc && modal) mc.addEventListener('click', () => modal.classList.remove('show'));
+        if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+        if (mg && modal) mg.addEventListener('click', () => {
+          modal.classList.remove('show');
+          const s4 = document.getElementById('s4');
+          if (s4) s4.scrollIntoView({ behavior: 'smooth' });
+        });
+              document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal && modal.classList.contains('show')) modal.classList.remove('show');
+              });
+
+              // ══════════════════════════════════════════════════
+              // ── 의학용어 설명 + 실무 매뉴얼 팝업 시스템
+              // ══════════════════════════════════════════════════
+              const TERMS = {
+                rcri: {
+                  abbr: 'RCRI',
+                  name: '개정 심장 위험 지수',
+                  full: 'Revised Cardiac Risk Index (Lee et al., 1999)',
+                  def: '비심장 수술 환자의 <b>주요 심혈관 합병증(MACE)</b> 위험을 예측하는 6개 항목 점수. 각 항목 1점, 총점으로 위험 계층화.',
+                  body: [
+                    { type: 'h4', text: '📋 6개 항목 (각 1점)' },
+                    { type: 'ul', items: [
+                      '<b>고위험 수술</b> (복강내·흉강내·상부 혈관수술 — LOD 수술은 여기 해당)',
+                      '<b>허혈성 심질환</b> 병력 (MI, angina, positive stress test)',
+                      '<b>울혈성 심부전</b> 병력',
+                      '<b>뇌혈관질환</b> 병력 (TIA/CVA)',
+                      '<b>인슐린 치료 당뇨병</b>',
+                      '<b>Cr &gt; 2.0 mg/dL</b> (신부전)'
+                    ]},
+                    { type: 'h4', text: '📊 점수별 MACE 위험' },
+                    { type: 'table', rows: [
+                      ['점수', 'MACE 위험(30일)', '해석'],
+                      ['0점', '0.4%', '저위험'],
+                      ['1점', '0.9%', '저위험'],
+                      ['2점', '6.6%', '중등도 — 추가 검사 고려'],
+                      ['≥3점', '≥11%', '고위험 — 심장내과 협진 · ICU 검토']
+                    ]},
+                    { type: 'tip', text: '<b>본 프로토콜 적용 환자</b>는 대부분 "고위험 수술(LOD)" 1점이 기본 부여. 여기에 심혈관·당뇨·신부전이 겹치면 즉시 <b>≥2점 → 심장내과 협진</b> 대상.' }
+                  ],
+                  ref: 'Lee TH et al. Circulation 1999;100:1043-1049.'
+                },
+                nsqip: {
+                  abbr: 'NSQIP',
+                  name: '외과 질 향상 프로그램',
+                  full: 'ACS National Surgical Quality Improvement Program Surgical Risk Calculator',
+                  def: '미국 외과학회(ACS) 개발 · <b>21개 변수</b>를 입력하면 30일 이내 합병증·사망률을 개별화 예측하는 온라인 도구. RCRI보다 정교하고 수술별 위험을 제공.',
+                  body: [
+                    { type: 'h4', text: '🖥 사용법' },
+                    { type: 'steps', items: [
+                      '온라인 접속: <b>riskcalculator.facs.org</b>',
+                      'CPT 코드 검색 (복벽재건술: 49561, 49565 등)',
+                      '환자 21개 변수 입력 (나이·기능상태·ASA·동반질환 등)',
+                      '개별 합병증(심장·폐·감염·재수술·사망) 확률 자동 산출',
+                      '결과 <b>PDF 인쇄 → 차트 부착</b> · 보호자 설명 자료로 활용'
+                    ]},
+                    { type: 'h4', text: '🎯 LOD 환자 활용 팁' },
+                    { type: 'ul', items: [
+                      '수술 결정 전 <b>Surgeon Adjustment</b> 항목에서 "이 환자는 예측보다 위험이 크다고 판단"을 체크하여 LOD 특성 반영',
+                      '심장 합병증 예측 위험이 <b>1% 이상</b>이면 심장내과 협진',
+                      '중환자실 필요 확률이 <b>50% 이상</b>이면 사전 ICU 확보',
+                      'RCRI와 함께 <b>이중 검증</b>하여 차트에 두 점수 모두 기록'
+                    ]},
+                    { type: 'tip', text: 'RCRI는 심혈관만, NSQIP는 <b>전체 합병증 + 사망률</b>까지 예측. 고위험 LOD 환자는 두 지표를 반드시 함께 사용.' }
+                  ],
+                  ref: 'Bilimoria KY et al. J Am Coll Surg 2013;217:833-842.'
+                },
+                news2: {
+                  abbr: 'NEWS2',
+                  name: '국가 조기경보점수 2판',
+                  full: 'National Early Warning Score 2 (Royal College of Physicians, 2017)',
+                  def: '6개 활력징후를 <b>0-3점</b>으로 채점하여 임상 악화를 조기 감지하는 <b>track-and-trigger 시스템</b>. 총점에 따라 대응 등급 결정.',
+                  body: [
+                    { type: 'h4', text: '📊 6개 파라미터 & 점수표' },
+                    { type: 'table', rows: [
+                      ['파라미터', '3점', '2점', '1점', '0점', '1점', '2점', '3점'],
+                      ['호흡수(/min)', '≤8', '', '9-11', '12-20', '', '21-24', '≥25'],
+                      ['SpO₂(%) Scale 1', '≤91', '92-93', '94-95', '≥96', '', '', ''],
+                      ['산소 투여', '', '', '', 'Air', '', 'Oxygen', ''],
+                      ['SBP(mmHg)', '≤90', '91-100', '101-110', '111-219', '', '', '≥220'],
+                      ['맥박(bpm)', '≤40', '', '41-50', '51-90', '91-110', '111-130', '≥131'],
+                      ['의식', '', '', '', 'Alert', '', '', 'CVPU'],
+                      ['체온(°C)', '≤35.0', '', '35.1-36.0', '36.1-38.0', '38.1-39.0', '≥39.1', '']
+                    ]},
+                    { type: 'h4', text: '🚨 총점별 대응' },
+                    { type: 'table', rows: [
+                      ['총점', '위험도', '측정 빈도', '대응'],
+                      ['0-4', '낮음', 'q12h', '통상 관찰'],
+                      ['1개 파라미터 3점', '낮-중', 'q4-6h', '전공의 즉시 알림'],
+                      ['5-6', '중', 'q1h', '상급자 대면 평가 · 임계 케어 팀 알림'],
+                      ['≥7', '높음', '연속', 'Rapid Response · ICU 전실']
+                    ]},
+                    { type: 'h4', text: '⚕️ 측정 실무 팁' },
+                    { type: 'steps', items: [
+                      '<b>호흡수는 눈으로 1분 완전 측정</b> — 30초×2는 부정확 (특히 밤에 놓치는 파라미터)',
+                      '<b>SpO₂ Scale 2</b>는 COPD·만성 CO₂ 저류 환자에 사용 (목표 88-92%)',
+                      '의식은 <b>ACVPU</b>로 평가: <b>C</b>onfusion(신발현) = 3점',
+                      '체온은 <b>고막·측두동맥 측정기</b> 사용 시 실제보다 낮게 나오는 편이 있음 — 저체온 판정 시 재검',
+                      '점수 산출 즉시 <b>EMR 관찰기록에 총점 입력</b> · 임계값 초과 시 자동 알림 설정'
+                    ]},
+                    { type: 'warn', text: '<b>NEWS2는 예후 예측 도구가 아니라 조기 경고 시스템</b>입니다. 단일 시점 점수보다 <b>추세(trend)</b>가 중요 — 4→6→7로 상승하면 절대값이 낮아도 즉시 에스컬레이션.' }
+                  ],
+                  ref: 'Royal College of Physicians. NEWS2 (2017). NHS England 표준 채택.'
+                },
+                iap: {
+                  abbr: 'IAP',
+                  name: '복강 내압',
+                  full: 'Intra-Abdominal Pressure — Bladder pressure via Foley',
+                  def: '복강 내부의 압력. 정상 <b>0-5 mmHg (0-7 cmH₂O)</b>. 방광에 25 mL 식염수를 주입 후 Foley를 통해 간접 측정하며, <b>병동에서는 자(ruler)로 물기둥 높이(cmH₂O) 측정 → mmHg 환산</b>이 표준. ICU에서는 압력 트랜스듀서로 mmHg 직독.',
+                  body: [
+                    { type: 'warn', text: '⚠️ <b>단위 주의</b>: 방광압 측정에는 두 방식이 있으며 <b>단위가 다릅니다</b>. 병동은 대부분 <b>물기둥법(cmH₂O)</b>, ICU/수술장은 <b>트랜스듀서법(mmHg)</b>. WSACS 임계값은 mmHg 기준이므로 <b>반드시 환산 필요</b>.' },
+                          { type: 'h4', text: '🔑 환산 공식 (반드시 기억)' },
+                          { type: 'ul', items: [
+                            '<b>1 mmHg = 1.36 cmH₂O</b> (수은/물 밀도비)',
+                            '<b>cmH₂O ÷ 1.36 = mmHg</b>',
+                            '<b>mmHg × 1.36 = cmH₂O</b>',
+                            '병동 암기용 두 지점: <b>27 cmH₂O ≈ 20 mmHg</b>, <b>34 cmH₂O ≈ 25 mmHg</b>'
+                          ]},
+                          { type: 'sticker' },
+                    { type: 'h4', text: '📊 등급별 환산표 (자로 측정한 cm 값을 그대로 비교)' },
+                    { type: 'table', rows: [
+                      ['등급', 'mmHg', '<b>cmH₂O (자 측정)</b>', '병동 대응'],
+                      ['정상', '0-5', '<b>0-7 cm</b>', '경과 관찰'],
+                      ['경계 상승', '6-11', '<b>8-15 cm</b>', '기저값 기록 · 감시 강화'],
+                      ['IAH I', '12-15', '<b>16-20 cm</b>', '수액 재검 · 진통 최적화'],
+                      ['IAH II', '16-20', '<b>22-27 cm</b>', 'NG 감압 · 관장 · NMB 검토'],
+                      ['IAH III', '21-25', '<b>28-34 cm</b>', '외과 감압 검토 · ICU 필수'],
+                      ['IAH IV / AbCS', '&gt;25', '<b>&gt;34 cm</b>', '<b>즉시 개복 감압술</b>']
+                    ]},
+                    { type: 'tip', text: '💡 <b>빠른 판정</b>: 병동에서 자로 잰 값이 <b>16 cm 넘으면 IAH</b>, <b>27 cm 넘으면 위험(Grade II 이상)</b>, <b>34 cm 넘으면 응급(감압술 검토)</b>. 셋 중 하나만 기억해도 실무 판단 가능.' },
+
+                    { type: 'h4', text: '🏥 [방법 A · 병동 표준] Water Column 측정법 (자로 cmH₂O 측정)' },
+                    { type: 'h4', text: '🧰 준비물 (병동 카트 사전 세팅)' },
+                    { type: 'ul', items: [
+                      'Foley 카테터 (이미 삽입된 상태)',
+                      '<b>60 mL 주사기</b> · <b>3-way stopcock</b> · <b>18G needle</b> or Foley urine sampling port',
+                      '<b>투명 수액 세트(IV extension tube)</b> — 물기둥 형성용, 약 60 cm 이상',
+                      '<b>멸균 생리식염수 25 mL</b> (성인) / 1 mL/kg 최대 25 mL',
+                      '<b>측정 자(ruler) 60 cm</b> 또는 벽면 눈금 스티커 · 알콜 스왑 · 클램프'
+                    ]},
+                    { type: 'h4', text: '📏 측정 절차 (물기둥법 · 병동)' },
+                    { type: 'steps', items: [
+                      '<b>체위: 완전 앙와위</b> — 침대 완전 수평 (Trendelenburg 금지, 두부 상승 금지)',
+                      '<b>영점(0 cm) 위치 결정: 액와중선(mid-axillary line)이 치골결합(symphysis pubis) 만나는 지점</b> — 여기에 자의 0을 맞춘다',
+                      'Foley 배액 튜브를 <b>클램프로 잠근다</b> (방광에서 소변 배출 차단)',
+                      'Foley의 <b>urine sampling port를 알콜 소독</b> → 3-way stopcock + 투명 수액 세트 연결',
+                      '<b>60 mL 주사기로 멸균 생리식염수 25 mL를 방광 내로 주입</b> (더 많이 주입 시 인위적 상승)',
+                      '주입 후 <b>30-60초 대기</b> (방광 근육 이완 — 급하면 값이 높게 나옴)',
+                      '<b>수액 세트를 수직으로 세워</b> 물기둥이 형성되게 한다 (튜브 안에 공기 방울 없게)',
+                      '<b>물기둥이 정지한 높이(cm)</b>를 자로 측정 — 영점 위치 기준',
+                      '<b>호기말(end-expiration)에 판독</b> — 흡기 시 횡격막 하강으로 5-10 cm 순간 상승',
+                      '측정한 cm 값을 <b>÷1.36 → mmHg로 환산</b>하거나 위 환산표로 등급 결정',
+                      '측정 후 <b>클램프 해제</b>, 소변량 정상화 확인 · <b>시간·수치·자세·측정자·단위</b> 모두 기록',
+                      '반복 측정은 <b>동일 조건</b>(자세·영점·주입량·호흡주기) — 추세가 절대값보다 중요'
+                    ]},
+
+                    { type: 'h4', text: '🏥 [방법 B · ICU/수술장] 압력 트랜스듀서 측정법 (mmHg 직독)' },
+                    { type: 'ul', items: [
+                      '동맥압 라인용 <b>압력 트랜스듀서 + 모니터 채널</b> 사용',
+                      '트랜스듀서를 <b>액와중선-치골결합 높이</b>에 고정 · 대기압으로 영점 조정(zeroing)',
+                      'Foley urine port → 3-way stopcock → 트랜스듀서 → 환자 모니터',
+                      '25 mL 생리식염수 주입 → 30-60초 대기 → <b>호기말 mmHg 값 모니터에서 직독</b>',
+                      '장점: 환산 불필요·연속 측정 가능 / 단점: 장비·라인 필요, 병동엔 대부분 없음'
+                    ]},
+
+                    { type: 'h4', text: '⚕️ LOD 환자 특화 팁' },
+                    { type: 'ul', items: [
+                      '<b>수술 종료 직전 baseline 측정</b> — 마취기록에 <b>수치+단위+측정법</b> 명기 (baseline 없이 POD 추적 불가)',
+                      'POD 0-1은 <b>q6h</b>, 상승 추세면 <b>q4h</b>로 강화',
+                      '<b>재현성 확보</b>: 매번 동일 방법·동일 자세·동일 측정자가 가장 이상적',
+                      '<b>측정 실패 Top 3</b>: (1) Foley 튜브 꼬임 (2) 방광 근육 경직 → sedation 부족 (3) 영점 위치 오류',
+                      '<b>측정 금기</b>: 방광 손상·요로감염·최근 방광 수술 → 위 카테터압/위전관압으로 대체',
+                      '<b>단위 혼동 방지</b>: EMR IAP 필드에 <b>반드시 단위 명기</b>(mmHg or cmH₂O) — 등급 오판의 최다 원인'
+                    ]},
+                    { type: 'warn', text: '<b>주의</b>: 방광 자극·수축·요로 감염이 있으면 인위적으로 값이 상승합니다. 예상보다 높으면 반드시 <b>재측정 + POCUS로 방광 상태 확인</b>.' },
+                    { type: 'tip', text: '💡 <b>병동 실행 체크</b>: (1) 측정 카트에 60 mL 주사기·투명 extension tube·60 cm 자·25 mL 식염수 상시 비치 (2) 측정 절차 카드 침상 옆 부착 (3) EMR IAP 필드 옆에 <b>단위 토글</b>(mmHg/cmH₂O) 필수 (4) 신규 인턴은 <b>실전 전 2회 관찰 + 1회 감독 하 시행</b> 원칙.' }
+                  ],
+                  ref: 'Kirkpatrick AW et al. WSACS Consensus. Intensive Care Med 2013;39:1190-1206. · Kron IL et al. Ann Surg 1984 (원법).'
+                },
+                iah: {
+                  abbr: 'IAH',
+                  name: '복강 내 고혈압',
+                  full: 'Intra-Abdominal Hypertension',
+                  def: '<b>지속적 또는 반복 측정한 IAP ≥ 12 mmHg</b>. LOD 수술 후 흔한 합병증으로, 지속되면 AbCS로 진행.',
+                  body: [
+                    { type: 'h4', text: '📊 진단 기준 (WSACS 2013)' },
+                    { type: 'ul', items: [
+                      'IAP <b>≥ 12 mmHg</b>가 <b>3회 이상 반복 측정</b>에서 확인',
+                      '<b>또는</b> 4-6시간 이내 연속 측정에서 지속',
+                      '단발 상승은 IAH가 아닌 <b>일시적 상승</b>일 수 있음 (기침·자세 변화)'
+                    ]},
+                    { type: 'h4', text: '⚕️ IAH 발견 시 즉시 조치 (WSACS Bundle)' },
+                    { type: 'steps', items: [
+                      '<b>NG tube 감압</b> · 대장 감압 (관장 · rectal tube)',
+                      '<b>수액 balance 재검</b> — 과부하는 IAH 악화 요인',
+                      '<b>진정·진통 최적화</b> — 복벽 긴장 이완',
+                      '필요 시 <b>신경근 이완제(NMB)</b> 단기 사용',
+                      '<b>복수·혈종·농양</b>이 있으면 경피 배액 (POCUS·CT 확인)',
+                      'IAP <b>≥ 20 + 새로운 장기 부전</b>이면 → AbCS로 재분류하여 <b>외과 감압술</b>'
+                    ]}
+                  ],
+                  ref: 'WSACS Consensus 2013.'
+                },
+                abcs: {
+                  abbr: 'AbCS / ACS',
+                  name: '복강 구획 증후군',
+                  full: 'Abdominal Compartment Syndrome',
+                  def: '<b>지속적 IAP &gt; 20 mmHg + 새로운 장기 부전(신·폐·순환)</b>이 동반된 응급 상태. <b>사망률 40-60%</b>. 진단 즉시 감압술이 원칙.',
+                  body: [
+                    { type: 'h4', text: '📋 진단 기준' },
+                    { type: 'ul', items: [
+                      'IAP <b>&gt; 20 mmHg</b> (일부 문헌 ≥ 20)',
+                      '+ 아래 중 <b>새로 발생한 장기 부전</b> 1개 이상:',
+                      '&nbsp;&nbsp;· <b>신부전</b> — 소변량 &lt; 0.5 mL/kg/h × 2h, Cr 상승',
+                      '&nbsp;&nbsp;· <b>호흡부전</b> — 기도압 상승, P/F ratio 저하',
+                      '&nbsp;&nbsp;· <b>순환부전</b> — CVP·PCWP 상승에도 CO 저하'
+                    ]},
+                    { type: 'h4', text: '🚨 LOD 환자 특이 위험 요인' },
+                    { type: 'ul', items: [
+                      '<b>loss of domain</b>이 클수록 폐쇄 후 IAP 상승 폭 큼',
+                      '수술 중 대량 수액 · 체온 저하 · 조직 부종',
+                      '수술 후 <b>기도압 급상승 + 소변량 감소</b> 조합은 즉각 IAP 측정 신호'
+                    ]},
+                    { type: 'h4', text: '⚕️ 응급 처치 순서' },
+                    { type: 'steps', items: [
+                      '<b>IAP 재측정</b> 확진 + POCUS/CT로 원인 확인 (복수·혈종·부종)',
+                      '<b>ICU 즉시 이송</b> · 상급자 대면 평가',
+                      'WSACS 비수술적 번들 시행 (NG 감압·수액 재조정·NMB·경피 배액)',
+                      '<b>1시간 이내 반응 없으면 개복 감압술</b>',
+                      '개복 후 <b>일시적 복벽 폐쇄(TAC, temporary abdominal closure)</b> · 재수술 계획',
+                      '가족에게 <b>사망률 및 재수술 필요성</b> 설명'
+                    ]},
+                    { type: 'warn', text: 'AbCS는 <b>진단 지연 = 사망</b>입니다. LOD 환자에서 <b>기도압 상승 + 저혈압 + 소변량 감소</b> 3징후가 나오면 IAP 측정 결과를 기다리지 말고 <b>병행 시행</b>하십시오.' }
+                  ],
+                  ref: 'Kirkpatrick AW et al. WSACS Consensus. Intensive Care Med 2013.'
+                },
+                hstni: {
+                  abbr: 'hs-TnI',
+                  name: '고감도 트로포닌 I',
+                  full: 'High-sensitivity Troponin I',
+                  def: '심근 손상 특이 바이오마커. 기존 트로포닌보다 <b>10-100배 낮은 농도</b>도 검출 가능하여 급성 심근경색(AMI)의 빠른 진단 rule-in/rule-out에 사용.',
+                  body: [
+                    { type: 'h4', text: '📊 판독 원칙 (Δ-change 기반)' },
+                    { type: 'ul', items: [
+                      '<b>정상 상한</b>: 여자 &lt; 16 ng/L, 남자 &lt; 34 ng/L (제조사별 다름 — 검사실 기준 확인)',
+                      '<b>0h/3h 프로토콜</b>: 기준값 대비 Δ &gt; 20% 상승 or 상한 초과 → 심근 손상',
+                      '<b>수술 후 상승</b>은 자체 수술 스트레스만으로도 발생 가능 — <b>ECG 변화·증상·심초음파</b>와 반드시 병행 해석'
+                    ]},
+                    { type: 'h4', text: '⚕️ 실무 팁' },
+                    { type: 'ul', items: [
+                      '<b>베이스라인 수치</b>는 반드시 수술 전 확보 (POD 상승 해석 기준점)',
+                      'POCUS로 <b>새로운 벽 운동 이상</b>이 있으면 상승 폭 작아도 ACS 의심',
+                      'CKD 환자는 만성적으로 상승할 수 있으므로 <b>추세 판독</b>',
+                      '심근염·PE·패혈증·뇌졸중도 상승 → 감별진단 병행'
+                    ]},
+                    { type: 'warn', text: '증례 교훈: <b>단일 시점 정상 수치로 심근허혈을 배제하지 마십시오</b>. 3시간 후 반복 채혈이 원칙.' }
+                  ],
+                  ref: 'Fourth Universal Definition of Myocardial Infarction (2018).'
+                },
+                pocus: {
+                  abbr: 'POCUS',
+                  name: '침상 초음파',
+                  full: 'Point-of-Care Ultrasound',
+                  def: '진단·처치 즉시 침상 옆에서 시행하는 목표 지향 초음파. 응급 상황에서 <b>4-6분 안에</b> 심장·폐·복부·혈관 상태 확인 가능.',
+                  body: [
+                    { type: 'h4', text: '🩺 LOD 환자 응급 시 POCUS 프로토콜' },
+                    { type: 'table', rows: [
+                      ['영역', '확인 항목', '소요'],
+                      ['심장 (parasternal, apical)', 'EF 시각적 평가·심장 tamponade·D-shape RV(PE)', '2분'],
+                      ['IVC (subcostal)', '직경·호흡변이 → 전부하 평가', '30초'],
+                      ['폐 (BLUE protocol)', 'B-line(폐부종)·기흉·흉수', '2분'],
+                      ['복부 (FAST)', '복강 유리액·혈복강', '1분'],
+                      ['방광', '방광 부피·요폐색·Foley 위치', '30초']
+                    ]},
+                    { type: 'h4', text: '🎯 소견별 판단' },
+                    { type: 'ul', items: [
+                      'IVC &lt; 1 cm + 완전 collapse → <b>저혈량</b> → 수액 반응 예측 +',
+                      'IVC &gt; 2.5 cm + 무변이 → <b>우심 부전 or AbCS</b>',
+                      '심낭 유리액 + tamponade 소견 → 즉시 심낭천자',
+                      'B-line 다발 → <b>수액 과부하 or 심부전</b>',
+                      '복강 유리액 새로 발견 → <b>수술 후 출혈</b> 감별'
+                    ]},
+                    { type: 'tip', text: 'POCUS는 <b>정식 초음파의 대체가 아닌 스크리닝</b>. 소견 있으면 정식 초음파·CT로 확진.' }
+                  ],
+                  ref: 'ACEP Emergency Ultrasound Guidelines.'
+                },
+                map: {
+                  abbr: 'MAP',
+                  name: '평균 동맥압',
+                  full: 'Mean Arterial Pressure',
+                  def: '한 심박 주기 동안의 평균 동맥압. <b>MAP = DBP + (SBP - DBP)/3</b>. 조직 관류의 대표 지표.',
+                  body: [
+                    { type: 'h4', text: '🎯 목표값 (환자군별)' },
+                    { type: 'table', rows: [
+                      ['환자군', 'MAP 목표', '근거'],
+                      ['일반 성인', '≥ 65 mmHg', '조직 관류 최소치'],
+                      ['고령 (75세↑)', '≥ 70 mmHg', '자가 조절 상향 이동'],
+                      ['만성 고혈압', '기저 MAP -20% 이내', '뇌·신장 관류 유지'],
+                      ['패혈증 쇼크', '≥ 65 mmHg', 'SSC 2021 가이드'],
+                      ['수술 중', '≥ 65 mmHg 10분 이상 하락 금지', '술후 신부전·심근허혈 증가']
+                    ]},
+                    { type: 'h4', text: '⚕️ 임상 팁' },
+                    { type: 'ul', items: [
+                      '수술 중 MAP &lt; 65 <b>10분 이상 지속 = 술후 신부전 · MI 위험 2-3배</b>',
+                      '자동 산출되지 않는 모니터는 <b>수동 계산 확인</b>',
+                      '고령·CKD·기저 고혈압 환자는 <b>70-75 mmHg</b> 목표 상향'
+                    ]}
+                  ],
+                  ref: 'POISE-3 trial; Sessler DI et al. Anesthesiology 2019.'
+                },
+                afrvr: {
+                  abbr: 'AF-RVR',
+                  name: '심방세동 with 급속 심실 반응',
+                  full: 'Atrial Fibrillation with Rapid Ventricular Response',
+                  def: '심방세동에서 <b>심실 박동수 &gt; 110 bpm</b>인 상태. 심근 허혈·심부전 유발 가능. 원인 감별 후 rate control이 원칙.',
+                  body: [
+                    { type: 'h4', text: '⚕️ 대응 알고리즘' },
+                    { type: 'steps', items: [
+                      '<b>안정성 평가</b>: 저혈압·흉통·의식 저하·심부전 → 불안정 → <b>즉시 전기적 심조율 전환</b>',
+                      '안정 시 <b>유발 요인 교정</b>: K⁺/Mg²⁺ 저하, 저산소, 발열, 통증, 저혈량, 감염, 갑상선기능항진',
+                      'Rate control: <b>β-blocker</b> (metoprolol 2.5-5 mg IV) 또는 <b>diltiazem</b> — SBP &lt; 100이면 재고',
+                      '심부전 동반 시 <b>digoxin</b> 또는 <b>amiodarone</b>',
+                      '48시간 이상 지속 · 새로 발생 · 색전 위험 → <b>항응고 재개 결정</b> (CHA₂DS₂-VASc)',
+                      '<b>지속되면 심장내과 협진</b>'
+                    ]},
+                    { type: 'warn', text: '수술 후 AF-RVR은 <b>단순 부정맥이 아니라 저혈량 · 감염 · 심근허혈의 신호</b>일 수 있습니다. 원인 감별을 rate control보다 우선.' }
+                  ]
+                },
+                anginal: {
+                  abbr: 'Anginal equivalent',
+                  name: '협심증 등가 증상',
+                  full: '비전형적 심근허혈 증상',
+                  def: '흉통이 아닌 <b>비전형 증상으로 나타나는 심근허혈</b>. 고령·여성·당뇨 환자에서 흔함. 놓치면 치명적.',
+                  body: [
+                    { type: 'h4', text: '🚨 주요 형태' },
+                    { type: 'ul', items: [
+                      '<b>명치·상복부 통증</b> — 하벽 심근경색의 40%가 상복부 통증으로 발현',
+                      '<b>호흡곤란</b>만 단독 (특히 고령 여성 · 당뇨)',
+                      '<b>극심한 피로 · 어지러움</b>',
+                      '<b>턱 · 왼팔 · 등 방사통</b> 단독',
+                      '<b>메스꺼움 · 구토 · 발한</b> — 미주신경 활성화',
+                      '<b>새로 발생한 부정맥</b> (특히 AF-RVR, VT)'
+                    ]},
+                    { type: 'h4', text: '⚕️ 대응 원칙' },
+                    { type: 'steps', items: [
+                      '증상 즉시 <b>12유도 ECG</b> (5분 이내)',
+                      '<b>hs-TnI 채혈</b> (0h + 3h 반복)',
+                      '이전 ECG와 <b>세밀한 비교</b> — 미묘한 ST 변화도 놓치지 말 것',
+                      '심초음파/POCUS — 벽 운동 이상 확인',
+                      '<b>고령 여성이 "속쓰림·명치통증"을 호소하면 ACS 배제까지 심근허혈 의심</b>'
+                    ]},
+                    { type: 'warn', text: '<b>증례 교훈</b>: 83세 여성 환자의 17:00 "명치 통증"이 소화기 증상으로 판단되었으나, 실제로는 심근허혈의 전조였을 가능성 — 이 시점에 ECG·TnI를 즉시 시행했다면 결과가 달랐을 수 있음.' }
+                  ]
+                },
+                rebound: {
+                  abbr: 'Rebound',
+                  name: '리바운드 빈맥',
+                  full: 'β-blocker withdrawal rebound tachycardia',
+                  def: '만성적으로 베타차단제를 복용하던 환자에서 <b>수술 등을 이유로 갑자기 중단</b>하면 발생하는 반동성 교감신경 항진 — <b>빈맥·고혈압·심근허혈·MI</b> 유발.',
+                  body: [
+                    { type: 'h4', text: '⚠️ 위험 시기' },
+                    { type: 'ul', items: [
+                      '중단 <b>24-48시간 후 최대</b>',
+                      '5-7일까지 지속 가능',
+                      '만성 복용 환자일수록 심함'
+                    ]},
+                    { type: 'h4', text: '⚕️ 예방 원칙' },
+                    { type: 'steps', items: [
+                      '<b>베타차단제는 수술 당일도 지속 투여</b> (POISE-1 이후 표준)',
+                      '경구 불가 시 <b>IV metoprolol / esmolol</b>로 전환',
+                      '중단이 불가피하면 <b>3-7일에 걸쳐 서서히 감량</b>',
+                      '수술 후 조기 재개 (경구 가능 즉시)'
+                    ]},
+                    { type: 'warn', text: '<b>새로 시작</b>하는 것은 POISE-1에서 사망률 증가로 권장하지 않음. 이 항목은 <b>이미 복용 중인 환자의 지속 투여</b>에 관한 것.' }
+                  ],
+                  ref: 'POISE Trial. Lancet 2008;371:1839-1847.'
+                }
+              };
+
+              // 팝업 렌더링 함수
+              const tModal = document.getElementById('term-modal-back');
+              const tAbbr = document.getElementById('term-abbr');
+              const tName = document.getElementById('term-name');
+              const tFull = document.getElementById('term-full');
+              const tBody = document.getElementById('term-body');
+              const tClose = document.getElementById('term-modal-close');
+
+              function renderTermBody(blocks) {
+                if (!blocks) return '';
+                let html = '';
+                blocks.forEach((b) => {
+                  if (b.type === 'h4') html += '<h4>' + b.text + '</h4>';
+                  else if (b.type === 'ul') {
+                    html += '<ul>';
+                    b.items.forEach((it) => (html += '<li>' + it + '</li>'));
+                    html += '</ul>';
+                  } else if (b.type === 'steps') {
+                    html += '<ol class="steps">';
+                    b.items.forEach((it) => (html += '<li>' + it + '</li>'));
+                    html += '</ol>';
+                  } else if (b.type === 'table') {
+                    html += '<table><thead><tr>';
+                    b.rows[0].forEach((c) => (html += '<th>' + c + '</th>'));
+                    html += '</tr></thead><tbody>';
+                    for (let i = 1; i < b.rows.length; i++) {
+                      html += '<tr>';
+                      b.rows[i].forEach((c) => (html += '<td>' + c + '</td>'));
+                      html += '</tr>';
+                    }
+                    html += '</tbody></table>';
+                  } else if (b.type === 'tip') {
+                    html += '<div class="tip">' + b.text + '</div>';
+                  } else if (b.type === 'warn') {
+                    html += '<div class="warn-box">' + b.text + '</div>';
+                  } else if (b.type === 'sticker') {
+                    // 인터랙티브 환산 스티커 (mmHg ↔ cmH₂O)
+                    html +=
+                      '<div class="conv-sticker" role="group" aria-label="mmHg cmH₂O 실시간 환산">' +
+                        '<div class="cs-title"><span class="cs-badge">환산 스티커</span> mmHg ↔ cmH₂O 실시간 계산기</div>' +
+                        '<div class="cs-row">' +
+                          '<div class="cs-side"><label>mmHg</label><input type="number" id="cs-mmhg" step="0.1" placeholder="예: 15" inputmode="decimal" aria-label="mmHg 입력"></div>' +
+                          '<div class="cs-arrow">⇄</div>' +
+                          '<div class="cs-side"><label>cmH₂O (자로 잰 값)</label><input type="number" id="cs-cmh2o" step="0.1" placeholder="예: 20" inputmode="decimal" aria-label="cmH₂O 입력"></div>' +
+                        '</div>' +
+                        '<div class="cs-verdict" id="cs-verdict">— 값을 입력하세요</div>' +
+                        '<div class="cs-quick">💡 <b>빠른 대입</b>: ' +
+                          '<span class="qp" data-cs-quick="12">12 mmHg (IAH↑)</span>' +
+                          '<span class="qp" data-cs-quick="20">20 mmHg (Grade II↑)</span>' +
+                          '<span class="qp" data-cs-quick="25">25 mmHg (감압)</span>' +
+                          '<span class="qp" data-cs-quick-cm="16">16 cm (IAH↑)</span>' +
+                          '<span class="qp" data-cs-quick-cm="27">27 cm (Grade II↑)</span>' +
+                          '<span class="qp" data-cs-quick-cm="34">34 cm (감압)</span>' +
+                        '</div>' +
+                      '</div>';
+                  }
+                });
+                return html;
+              }
+
+              // 환산 스티커 바인딩 함수 (팝업이 열린 뒤 호출)
+              function bindConvSticker() {
+                const CM = 1.36;
+                const inMm = document.getElementById('cs-mmhg');
+                const inCm = document.getElementById('cs-cmh2o');
+                const verdict = document.getElementById('cs-verdict');
+                if (!inMm || !inCm || !verdict) return;
+
+                function grade(mmhg) {
+                  if (isNaN(mmhg)) return { cls: '', txt: '— 값을 입력하세요' };
+                  if (mmhg < 6) return { cls: 'g0', txt: '🟢 정상 (경과 관찰)' };
+                  if (mmhg < 12) return { cls: 'g0', txt: '🟢 경계 상승 (감시 강화)' };
+                  if (mmhg <= 15) return { cls: 'g1', txt: '🟡 IAH Grade I · 수액 재검' };
+                  if (mmhg <= 20) return { cls: 'g2', txt: '🟠 IAH Grade II · NG 감압·NMB 검토' };
+                  if (mmhg <= 25) return { cls: 'g3', txt: '🔴 IAH Grade III · 감압 검토·ICU' };
+                  return { cls: 'g4', txt: '🔴 IAH Grade IV / AbCS · 즉시 감압술' };
+                }
+
+                function update(mmhg) {
+                  const g = grade(mmhg);
+                  verdict.className = 'cs-verdict ' + g.cls;
+                  if (isNaN(mmhg)) verdict.textContent = g.txt;
+                  else verdict.innerHTML = '<b>' + mmhg.toFixed(1) + ' mmHg</b> · <b>' + (mmhg * CM).toFixed(1) + ' cmH₂O</b> · ' + g.txt;
+                }
+
+                inMm.addEventListener('input', () => {
+                  const v = parseFloat(inMm.value);
+                  if (!isNaN(v)) {
+                    inCm.value = (v * CM).toFixed(1);
+                    update(v);
+                  } else {
+                    inCm.value = '';
+                    update(NaN);
+                  }
+                });
+                inCm.addEventListener('input', () => {
+                  const v = parseFloat(inCm.value);
+                  if (!isNaN(v)) {
+                    const mm = v / CM;
+                    inMm.value = mm.toFixed(1);
+                    update(mm);
+                  } else {
+                    inMm.value = '';
+                    update(NaN);
+                  }
+                });
+                // 빠른 대입
+                document.querySelectorAll('[data-cs-quick]').forEach((el) => {
+                  el.addEventListener('click', () => {
+                    inMm.value = el.getAttribute('data-cs-quick');
+                    inMm.dispatchEvent(new Event('input', { bubbles: true }));
+                  });
+                });
+                document.querySelectorAll('[data-cs-quick-cm]').forEach((el) => {
+                  el.addEventListener('click', () => {
+                    inCm.value = el.getAttribute('data-cs-quick-cm');
+                    inCm.dispatchEvent(new Event('input', { bubbles: true }));
+                  });
+                });
+                update(NaN);
+              }
+
+              function openTerm(key) {
+                const t = TERMS[key];
+                if (!t) return;
+                tAbbr.textContent = t.abbr;
+                tName.textContent = t.name;
+                tFull.textContent = t.full;
+                let html = '<div class="def-box">' + t.def + '</div>';
+                html += renderTermBody(t.body);
+                if (t.ref) html += '<div class="ref">📚 근거: ' + t.ref + '</div>';
+                tBody.innerHTML = html;
+                tModal.classList.add('show');
+                tModal.scrollTop = 0;
+                // 스티커가 있으면 바인딩
+                bindConvSticker();
+                // ARIA
+                setTimeout(() => tClose.focus(), 50);
+              }
+
+              function closeTerm() { tModal.classList.remove('show'); }
+
+              // 클릭 위임 (term span + howto 버튼)
+              document.addEventListener('click', (e) => {
+                const term = e.target.closest('.term');
+                if (term) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openTerm(term.getAttribute('data-term'));
+                  return;
+                }
+                const howto = e.target.closest('.howto-btn');
+                if (howto) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  openTerm(howto.getAttribute('data-howto'));
+                  return;
+                }
+              });
+              // 키보드 접근성
+              document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  const el = document.activeElement;
+                  if (el && el.classList && el.classList.contains('term')) {
+                    e.preventDefault();
+                    openTerm(el.getAttribute('data-term'));
+                  }
+                }
+                if (e.key === 'Escape' && tModal.classList.contains('show')) closeTerm();
+              });
+                    tClose.addEventListener('click', closeTerm);
+                    tModal.addEventListener('click', (e) => { if (e.target === tModal) closeTerm(); });
+
+              // ══════════════════════════════════════════════════
+              // ── EMR 요약 · 클립보드 복사 시스템
+              // ══════════════════════════════════════════════════
+              const emrToast = document.getElementById('emr-toast');
+              const emrToastText = document.getElementById('emr-toast-text');
+              function showToast(msg) {
+                if (!emrToast) return;
+                emrToastText.textContent = msg;
+                emrToast.classList.add('show');
+                clearTimeout(emrToast._t);
+                emrToast._t = setTimeout(() => emrToast.classList.remove('show'), 2200);
+              }
+
+              function nowStr() {
+                const d = new Date();
+                const p = (n) => String(n).padStart(2, '0');
+                return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+              }
+
+              function patientHeader() {
+                const id = (document.getElementById('pt-id')||{}).value || '';
+                const nm = (document.getElementById('pt-name')||{}).value || '';
+                const pod = (document.getElementById('pt-pod')||{}).value || '';
+                const doc = (document.getElementById('pt-doc')||{}).value || '';
+                const parts = [];
+                if (id) parts.push('ID: ' + id);
+                if (nm) parts.push('성명: ' + nm);
+                if (pod) parts.push('POD: ' + pod);
+                if (doc) parts.push('담당: ' + doc);
+                return parts.length ? parts.join(' · ') : '(환자 정보 미입력)';
+              }
+
+              // 각 섹션별 요약 생성 함수
+              const EMR = {};
+
+              // [적용 대상]
+              EMR.apply = function() {
+                const items = document.querySelectorAll('[data-apply]');
+                const checked = [], unchecked = [];
+                items.forEach((l) => {
+                  const on = l.querySelector('input').checked;
+                  const label = (l.querySelector('.txt')||{}).textContent || '';
+                  (on ? checked : unchecked).push(label.trim());
+                });
+                let lvl = '일반';
+                if (checked.length >= 3) lvl = '초고위험군 (ICU/Step-down 강력 권고)';
+                else if (checked.length >= 1) lvl = '고위험군';
+                return [
+                  '■ 고위험 프로토콜 적용 판정',
+                  '· 위험 요인 (' + checked.length + '/' + items.length + '개 해당): ' + (checked.length ? checked.join(', ') : '없음'),
+                  '· 분류: ' + lvl
+                ].join('\n');
+              };
+
+              // [1] 수술 전
+              EMR.preop = function() {
+                const items = document.querySelectorAll('#preop-list [data-preop]');
+                const checked = [], missing = [];
+                items.forEach((l) => {
+                  const on = l.querySelector('input').checked;
+                  // .txt 내에서 .why를 제외한 첫 텍스트만 뽑기 위해 clone
+                  const t = l.querySelector('.txt').cloneNode(true);
+                  const why = t.querySelector('.why');
+                  if (why) why.remove();
+                  const label = t.textContent.trim();
+                  (on ? checked : missing).push(label);
+                });
+                const lines = [
+                  '■ 수술 전 필수 확인 (' + checked.length + '/' + items.length + '개 완료)',
+                  '· 완료: ' + (checked.length ? checked.join('; ') : '없음')
+                ];
+                if (missing.length) lines.push('· 미완료: ' + missing.join('; '));
+                return lines.join('\n');
+              };
+
+              // [2] 수술 중 → 인수인계
+              EMR.intra = function() {
+                const v = (id) => (document.getElementById(id)||{}).value || '';
+                const opTime = v('op-time'), opEbl = v('op-ebl'), opFluid = v('op-fluid');
+                const opLowBp = v('op-lowbp'), opHiHr = v('op-hihr'), opIap = v('op-iap');
+                const opScenario = v('op-scenario');
+                const chk = document.querySelectorAll('[data-op] input');
+                const chkTxts = [];
+                chk.forEach((c) => {
+                  if (c.checked) {
+                    const l = c.closest('.chk');
+                    const t = (l && l.querySelector('.txt')||{}).textContent || '';
+                    chkTxts.push(t.trim());
+                  }
+                });
+                const lines = ['■ 수술 중 · 병동 인수인계'];
+                if (opTime) lines.push('· 수술시간: ' + opTime + ' 분');
+                if (opEbl) lines.push('· EBL: ' + opEbl + ' mL');
+                if (opFluid) lines.push('· 수액/수혈: ' + opFluid + ' mL');
+                if (opLowBp) lines.push('· 최저 SBP/DBP: ' + opLowBp);
+                if (opHiHr) lines.push('· 최고 HR: ' + opHiHr + ' bpm');
+                if (opIap) lines.push('· 종료 전 방광 IAP: ' + opIap + ' mmHg');
+                if (chkTxts.length) lines.push('· 특이사항 체크: ' + chkTxts.join('; '));
+                if (opScenario) lines.push('· 예상 위험 시나리오: ' + opScenario);
+                if (lines.length === 1) lines.push('· 기록 없음');
+                return lines.join('\n');
+              };
+
+              // [3] 수술 후 모니터링
+              EMR.mon = function() {
+                const rows = document.querySelectorAll('#mon-body tr[data-mon]');
+                const lines = ['■ 수술 후 모니터링 상태 (POD 0-3)'];
+                rows.forEach((r) => {
+                  const name = (r.querySelector('.item-name')||{}).textContent || '';
+                  const last = (r.querySelector('.lastcheck')||{}).textContent || '—';
+                  const stat = (r.querySelector('.status')||{}).textContent || '';
+                  lines.push('· ' + name.replace(/📖\s*$/, '').trim() + ' — 마지막 확인: ' + last.trim() + ' ' + stat.trim());
+                });
+                return lines.join('\n');
+              };
+
+              // [4] 에스컬레이션 트리거
+              EMR.trig = function() {
+                const trigs = document.querySelectorAll('#trigger-grid .trigger');
+                const onList = [];
+                trigs.forEach((t) => {
+                  if (t.classList.contains('on')) {
+                    const body = (t.querySelector('.body')||{}).textContent || '';
+                    onList.push(body.trim());
+                  }
+                });
+                const alarmOn = (document.getElementById('alarm-banner')||{}).classList && document.getElementById('alarm-banner').classList.contains('show');
+                const cd = (document.getElementById('countdown')||{}).textContent || '';
+                const steps = document.querySelectorAll('#action-steps li');
+                const doneSteps = [];
+                steps.forEach((li) => {
+                  const cb = li.querySelector('input[type=checkbox]');
+                  if (cb && cb.checked) {
+                    const lbl = (li.querySelector('.step-label')||{}).textContent || '';
+                    const tm = (li.querySelector('input[type=time]')||{}).value || '';
+                    doneSteps.push(lbl.trim() + (tm ? ' [' + tm + ']' : ''));
+                  }
+                });
+                const lines = ['■ 에스컬레이션 트리거 상태'];
+                if (!onList.length && !alarmOn) return lines.concat(['· 활성 트리거 없음']).join('\n');
+                lines.push('· 🚨 활성 트리거 (' + onList.length + '개): ' + onList.join(' | '));
+                if (alarmOn) lines.push('· 카운트다운: ' + cd + ' 남음 (30분 이내 상급자 대면 평가 필수)');
+                if (doneSteps.length) lines.push('· 자동 행동 세트 완료: ' + doneSteps.join('; '));
+                else lines.push('· 자동 행동 세트: 미시행');
+                return lines.join('\n');
+              };
+
+              // [5] NEWS2
+              EMR.news2 = function() {
+                const v = (id) => (document.getElementById(id)||{}).value || '';
+                const rr = v('n-rr'), spo2 = v('n-spo2'), o2 = v('n-o2'), sbp = v('n-sbp'), hr = v('n-hr'), cns = v('n-cns'), temp = v('n-temp');
+                const score = (document.getElementById('news2-score')||{}).textContent || '0';
+                const resp = (document.getElementById('news2-resp')||{}).textContent || '';
+                const parts = [];
+                if (rr) parts.push('RR ' + rr);
+                if (spo2) parts.push('SpO₂ ' + spo2 + '%');
+                if (o2) parts.push(o2 === 'oxygen' ? 'O₂ 투여 中' : 'Room air');
+                if (sbp) parts.push('SBP ' + sbp);
+                if (hr) parts.push('HR ' + hr);
+                if (cns) parts.push('의식 ' + (cns === 'alert' ? 'Alert' : cns === 'confused' ? 'New Confusion' : cns.toUpperCase()));
+                if (temp) parts.push('체온 ' + temp + '℃');
+                const lines = ['■ NEWS2 평가'];
+                if (parts.length) lines.push('· 활력 입력: ' + parts.join(', '));
+                lines.push('· 총점: ' + score + '점');
+                lines.push('· 대응 등급: ' + resp.trim());
+                return lines.join('\n');
+              };
+
+              // [6] IAP 해석기
+              EMR.iap = function() {
+                const CM = 1.36;
+                const raw = parseFloat((document.getElementById('iap-input')||{}).value);
+                const unit = (typeof iapUnit !== 'undefined') ? iapUnit : 'mmHg';
+                const organ = (document.getElementById('iap-organ')||{}).checked;
+                let mm = NaN, cm = NaN;
+                if (!isNaN(raw)) {
+                  if (unit === 'mmHg') { mm = raw; cm = raw * CM; }
+                  else { cm = raw; mm = raw / CM; }
+                }
+                const active = document.querySelector('.iap-tier.active');
+                const tierText = active ? (active.querySelector('span')||{}).textContent || '' : '(측정값 없음)';
+                const abcsShown = (document.getElementById('abcs-alert')||{}).classList && document.getElementById('abcs-alert').classList.contains('show');
+                const lines = ['■ 방광 내압(IAP) 평가'];
+                if (isNaN(mm)) lines.push('· 측정값: 미입력');
+                else lines.push('· 측정값: ' + mm.toFixed(1) + ' mmHg (' + cm.toFixed(1) + ' cmH₂O), 입력 단위 = ' + (unit === 'mmHg' ? 'mmHg' : 'cmH₂O'));
+                lines.push('· 등급: ' + tierText.trim());
+                lines.push('· 장기 기능 장애 동반: ' + (organ ? '예' : '아니오'));
+                if (abcsShown) lines.push('· 🚨 AbCS 확진 조건 충족 — 즉시 감압술(개복/감압 도관) 검토');
+                return lines.join('\n');
+              };
+
+              // [7] 감별진단
+              EMR.ddx = function() {
+                const sxs = document.querySelectorAll('.sx-chip input:checked');
+                const sxList = [];
+                sxs.forEach((c) => {
+                  const l = c.closest('.sx-chip');
+                  const txt = (l ? l.textContent : '').trim();
+                  if (txt) sxList.push(txt);
+                });
+                const matched = document.querySelectorAll('#ddx-list .ddx-item.match');
+                const ddxList = [];
+                matched.forEach((it) => {
+                  const nm = (it.querySelector('.name')||{}).textContent || '';
+                  const tl = (it.querySelector('.tools')||{}).textContent || '';
+                  ddxList.push(nm.trim() + ' (' + tl.trim().replace(/\s*📖\s*/, '').trim() + ')');
+                });
+                const lines = ['■ 감별진단 매트릭스'];
+                lines.push('· 관찰 증상: ' + (sxList.length ? sxList.join(', ') : '선택 없음'));
+                lines.push('· 우선 감별질환: ' + (ddxList.length ? ddxList.join(' / ') : '(증상 선택 시 자동 강조)'));
+                return lines.join('\n');
+              };
+
+              // [8] 침상 안정
+              EMR.bed = function() {
+                const activated = (document.getElementById('bed-triple')||{}).classList && document.getElementById('bed-triple').classList.contains('show');
+                const triple = document.querySelectorAll('#bed-triple input:checked');
+                const tripleList = [];
+                triple.forEach((c) => {
+                  const l = c.closest('label');
+                  if (l) tripleList.push(l.textContent.trim());
+                });
+                const ts = (document.getElementById('bed-timestamp')||{}).textContent || '';
+                const lines = ['■ 침상 안정 규정'];
+                lines.push('· 처방 활성화: ' + (activated ? '예' : '아니오'));
+                if (activated) {
+                  lines.push('· 3중 고지 이행: ' + (tripleList.length ? tripleList.join(' / ') : '미이행'));
+                  if (ts) lines.push('· 활성화 시각: ' + ts.trim());
+                }
+                return lines.join('\n');
+              };
+
+              // [9] 약물 주의 (정보성 — 체크 상태 없음)
+              EMR.drug = function() {
+                return [
+                  '■ 약물 주의사항 (참조)',
+                  '· 베타차단제: 조기 재개 원칙 · 단, SBP<100 상태에서 rate-control 추가 투여는 재고',
+                  '· 항응고제: POD 1 재개 여부 재평가 및 명문화'
+                ].join('\n');
+              };
+
+              // 통합 요약
+              function buildAll() {
+                const head = [
+                  '═══════════════════════════════════════════',
+                  '  LOD 수술 주술기 요약 (v1.5) — ' + nowStr(),
+                  '  ' + patientHeader(),
+                  '═══════════════════════════════════════════'
+                ].join('\n');
+                const order = ['apply', 'preop', 'intra', 'mon', 'trig', 'news2', 'iap', 'ddx', 'bed', 'drug'];
+                return head + '\n\n' + order.map((k) => EMR[k]()).join('\n\n') + '\n\n' +
+                  '— 본 요약은 대시보드에 입력된 값에 기반한 자동 생성 텍스트이며, 임상 판단을 대신하지 않음. —';
+              }
+
+              function buildSection(key) {
+                const head = '[' + nowStr() + '] ' + patientHeader();
+                return head + '\n\n' + EMR[key]();
+              }
+
+              // 클립보드 복사 (execCommand fallback 포함)
+              async function copyText(text) {
+                try {
+                  if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                  }
+                } catch (e) {}
+                // fallback
+                try {
+                  const ta = document.createElement('textarea');
+                  ta.value = text;
+                  ta.style.position = 'fixed';
+                  ta.style.left = '-9999px';
+                  document.body.appendChild(ta);
+                  ta.focus();
+                  ta.select();
+                  const ok = document.execCommand('copy');
+                  document.body.removeChild(ta);
+                  return ok;
+                } catch (e) { return false; }
+              }
+
+              // 각 섹션 버튼 클릭
+              document.querySelectorAll('.emr-copy').forEach((btn) => {
+                btn.addEventListener('click', async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const key = btn.getAttribute('data-emr');
+                  if (!EMR[key]) return;
+                  const text = buildSection(key);
+                  const ok = await copyText(text);
+                  if (ok) {
+                    btn.classList.add('copied');
+                    btn.textContent = '복사됨';
+                    showToast('섹션 요약이 클립보드에 복사됨');
+                    setTimeout(() => {
+                      btn.classList.remove('copied');
+                      btn.textContent = 'EMR 복사';
+                    }, 1600);
+                  } else {
+                    showToast('❌ 복사 실패 — 미리보기 창에서 수동 복사 필요');
+                    openEmrPreview(text);
+                  }
+                });
+              });
+
+              // 전체 복사 / 미리보기
+              const emrAllBtn = document.getElementById('emr-all');
+              const emrPreviewBtn = document.getElementById('emr-preview-btn');
+              const emrPreviewBack = document.getElementById('emr-preview-back');
+              const emrPreviewText = document.getElementById('emr-preview-text');
+              const emrPreviewClose = document.getElementById('emr-preview-close');
+              const emrPreviewCancel = document.getElementById('emr-preview-cancel');
+              const emrPreviewCopy = document.getElementById('emr-preview-copy');
+              const emrStatus = document.getElementById('emr-status');
+
+              function openEmrPreview(text) {
+                if (!emrPreviewBack) return;
+                emrPreviewText.value = text;
+                emrPreviewBack.classList.add('show');
+                setTimeout(() => emrPreviewText.focus(), 100);
+              }
+              function closeEmrPreview() { emrPreviewBack && emrPreviewBack.classList.remove('show'); }
+
+              if (emrAllBtn) emrAllBtn.addEventListener('click', async () => {
+                const text = buildAll();
+                const ok = await copyText(text);
+                if (ok) {
+                  emrAllBtn.textContent = '✅ 전체 요약 복사됨';
+                  showToast('전체 요약(' + text.split('\n').length + '줄)이 클립보드에 복사됨');
+                  if (emrStatus) emrStatus.textContent = '마지막 복사: ' + nowStr();
+                  setTimeout(() => emrAllBtn.textContent = '전체 요약 복사', 1800);
+                } else {
+                  showToast('❌ 자동 복사 실패 — 미리보기 창에서 수동 복사');
+                  openEmrPreview(text);
+                }
+              });
+
+              if (emrPreviewBtn) emrPreviewBtn.addEventListener('click', () => openEmrPreview(buildAll()));
+              if (emrPreviewClose) emrPreviewClose.addEventListener('click', closeEmrPreview);
+              if (emrPreviewCancel) emrPreviewCancel.addEventListener('click', closeEmrPreview);
+              if (emrPreviewBack) emrPreviewBack.addEventListener('click', (e) => { if (e.target === emrPreviewBack) closeEmrPreview(); });
+              if (emrPreviewCopy) emrPreviewCopy.addEventListener('click', async () => {
+                const ok = await copyText(emrPreviewText.value);
+                if (ok) {
+                  emrPreviewCopy.textContent = '✅ 복사됨';
+                  showToast('편집된 요약이 클립보드에 복사됨');
+                  setTimeout(() => emrPreviewCopy.textContent = '📋 클립보드로 복사', 1600);
+                } else {
+                  showToast('❌ 복사 실패 — 텍스트 영역을 수동 선택 후 Ctrl+C');
+                }
+              });
+              document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && emrPreviewBack && emrPreviewBack.classList.contains('show')) closeEmrPreview();
+              });
+                  })();
+                </script>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body></html>

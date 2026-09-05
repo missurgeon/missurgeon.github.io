@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="복벽탈장 및 외과 수술환자의 수술 전후 처치 임상 의사결정 지원 대시보드 모음">
+<meta name="theme-color" content="#0f172a">
+<title>Perioperative Care Console · 수술 전후 처치 대시보드</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --card:#fff; --border:#e5e7eb; --border-strong:#cbd5e1;
+    --text:#0f172a; --muted:#64748b;
+    --primary:#1e40af; --primary-soft:#eff6ff;
+    --warning:#ea580c; --warning-soft:#fff7ed;
+    --success:#16a34a; --success-soft:#dcfce7;
+    --purple:#7c3aed; --purple-soft:#f5f3ff;
+    --shadow:0 1px 3px rgba(0,0,0,.06);
+    --shadow-lg:0 8px 28px rgba(15,23,42,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:16px; line-height:1.6; -webkit-text-size-adjust:100%;
+  }
+
+  header.hero{
+    background:#0f172a; color:#fff;
+    padding:36px 24px 40px;
+    box-shadow:var(--shadow-lg);
+  }
+  .wrap{max-width:1060px;margin:0 auto}
+  .eyebrow{
+    font-size:12px; font-weight:800; letter-spacing:1.4px;
+    color:#93c5fd; text-transform:uppercase; margin:0 0 8px;
+  }
+  header h1{
+    margin:0; font-size:29px; font-weight:800; letter-spacing:-.5px; line-height:1.25;
+  }
+  header .sub{margin-top:10px; font-size:15px; color:#cbd5e1; max-width:640px}
+  header .meta{
+    margin-top:18px; display:flex; flex-wrap:wrap; gap:8px;
+  }
+  header .pill{
+    background:#1e293b; border:1px solid #334155; color:#e2e8f0;
+    font-size:12px; font-weight:700; padding:5px 11px; border-radius:999px;
+  }
+
+  main{max-width:1060px; margin:0 auto; padding:32px 24px 64px}
+
+  .section-label{
+    font-size:12px; font-weight:800; letter-spacing:1px; color:var(--muted);
+    text-transform:uppercase; margin:0 0 14px;
+  }
+
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px}
+  a.card{
+    display:flex; flex-direction:column;
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:22px 22px 20px; text-decoration:none; color:inherit;
+    box-shadow:var(--shadow); transition:transform .15s, box-shadow .15s, border-color .15s;
+    border-top:4px solid var(--primary);
+  }
+  a.card:hover,a.card:focus{
+    transform:translateY(-3px); box-shadow:var(--shadow-lg);
+    border-color:var(--border-strong); outline:none;
+  }
+  a.card:focus-visible{outline:3px solid var(--primary); outline-offset:2px}
+  a.card.c-warn{border-top-color:var(--warning)}
+  a.card.c-purple{border-top-color:var(--purple)}
+
+  .card .tag{
+    align-self:flex-start; font-size:11px; font-weight:800; letter-spacing:.4px;
+    padding:3px 9px; border-radius:6px; margin-bottom:12px;
+    background:var(--primary-soft); color:var(--primary);
+  }
+  .card.c-warn .tag{background:var(--warning-soft); color:var(--warning)}
+  .card.c-purple .tag{background:var(--purple-soft); color:var(--purple)}
+
+  .card h2{margin:0 0 4px; font-size:19px; font-weight:800; line-height:1.35}
+  .card .en{font-size:12.5px; color:var(--muted); font-weight:600; margin:0 0 12px}
+  .card p.desc{margin:0 0 14px; font-size:14px; color:#334155; line-height:1.6}
+  .card ul{margin:0 0 16px; padding-left:18px; font-size:13px; color:var(--muted)}
+  .card ul li{margin:3px 0}
+  .card .go{
+    margin-top:auto; font-size:14px; font-weight:800; color:var(--primary);
+    display:flex; align-items:center; gap:6px;
+  }
+  .card.c-warn .go{color:var(--warning)}
+  .card.c-purple .go{color:var(--purple)}
+  .card .go::after{content:'→'; transition:transform .15s}
+  a.card:hover .go::after{transform:translateX(3px)}
+
+  .notes{
+    margin-top:34px; background:#fff; border:1px solid var(--border);
+    border-left:4px solid var(--warning); border-radius:12px; padding:18px 20px;
+  }
+  .notes h3{margin:0 0 8px; font-size:15px; font-weight:800; color:#9a3412}
+  .notes ul{margin:0; padding-left:18px; font-size:13.5px; color:#334155}
+  .notes li{margin:4px 0}
+
+  .tip{
+    margin-top:16px; background:var(--primary-soft); border:1px solid #bfdbfe;
+    border-radius:12px; padding:16px 20px; font-size:13.5px; color:#1e3a8a;
+  }
+  .tip b{color:var(--primary)}
+
+  footer{
+    max-width:1060px; margin:0 auto; padding:0 24px 48px;
+    font-size:12.5px; color:var(--muted); line-height:1.7;
+  }
+  footer a{color:var(--primary)}
+  footer .rule{height:1px; background:var(--border); margin:0 0 16px}
+
+  @media (max-width:600px){
+    header.hero{padding:28px 18px 32px}
+    header h1{font-size:23px}
+    main{padding:26px 18px 48px}
+    footer{padding:0 18px 40px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Hanyang University Hospital · Robotic Abdominal Wall Surgery</p>
+    <h1>수술 전후 처치 대시보드</h1>
+    <div class="sub">
+      복벽탈장 및 외과 수술환자의 주술기(perioperative) 위험 평가 · 조기 인지 · 처치 결정을
+      병상 옆에서 바로 쓰기 위한 임상 의사결정 지원 도구 모음입니다.
+    </div>
+    <div class="meta">
+      <span class="pill">📱 모바일 · 태블릿 지원</span>
+      <span class="pill">🔒 데이터 서버 전송 없음</span>
+      <span class="pill">📋 EMR 복사 지원</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <p class="section-label">▎대시보드 3종</p>
+
+  <div class="cards">
+
+    <a class="card c-warn" href="lod-perioperative.html">
+      <span class="tag">LOD · 고위험군</span>
+      <h2>복벽탈장(LOD) 수술 주술기 대시보드</h2>
+      <p class="en">Loss of Domain · Perioperative Protocol</p>
+      <p class="desc">
+        심혈관 위험이 높은 고령 거대 복벽탈장 환자의 이상징후를 조기에 잡아내기 위한 프로토콜.
+        적용 대상 판정에 따라 맞춤 권고가 자동으로 펼쳐집니다.
+      </p>
+      <ul>
+        <li>적용 대상 판정 · 동반질환별 맞춤 권고</li>
+        <li>수술 전 체크리스트 · 수술 중 인수인계</li>
+        <li>POD 0–3 모니터링 · 에스컬레이션 트리거</li>
+        <li>NEWS2 계산기 · IAP 해석기 · 감별진단</li>
+      </ul>
+      <span class="go">열기</span>
+    </a>
+
+    <a class="card" href="ward-perioperative.html">
+      <span class="tag">병동 · 범용</span>
+      <h2>병동 수술전후 처치 대시보드</h2>
+      <p class="en">Surgical Ward · Perioperative Care Console</p>
+      <p class="desc">
+        환자 위험도를 입력하면 본원 보정을 적용한 예상 합병증 위험도를 산출하고,
+        그에 맞는 수술 전후 프로토콜과 합병증별 대처 실무지침을 제시합니다.
+      </p>
+      <ul>
+        <li>환자 위험도 입력 · 본원 보정 위험도 산출</li>
+        <li>STOP-BANG · Caprini VTE 점수 계산</li>
+        <li>수술군별 baseline 위험도 재보정</li>
+        <li>합병증별 조기 인지 및 대처 실무지침</li>
+      </ul>
+      <span class="go">열기</span>
+    </a>
+
+    <a class="card c-purple" href="foley-decision-support.html">
+      <span class="tag">Foley · 오더 보조</span>
+      <h2>Foley Catheter Decision Support</h2>
+      <p class="en">개별 환자 판단 · 입원 오더 보조</p>
+      <p class="desc">
+        도뇨관을 넣을지, 넣는다면 언제 뺄지를 환자·해부·술기·주술기 4개 축으로 나누어
+        판단하도록 돕는 도구. 불필요한 유치 도뇨를 줄이는 데 초점을 두었습니다.
+      </p>
+      <ul>
+        <li>Axis A 환자 요인 / Axis B 해부학적 요인</li>
+        <li>Axis C 술기 요인 / Axis D 주술기 요인</li>
+        <li>선택적 삽입(in-and-out) 대안 제시</li>
+        <li>입원 오더에 바로 옮길 수 있는 결론</li>
+      </ul>
+      <span class="go">열기</span>
+    </a>
+
+  </div>
+
+  <div class="notes">
+    <h3>⚠ 사용상 주의</h3>
+    <ul>
+      <li>본 도구는 <b>임상 의사결정을 보조</b>하기 위한 참고 자료이며, 담당 의료진의 판단을 대체하지 않습니다.</li>
+      <li>모든 계산과 입력은 <b>사용자 브라우저 안에서만</b> 이루어지며, 어떤 환자 정보도 서버로 전송·저장되지 않습니다.</li>
+      <li>환자 식별 정보는 입력하지 않는 것을 권장합니다. 페이지를 새로 고치면 입력 내용은 사라집니다.</li>
+      <li>기관별 프로토콜·약제 정책이 다를 수 있으므로 <b>본원 지침에 맞추어 확인</b> 후 사용하십시오.</li>
+    </ul>
+  </div>
+
+  <div class="tip">
+    <b>병동에서 쓰는 법</b> — 휴대폰이나 태블릿 브라우저에서 이 주소를 열고
+    <b>홈 화면에 추가</b>해 두면 앱처럼 한 번에 실행됩니다. 오프라인이 아닌 한 항상 최신 버전이 열립니다.
+  </div>
+</main>
+
+<footer>
+  <div class="rule"></div>
+  <div>
+    Ha Tae-kyung, MD · Department of Surgery, Hanyang University Hospital<br>
+    Robotic Abdominal Wall Hernia Surgery
+  </div>
+</footer>
+
+</body>
+</html>
