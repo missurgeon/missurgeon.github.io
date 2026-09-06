@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="수술 전 심혈관 위험도 평가 · 본원 마취과 알고리즘 기반 임상 의사결정 지원">
+<meta name="theme-color" content="#0f172a">
+<title>Preop Cardiac Risk · 수술 전 심혈관 위험도 평가</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --card:#fff; --border:#e5e7eb; --border-strong:#cbd5e1;
+    --text:#0f172a; --muted:#64748b;
+    --primary:#1e40af; --primary-soft:#eff6ff;
+    --warning:#ea580c; --warning-soft:#fff7ed;
+    --danger:#dc2626; --danger-soft:#fef2f2;
+    --success:#16a34a; --success-soft:#dcfce7;
+    --amber:#b45309; --amber-soft:#fffbeb;
+    --purple:#7c3aed; --purple-soft:#f5f3ff;
+    --shadow:0 1px 3px rgba(0,0,0,.06);
+    --shadow-lg:0 8px 28px rgba(15,23,42,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:16px; line-height:1.6;
+  }
+
+  header.hero{background:#0f172a; color:#fff; padding:28px 24px 32px; box-shadow:var(--shadow-lg);}
+  .wrap{max-width:1060px; margin:0 auto}
+  .eyebrow{font-size:12px; font-weight:800; letter-spacing:1.4px; color:#93c5fd; text-transform:uppercase; margin:0 0 8px}
+  header h1{margin:0; font-size:26px; font-weight:800; letter-spacing:-.5px; line-height:1.25}
+  header .sub{margin-top:8px; font-size:14.5px; color:#cbd5e1; max-width:720px}
+  header .backlink{display:inline-block; margin-top:14px; font-size:13px; font-weight:700; color:#93c5fd; text-decoration:none}
+  header .backlink:hover{color:#dbeafe}
+
+  main{max-width:1060px; margin:0 auto; padding:24px 24px 64px}
+
+  .patient-bar{
+    background:#fff; border:1px solid var(--border); border-radius:12px;
+    padding:14px 18px; margin-bottom:20px; box-shadow:var(--shadow);
+    display:grid; grid-template-columns:1fr 1fr; gap:10px 16px;
+  }
+  .patient-bar .row{display:flex; align-items:center; gap:8px; font-size:14px}
+  .patient-bar label{font-weight:700; color:var(--muted); min-width:78px; font-size:13px}
+  .patient-bar input{
+    flex:1; padding:6px 10px; border:1px solid var(--border); border-radius:6px;
+    font-size:14px; font-family:inherit; background:#fff;
+  }
+  .patient-bar input:focus{outline:2px solid var(--primary); outline-offset:-1px; border-color:var(--primary)}
+
+  .stepbar{
+    display:flex; gap:6px; margin-bottom:20px; overflow-x:auto; padding-bottom:4px;
+  }
+  .stepdot{
+    flex:0 0 auto; background:#fff; border:1px solid var(--border); border-radius:99px;
+    padding:6px 12px; font-size:12px; font-weight:700; color:var(--muted);
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .stepdot.done{background:var(--success-soft); border-color:#86efac; color:#166534}
+  .stepdot.current{background:var(--primary-soft); border-color:#93c5fd; color:var(--primary)}
+  .stepdot .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:20px; height:20px; border-radius:99px; background:#f1f5f9;
+    color:var(--muted); font-size:11px; font-weight:800;
+  }
+  .stepdot.done .num{background:var(--success); color:#fff}
+  .stepdot.current .num{background:var(--primary); color:#fff}
+
+  .card{
+    background:#fff; border:1px solid var(--border); border-radius:14px;
+    padding:20px 22px; margin-bottom:16px; box-shadow:var(--shadow);
+  }
+  .card h2{margin:0 0 4px; font-size:18px; font-weight:800}
+  .card .qsub{margin:0 0 14px; font-size:13px; color:var(--muted)}
+  .card.q{border-left:4px solid var(--primary)}
+  .card.q.active{border-left-color:var(--warning); background:linear-gradient(180deg,#fff, #fffdf6)}
+
+  .qbtns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+  .qbtn{
+    flex:1; min-width:120px; padding:12px 16px; border:2px solid var(--border);
+    background:#fff; border-radius:10px; font-size:15px; font-weight:700;
+    cursor:pointer; transition:all .12s; font-family:inherit; color:var(--text);
+  }
+  .qbtn:hover{border-color:var(--primary); background:var(--primary-soft)}
+  .qbtn.sel-yes{background:var(--warning-soft); border-color:var(--warning); color:var(--warning)}
+  .qbtn.sel-no{background:var(--success-soft); border-color:var(--success); color:var(--success)}
+
+  .checklist{display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; margin-top:10px}
+  @media(max-width:600px){.checklist{grid-template-columns:1fr}}
+  .checkitem{
+    display:flex; align-items:flex-start; gap:8px; padding:10px 12px;
+    border:1px solid var(--border); border-radius:8px; background:#fff;
+    cursor:pointer; user-select:none; transition:all .12s;
+  }
+  .checkitem:hover{border-color:var(--border-strong); background:#f9fafb}
+  .checkitem input{margin-top:3px; accent-color:var(--primary); flex-shrink:0}
+  .checkitem span{font-size:13.5px; line-height:1.45; color:#334155}
+  .checkitem.checked{background:var(--primary-soft); border-color:#93c5fd}
+  .checkitem.danger.checked{background:var(--danger-soft); border-color:#fca5a5}
+  .checkitem.warn.checked{background:var(--warning-soft); border-color:#fdba74}
+  .checkitem.amber.checked{background:var(--amber-soft); border-color:#fcd34d}
+
+  .verdict{
+    padding:18px 20px; border-radius:12px; margin:16px 0 0;
+    font-weight:700; font-size:15px; line-height:1.55;
+  }
+  .verdict.danger{background:var(--danger-soft); border:2px solid var(--danger); color:#991b1b}
+  .verdict.warn{background:var(--warning-soft); border:2px solid var(--warning); color:#9a3412}
+  .verdict.amber{background:var(--amber-soft); border:2px solid var(--amber); color:#78350f}
+  .verdict.success{background:var(--success-soft); border:2px solid var(--success); color:#166534}
+  .verdict .vhead{font-size:17px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:8px}
+  .verdict .vbody{font-size:14px; font-weight:500}
+  .verdict ul{margin:8px 0 0; padding-left:20px}
+  .verdict li{margin:3px 0; font-weight:500}
+
+  .op-context{
+    background:#fff; border:1px solid var(--border); border-radius:12px;
+    padding:16px 18px; margin-top:10px;
+  }
+  .op-context .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px}
+  .op-context label{font-weight:700; font-size:13.5px; color:#334155; min-width:140px}
+  .op-context input[type="checkbox"]{accent-color:var(--primary); transform:scale(1.1)}
+  .op-context select{padding:6px 10px; border:1px solid var(--border); border-radius:6px; font-family:inherit; font-size:14px}
+
+  .actions{margin-top:20px; display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+  .btn{
+    padding:10px 16px; border-radius:8px; border:1px solid transparent;
+    font-weight:700; font-size:14px; cursor:pointer; font-family:inherit;
+  }
+  .btn-primary{background:var(--primary); color:#fff}
+  .btn-primary:hover{background:#1e3a8a}
+  .btn-outline{background:#fff; color:var(--primary); border-color:var(--primary)}
+  .btn-outline:hover{background:var(--primary-soft)}
+  .btn-danger{background:var(--danger); color:#fff}
+  .btn-ghost{background:transparent; color:var(--muted); border:1px dashed var(--border)}
+
+  .flow-legend{
+    background:#f8fafc; border:1px solid var(--border); border-radius:10px;
+    padding:12px 16px; margin-bottom:16px; font-size:13px;
+  }
+  .flow-legend b{color:var(--primary)}
+
+  details.ref{
+    background:#fff; border:1px solid var(--border); border-radius:10px;
+    padding:12px 16px; margin-top:16px;
+  }
+  details.ref summary{font-weight:800; font-size:14px; cursor:pointer; color:var(--primary)}
+  details.ref[open] summary{margin-bottom:10px}
+  details.ref .refbody{font-size:13px; color:#334155; line-height:1.65}
+  details.ref .refbody h4{margin:12px 0 4px; color:#1e293b; font-size:13.5px}
+
+  .final{
+    background:#fff; border:2px solid var(--primary); border-radius:14px;
+    padding:20px 22px; margin-top:20px; box-shadow:var(--shadow-lg);
+  }
+  .final h2{margin:0 0 12px; font-size:20px; font-weight:800; color:var(--primary)}
+  .final .summary-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0}
+  @media(max-width:600px){.final .summary-grid{grid-template-columns:1fr}}
+  .final .sumrow{background:#f8fafc; padding:8px 12px; border-radius:6px; font-size:13.5px}
+  .final .sumrow b{color:var(--primary)}
+
+  .copy-note{
+    margin-top:12px; padding:12px 14px; background:var(--primary-soft);
+    border:1px dashed #93c5fd; border-radius:8px; font-size:12.5px; color:#1e3a8a;
+  }
+
+  .footer{
+    max-width:1060px; margin:20px auto 0; padding:14px 24px 40px;
+    font-size:12px; color:var(--muted); text-align:center;
+  }
+  .hidden{display:none}
+  kbd{background:#f1f5f9; padding:1px 6px; border-radius:4px; font-size:12px; border:1px solid var(--border)}
+
+  @media print{
+    body{background:#fff}
+    header.hero{background:#fff; color:#000; box-shadow:none; padding:12px 0}
+    header .eyebrow, header .backlink, .actions, .stepbar{display:none}
+    .card, .final{box-shadow:none; page-break-inside:avoid}
+    header h1{color:#000}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Hanyang University Hospital · Preoperative Anesthesia Screening</p>
+    <h1>🫀 수술 전 심혈관 위험도 평가</h1>
+    <div class="sub">
+      본원 마취과의 심혈관 위험 평가 알고리즘(Major / Intermediate / Minor Clinical Predictors + METs)을
+      실무자가 병상 옆에서 바로 쓸 수 있도록 인터랙티브 위저드로 옮긴 도구입니다.
+    </div>
+    <a class="backlink" href="./">← 대시보드 홈으로</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- 환자 정보 -->
+  <div class="patient-bar">
+    <div class="row"><label>이름</label><input id="pt_name" placeholder="환자 이름 입력 안 함 권장"></div>
+    <div class="row"><label>등록번호</label><input id="pt_id" placeholder="선택 · Unit No."></div>
+    <div class="row"><label>진단명</label><input id="pt_dx" placeholder="예: Malignant neoplasm of stomach"></div>
+    <div class="row"><label>예정 수술명</label><input id="pt_op" placeholder="예: Robot distal gastrectomy"></div>
+  </div>
+
+  <div class="flow-legend">
+    <b>이 알고리즘의 논리</b> · Q1→Q2 관상동맥 시술/수술 이력 → Q3→Q4 6개월 이내 심장 검사 이력 →
+    Q5 임상적 예측인자 3계층(Major·Intermediate·Minor) → Q6 METs 운동능력 평가 → 수술 위험도(vascular / ≥6시간) 반영.
+    <b>Major 있음 → 수술 연기·심장내과 consult 즉시</b>. Minor 만 있음 & METs 양호 & 저·중간위험 수술 → 예정수술 진행.
+  </div>
+
+  <!-- Step indicator -->
+  <div class="stepbar" id="stepbar"></div>
+
+  <!-- Q1 -->
+  <div class="card q" id="cardQ1">
+    <h2>Q1. 관상동맥 시술/수술 이력</h2>
+    <p class="qsub">과거 <b>5년간</b> 관상동맥 시술(PTCA: 풍선확장·스텐트) 또는 수술(CABG: 관상동맥 우회로)을 받았습니까?</p>
+    <div class="qbtns">
+      <button class="qbtn" onclick="setAnswer('q1','yes')">예 (있다)</button>
+      <button class="qbtn" onclick="setAnswer('q1','no')">아니오 (없다)</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="card q hidden" id="cardQ2">
+    <h2>Q2. 시술 후 증상 재발</h2>
+    <p class="qsub">그 이후 증상이 재발하거나, "이상이 있다"는 의사의 말을 들은 적이 있나요?</p>
+    <div class="qbtns">
+      <button class="qbtn" onclick="setAnswer('q2','yes')">예 (있다)</button>
+      <button class="qbtn" onclick="setAnswer('q2','no')">아니오 (없다)</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="card q hidden" id="cardQ3">
+    <h2>Q3. 최근 6개월 심장 검사 이력</h2>
+    <p class="qsub"><b>6개월 이내</b>에 관상동맥질환에 대한 검사(관동맥 조영술 · 운동부하검사 · 핵의학 검사 등)를 받은 적이 있나요?</p>
+    <div class="qbtns">
+      <button class="qbtn" onclick="setAnswer('q3','yes')">예</button>
+      <button class="qbtn" onclick="setAnswer('q3','no')">아니오</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="card q hidden" id="cardQ4">
+    <h2>Q4. 검사 결과</h2>
+    <p class="qsub">관동맥 조영술 · 운동부하검사 · 핵의학 검사 중 <b>하나 이상</b>에서 "이상이 없다"는 결과를 들었나요?</p>
+    <div class="qbtns">
+      <button class="qbtn" onclick="setAnswer('q4','yes')">예 (정상)</button>
+      <button class="qbtn" onclick="setAnswer('q4','no')">아니오 (이상 소견)</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="card q hidden" id="cardQ5">
+    <h2>Q5. 임상적 예측인자 (Clinical Predictors)</h2>
+    <p class="qsub">해당하는 항목을 <b>모두</b> 체크하세요. 3그룹으로 자동 분류됩니다.</p>
+
+    <h4 style="margin:14px 0 6px; color:var(--danger); font-size:14px;">🔴 Major Clinical Predictors <span style="font-weight:500;color:var(--muted);">— 하나라도 있으면 수술 연기·심장내과 consult</span></h4>
+    <div class="checklist" id="chkMajor">
+      <label class="checkitem danger"><input type="checkbox" data-grp="major" value="Unstable angina"><span>불안정협심증 (협심증 증세가 심하다)</span></label>
+      <label class="checkitem danger"><input type="checkbox" data-grp="major" value="Heart failure"><span>심부전 (숨참, 부종, x-ray상 심부전)</span></label>
+      <label class="checkitem danger"><input type="checkbox" data-grp="major" value="Severe arrhythmia"><span>심한 부정맥 (palpitation, VPC · A-fib · LBBB 등)</span></label>
+      <label class="checkitem danger"><input type="checkbox" data-grp="major" value="Severe valvular disease"><span>심한 판막질환 (심잡음, x-ray 이상)</span></label>
+      <label class="checkitem danger"><input type="checkbox" data-grp="major" value="Recent MI"><span>협심증 증세 또는 심전도상 MI</span></label>
+    </div>
+
+    <h4 style="margin:16px 0 6px; color:var(--warning); font-size:14px;">🟠 Intermediate Clinical Predictors <span style="font-weight:500;color:var(--muted);">— METs(Q6)로 진행</span></h4>
+    <div class="checklist" id="chkInter">
+      <label class="checkitem warn"><input type="checkbox" data-grp="intermediate" value="Mild angina"><span>경도의 협심증 (심한 운동 시 가끔 나타남)</span></label>
+      <label class="checkitem warn"><input type="checkbox" data-grp="intermediate" value="Prior MI"><span>과거 심근경색 병력</span></label>
+      <label class="checkitem warn"><input type="checkbox" data-grp="intermediate" value="Prior HF"><span>과거 심부전 병력</span></label>
+      <label class="checkitem warn"><input type="checkbox" data-grp="intermediate" value="DM"><span>당뇨병</span></label>
+      <label class="checkitem warn"><input type="checkbox" data-grp="intermediate" value="Renal insufficiency"><span>신부전 (BUN/Cr 상승)</span></label>
+    </div>
+
+    <h4 style="margin:16px 0 6px; color:var(--amber); font-size:14px;">🟡 Minor Clinical Predictors <span style="font-weight:500;color:var(--muted);">— METs(Q6)로 진행</span></h4>
+    <div class="checklist" id="chkMinor">
+      <label class="checkitem amber"><input type="checkbox" data-grp="minor" value="Age ≥70"><span>70세 이상의 고령</span></label>
+      <label class="checkitem amber"><input type="checkbox" data-grp="minor" value="Abnormal ECG"><span>심전도 이상 (LVH · non-specific ST-T change 등)</span></label>
+      <label class="checkitem amber"><input type="checkbox" data-grp="minor" value="Minor arrhythmia"><span>약간의 부정맥 소견</span></label>
+      <label class="checkitem amber"><input type="checkbox" data-grp="minor" value="Poor exercise tolerance"><span>허약 체질 · 운동 능력 매우 저하</span></label>
+      <label class="checkitem amber"><input type="checkbox" data-grp="minor" value="Prior stroke"><span>뇌졸중 과거력</span></label>
+      <label class="checkitem amber"><input type="checkbox" data-grp="minor" value="Uncontrolled HTN"><span>현재 조절되지 않는 고혈압 (≥140/90 mmHg)</span></label>
+    </div>
+
+    <div style="margin-top:16px; text-align:right;">
+      <button class="btn btn-primary" onclick="submitQ5()">다음 →</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="card q hidden" id="cardQ6">
+    <h2>Q6. 운동능력 평가 (METs)</h2>
+    <p class="qsub">문진을 통해 평소에 <b>가능한 활동</b>을 모두 체크하세요. 하나라도 가능하면 <b>METs 양호(≥4)</b>로 판정.</p>
+    <div class="checklist">
+      <label class="checkitem"><input type="checkbox" data-mets="1" value="설거지, 간단한 청소"><span>설거지 · 간단한 청소</span></label>
+      <label class="checkitem"><input type="checkbox" data-mets="1" value="부부생활"><span>부부생활</span></label>
+      <label class="checkitem"><input type="checkbox" data-mets="1" value="한 층 계단·언덕 쉬지 않고 오르기"><span>한 층 계단 · 언덕을 쉬지 않고 오르기</span></label>
+      <label class="checkitem"><input type="checkbox" data-mets="1" value="평지 속보 10분 이상"><span>평지에서 속보로 10분 이상 걷기</span></label>
+      <label class="checkitem"><input type="checkbox" data-mets="1" value="골프·걸레질·이불개기·빨래하기"><span>골프 · 걸레질 · 이불개기 · 빨래하기</span></label>
+    </div>
+
+    <div class="op-context" style="margin-top:14px;">
+      <div style="font-weight:800; color:var(--primary); margin-bottom:8px; font-size:14px;">🔧 수술 정보 (위험도 판정에 반영)</div>
+      <div class="row">
+        <label>수술 종류</label>
+        <select id="opType">
+          <option value="general">일반 (저·중간위험)</option>
+          <option value="vascular">혈관 수술 (Vascular surgery)</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>예상 수술시간</label>
+        <select id="opDuration">
+          <option value="short">6시간 미만</option>
+          <option value="long">6시간 이상</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="margin-top:16px; text-align:right;">
+      <button class="btn btn-primary" onclick="submitQ6()">최종 판정 →</button>
+    </div>
+  </div>
+
+  <!-- Final -->
+  <div id="final" class="hidden"></div>
+
+  <div class="actions">
+    <button class="btn btn-ghost" onclick="resetAll()">🔄 처음부터</button>
+    <button class="btn btn-outline" onclick="window.print()">🖨 인쇄 · PDF 저장</button>
+    <button class="btn btn-outline" onclick="copyEMR()">📋 EMR 문구 복사</button>
+  </div>
+
+  <details class="ref">
+    <summary>📖 참고 · 알고리즘 근거와 세부 기준</summary>
+    <div class="refbody">
+      <h4>이 도구의 근거</h4>
+      본원 마취과가 마취 전 병력청취로 사용하는 <b>수술 전 심혈관 위험도 평가 서식</b>을 인터랙티브화한 것.
+      ACC/AHA perioperative guideline과 Eagle criteria를 본원 실무 흐름에 맞게 재구성한 6단계 알고리즘입니다.
+
+      <h4>Clinical Predictors 3계층</h4>
+      <ul>
+        <li><b>Major</b> — 불안정협심증 · 심부전 · 심한 부정맥 · 심한 판막질환 · 최근/현재 MI. <b>이 중 하나라도 있으면 수술 연기하고 심장내과 consult 필수</b>.</li>
+        <li><b>Intermediate</b> — 경도 협심증 · 과거 MI · 과거 심부전 · DM · 신부전. METs 평가로 이어짐.</li>
+        <li><b>Minor</b> — 고령(≥70) · ECG 이상 · 경도 부정맥 · 운동능력 저하 · 뇌졸중 과거력 · 조절 안 되는 HTN. METs 평가로 이어짐.</li>
+      </ul>
+
+      <h4>METs (Metabolic Equivalents)</h4>
+      나열된 5가지 활동은 대체로 <b>4 METs 이상</b>에 해당합니다. 하나라도 평소에 가능하면 "METs 양호"로 판정하며,
+      Duke Activity Status Index(DASI)와 일치하는 절단점입니다. 4 METs 미만은 perioperative MACE 위험 증가.
+
+      <h4>수술 위험도 반영</h4>
+      <ul>
+        <li>Vascular surgery(대혈관 수술) · 예상시간 ≥6시간 = <b>고위험 수술</b>. Intermediate/Minor predictor + METs 양호여도 심장내과 consult 권고.</li>
+        <li>일반 수술 · &lt;6시간 = 저·중간위험. Minor predictor + METs 양호면 예정수술 진행 가능.</li>
+      </ul>
+
+      <h4>주의</h4>
+      본 도구는 임상 의사결정을 <b>보조</b>합니다. 최종 판단은 담당 마취과·외과·심장내과 의사의 협의로 이루어져야 합니다.
+      모든 계산은 브라우저 안에서만 이루어지며 어떤 정보도 서버로 전송되지 않습니다.
+    </div>
+  </details>
+
+</main>
+
+<div class="footer">
+  Ha Tae-kyung, MD · Department of Surgery, Hanyang University Hospital · Robotic Abdominal Wall Hernia Surgery
+</div>
+
+<script>
+// ============================================================
+//  Preop Cardiac Risk Assessment · Interactive Wizard
+// ============================================================
+
+const state = {
+  q1:null, q2:null, q3:null, q4:null,
+  q5:{major:[], intermediate:[], minor:[]},
+  q6:{mets:[], opType:'general', opDuration:'short'},
+  path:[], // trace which questions were answered
+  verdict:null
+};
+
+const STEPS = [
+  {id:'q1', label:'Q1 관동맥 시술이력'},
+  {id:'q2', label:'Q2 증상 재발'},
+  {id:'q3', label:'Q3 6개월 심장검사'},
+  {id:'q4', label:'Q4 검사결과'},
+  {id:'q5', label:'Q5 예측인자'},
+  {id:'q6', label:'Q6 METs · 수술위험'},
+  {id:'final', label:'✔ 최종 판정'}
+];
+
+function renderStepbar(){
+  const bar = document.getElementById('stepbar');
+  const currentStep = getCurrentStep();
+  bar.innerHTML = STEPS.map(s=>{
+    const done = state.path.includes(s.id) && s.id !== currentStep;
+    const current = s.id === currentStep;
+    return `<div class="stepdot ${done?'done':''} ${current?'current':''}">
+      <span class="num">${done?'✓':STEPS.indexOf(s)+1}</span>
+      <span>${s.label}</span>
+    </div>`;
+  }).join('');
+}
+
+function getCurrentStep(){
+  if(state.verdict) return 'final';
+  if(state.q1===null) return 'q1';
+  if(state.q1==='yes' && state.q2===null) return 'q2';
+  // Q3 reached if: q1='no', OR q2='yes'
+  const reachedQ3 = state.q1==='no' || state.q2==='yes';
+  if(reachedQ3 && state.q3===null) return 'q3';
+  if(state.q3==='yes' && state.q4===null) return 'q4';
+  // Q5 reached if: q3='no', OR q4='no'
+  const reachedQ5 = state.q3==='no' || state.q4==='no';
+  if(reachedQ5 && !state.path.includes('q5')) return 'q5';
+  if(state.path.includes('q5') && !state.path.includes('q6')) return 'q6';
+  return 'final';
+}
+
+function setAnswer(q, val){
+  state[q] = val;
+  if(!state.path.includes(q)) state.path.push(q);
+
+  // Early termination paths
+  if(q==='q2' && val==='no'){
+    // Q2 아니오 → 예정수술 진행 (증상 없음)
+    finalize('success', '예정 수술 진행', [
+      '과거 관상동맥 시술/수술 이력은 있으나 이후 증상 재발이 없음.',
+      '본원 알고리즘상 추가 심장 평가 없이 <b>예정 수술 진행</b>.'
+    ]);
+    return;
+  }
+  if(q==='q4' && val==='yes'){
+    // Q4 예 → 예정수술 진행 (최근 검사 정상)
+    finalize('success', '예정 수술 진행', [
+      '6개월 이내 심장 검사에서 이상 없음 확인.',
+      '본원 알고리즘상 추가 심장 평가 없이 <b>예정 수술 진행</b>.'
+    ]);
+    return;
+  }
+
+  advance();
+}
+
+function advance(){
+  // Hide all Q cards
+  ['Q1','Q2','Q3','Q4','Q5','Q6'].forEach(k=>{
+    document.getElementById('card'+k).classList.add('hidden');
+    document.getElementById('card'+k).classList.remove('active');
+  });
+  document.getElementById('final').classList.add('hidden');
+
+  const step = getCurrentStep();
+  if(step==='final'){
+    // shouldn't reach here without verdict
+    return;
+  }
+  const card = document.getElementById('card'+step.toUpperCase());
+  card.classList.remove('hidden');
+  card.classList.add('active');
+  card.scrollIntoView({behavior:'smooth', block:'start'});
+
+  // Restore button selection state
+  restoreBtnSelection(step);
+  renderStepbar();
+}
+
+function restoreBtnSelection(step){
+  if(['q1','q2','q3','q4'].includes(step)){
+    const card = document.getElementById('card'+step.toUpperCase());
+    card.querySelectorAll('.qbtn').forEach(b=>b.classList.remove('sel-yes','sel-no'));
+    const val = state[step];
+    if(val){
+      const btns = card.querySelectorAll('.qbtn');
+      if(val==='yes') btns[0].classList.add('sel-yes');
+      else btns[1].classList.add('sel-no');
+    }
+  }
+}
+
+// Checklist visual state
+document.addEventListener('change', e=>{
+  if(e.target.matches('.checkitem input')){
+    e.target.parentElement.classList.toggle('checked', e.target.checked);
+  }
+});
+
+function submitQ5(){
+  const major = [...document.querySelectorAll('#chkMajor input:checked')].map(i=>i.value);
+  const inter = [...document.querySelectorAll('#chkInter input:checked')].map(i=>i.value);
+  const minor = [...document.querySelectorAll('#chkMinor input:checked')].map(i=>i.value);
+  state.q5 = {major, intermediate:inter, minor};
+  if(!state.path.includes('q5')) state.path.push('q5');
+
+  // Major → immediate consult
+  if(major.length > 0){
+    finalize('danger', '수술 연기 · 심장내과 consult', [
+      `<b>Major Clinical Predictor 확인됨</b>: ${major.join(', ')}`,
+      '이 상태에서 계획된 수술을 진행하면 perioperative MACE(주요 심장사고) 위험이 매우 높음.',
+      '<b>예정 수술을 연기하고 즉시 심장내과 consult</b>. 심장내과 clearance 이후 재평가.'
+    ]);
+    return;
+  }
+
+  // No major → proceed to Q6 (METs + surgical context)
+  advance();
+}
+
+function submitQ6(){
+  const mets = [...document.querySelectorAll('#cardQ6 input[data-mets]:checked')].map(i=>i.value);
+  const opType = document.getElementById('opType').value;
+  const opDuration = document.getElementById('opDuration').value;
+  state.q6 = {mets, opType, opDuration};
+  if(!state.path.includes('q6')) state.path.push('q6');
+
+  const metsOK = mets.length > 0;
+  const highRiskSurgery = (opType === 'vascular') || (opDuration === 'long');
+  const hasIntermediate = state.q5.intermediate.length > 0;
+  const hasMinor = state.q5.minor.length > 0;
+
+  if(!metsOK){
+    // METs poor
+    finalize('warn', '심장내과 consult 권고', [
+      '<b>METs &lt;4</b> — 4 METs 이상의 일상 활동이 어렵습니다.',
+      '기능적 예비능력이 낮아 perioperative 심혈관 사건 위험 상승.',
+      '<b>심장내과 consult 후</b> 필요시 stress test · echo 등 추가 평가 진행.'
+    ]);
+    return;
+  }
+
+  if(metsOK && highRiskSurgery && (hasIntermediate || hasMinor)){
+    // METs OK지만 고위험 수술 + 위험인자 → consult
+    finalize('warn', '심장내과 consult 권고', [
+      `METs 양호(≥4)이지만 <b>${opType==='vascular'?'혈관 수술':'예상 시간 ≥6시간'}</b>인 <b>고위험 수술</b>.`,
+      `동반된 임상 예측인자: ${[...state.q5.intermediate, ...state.q5.minor].join(', ')||'없음'}.`,
+      '본원 알고리즘상 이 조합은 <b>심장내과 consult</b>가 권고됩니다.'
+    ]);
+    return;
+  }
+
+  if(metsOK && !highRiskSurgery){
+    // METs OK + 저·중간위험 수술
+    const details = [];
+    if(hasIntermediate) details.push(`Intermediate predictor 있음: ${state.q5.intermediate.join(', ')}`);
+    if(hasMinor) details.push(`Minor predictor 있음: ${state.q5.minor.join(', ')}`);
+    if(!hasIntermediate && !hasMinor) details.push('임상 예측인자 없음 (No Clinical Predictors).');
+    details.push('METs ≥4 (일상 활동 가능) 확인.');
+    details.push('저·중간위험 수술 (비-혈관 · &lt;6시간).');
+    details.push('본원 알고리즘상 추가 심장 평가 없이 <b>예정 수술 진행</b>.');
+    finalize('success', '예정 수술 진행', details);
+    return;
+  }
+
+  // Fallback: METs OK + high-risk surgery + no predictors
+  finalize('amber', '주의 하 예정 수술 진행', [
+    'METs 양호 · 임상 예측인자 없음.',
+    `<b>${opType==='vascular'?'혈관 수술':'예상 시간 ≥6시간'}</b>인 고위험 수술이나 예측인자 부재.`,
+    '예정 수술 진행 가능하나 술중 <b>invasive monitoring</b> 준비 및 심장내과 back-up 유지.'
+  ]);
+}
+
+function finalize(level, headline, details){
+  state.verdict = {level, headline, details};
+  ['Q1','Q2','Q3','Q4','Q5','Q6'].forEach(k=>document.getElementById('card'+k).classList.add('hidden'));
+
+  const icon = {danger:'⛔', warn:'⚠', amber:'🟡', success:'✅'}[level];
+
+  const now = new Date();
+  const timeStr = `${now.getFullYear()}년 ${String(now.getMonth()+1).padStart(2,'0')}월 ${String(now.getDate()).padStart(2,'0')}일 ${String(now.getHours()).padStart(2,'0')}시 ${String(now.getMinutes()).padStart(2,'0')}분`;
+
+  const pt = {
+    name: document.getElementById('pt_name').value || '—',
+    id: document.getElementById('pt_id').value || '—',
+    dx: document.getElementById('pt_dx').value || '—',
+    op: document.getElementById('pt_op').value || '—'
+  };
+
+  const q5all = [
+    ...state.q5.major.map(x=>`Major: ${x}`),
+    ...state.q5.intermediate.map(x=>`Intermediate: ${x}`),
+    ...state.q5.minor.map(x=>`Minor: ${x}`)
+  ];
+
+  document.getElementById('final').innerHTML = `
+    <div class="final">
+      <h2>🫀 최종 판정</h2>
+
+      <div class="summary-grid">
+        <div class="sumrow"><b>이름:</b> ${pt.name}</div>
+        <div class="sumrow"><b>등록번호:</b> ${pt.id}</div>
+        <div class="sumrow"><b>진단명:</b> ${pt.dx}</div>
+        <div class="sumrow"><b>예정 수술명:</b> ${pt.op}</div>
+      </div>
+
+      <div class="verdict ${level}">
+        <div class="vhead">${icon} ${headline}</div>
+        <div class="vbody">
+          <ul>${details.map(d=>`<li>${d}</li>`).join('')}</ul>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; font-size:13px; color:var(--muted); line-height:1.7;">
+        <b style="color:var(--primary);">평가 경로 요약</b><br>
+        · Q1 관상동맥 시술/수술 (5년): <b>${label(state.q1)}</b><br>
+        ${state.q2!==null?`· Q2 시술 후 증상 재발: <b>${label(state.q2)}</b><br>`:''}
+        ${state.q3!==null?`· Q3 6개월 이내 심장 검사: <b>${label(state.q3)}</b><br>`:''}
+        ${state.q4!==null?`· Q4 검사 결과 정상: <b>${label(state.q4)}</b><br>`:''}
+        ${state.path.includes('q5')?`· Q5 임상 예측인자: <b>${q5all.length?q5all.join(' · '):'없음'}</b><br>`:''}
+        ${state.path.includes('q6')?`· Q6 METs 활동: <b>${state.q6.mets.length?state.q6.mets.join(' · '):'없음'}</b><br>· 수술 종류: <b>${state.q6.opType==='vascular'?'혈관 수술':'일반'}</b> · 예상 시간: <b>${state.q6.opDuration==='long'?'≥6시간':'&lt;6시간'}</b>`:''}
+      </div>
+
+      <div class="copy-note">
+        <b>평가 일시</b> · ${timeStr} · 평가자 확인 후 EMR에 기록하세요.
+      </div>
+    </div>
+  `;
+  document.getElementById('final').classList.remove('hidden');
+  renderStepbar();
+  document.getElementById('final').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function label(v){ return v==='yes'?'예':v==='no'?'아니오':'—'; }
+
+function resetAll(){
+  if(!confirm('평가를 처음부터 다시 시작할까요? 환자 정보는 유지됩니다.')) return;
+  state.q1=state.q2=state.q3=state.q4=null;
+  state.q5={major:[], intermediate:[], minor:[]};
+  state.q6={mets:[], opType:'general', opDuration:'short'};
+  state.path=[]; state.verdict=null;
+  document.querySelectorAll('.qbtn').forEach(b=>b.classList.remove('sel-yes','sel-no'));
+  document.querySelectorAll('.checkitem input:checked').forEach(i=>{i.checked=false; i.parentElement.classList.remove('checked');});
+  document.getElementById('opType').value='general';
+  document.getElementById('opDuration').value='short';
+  ['Q1','Q2','Q3','Q4','Q5','Q6'].forEach(k=>{
+    document.getElementById('card'+k).classList.add('hidden');
+    document.getElementById('card'+k).classList.remove('active');
+  });
+  document.getElementById('final').classList.add('hidden');
+  document.getElementById('cardQ1').classList.remove('hidden');
+  document.getElementById('cardQ1').classList.add('active');
+  renderStepbar();
+}
+
+function copyEMR(){
+  if(!state.verdict){
+    alert('먼저 평가를 완료해주세요.');
+    return;
+  }
+  const pt = {
+    name: document.getElementById('pt_name').value || '',
+    id: document.getElementById('pt_id').value || '',
+    dx: document.getElementById('pt_dx').value || '',
+    op: document.getElementById('pt_op').value || ''
+  };
+  const q5all = [
+    ...state.q5.major.map(x=>`[Major] ${x}`),
+    ...state.q5.intermediate.map(x=>`[Intermediate] ${x}`),
+    ...state.q5.minor.map(x=>`[Minor] ${x}`)
+  ];
+  const now = new Date();
+  const dt = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  const emr = `[Preoperative Cardiac Risk Assessment · ${dt}]
+Patient: ${pt.name} / ${pt.id}
+Dx: ${pt.dx}
+Planned OP: ${pt.op}
+
+- Q1 관상동맥 시술/수술 (past 5y): ${label(state.q1)}
+${state.q2!==null?`- Q2 시술 후 증상 재발: ${label(state.q2)}\n`:''}${state.q3!==null?`- Q3 6개월 이내 심장 검사: ${label(state.q3)}\n`:''}${state.q4!==null?`- Q4 검사 결과 정상: ${label(state.q4)}\n`:''}${state.path.includes('q5')?`- Q5 Clinical Predictors: ${q5all.length?q5all.join(' / '):'None'}\n`:''}${state.path.includes('q6')?`- Q6 METs (≥4 activity): ${state.q6.mets.length?state.q6.mets.join(' / '):'None'}\n- OP type: ${state.q6.opType==='vascular'?'Vascular surgery':'General'} / Duration: ${state.q6.opDuration==='long'?'≥6h':'<6h'}\n`:''}
+▶ Verdict: ${state.verdict.headline}
+${state.verdict.details.map(d=>'  · '+d.replace(/<[^>]+>/g,'')).join('\n')}
+`;
+
+  navigator.clipboard.writeText(emr).then(()=>{
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;padding:12px 22px;border-radius:8px;z-index:99999;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+    toast.textContent = '✓ EMR 문구가 클립보드에 복사되었습니다';
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(), 2500);
+  }).catch(err=>{
+    // Fallback: show textarea
+    const ta = document.createElement('textarea');
+    ta.value = emr; ta.style.cssText='position:fixed;top:20px;left:20px;right:20px;height:60vh;z-index:99999;padding:12px;font-family:monospace;font-size:13px;';
+    document.body.appendChild(ta); ta.select();
+    alert('클립보드 복사 실패. 텍스트 영역에서 직접 복사하세요. (닫으려면 새로고침)');
+  });
+}
+
+// Init
+renderStepbar();
+</script>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
