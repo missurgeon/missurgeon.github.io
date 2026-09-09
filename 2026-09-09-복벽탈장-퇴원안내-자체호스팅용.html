@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>복벽탈장 퇴원 안내</title>
+<meta name="description" content="복벽탈장 수술 후 퇴원 안내 — 수술 후 관리 방법과 복횡근 재활 운동 영상, 시기별 주의사항, 응급 증상 안내.">
+<meta name="robots" content="noindex">
+<meta property="og:type" content="website">
+<meta property="og:title" content="복벽탈장 퇴원 안내">
+<meta property="og:description" content="복벽탈장센터 — 수술 후 관리 방법과 재활 운동 영상이 함께 있습니다.">
+<meta name="theme-color" content="#083A63" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A151E" media="(prefers-color-scheme: dark)">
+<style>
+html{color-scheme:light dark}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#EEF3F8; --surface:#FFFFFF; --band:#E3EDF7;
+  --ink:#0E2E4A; --ink-2:#415E75; --ink-3:#6D8398;
+  --line:#CFDEEC;
+  --brand:#0C5590; --brand-deep:#083A63; --btn-ink:#FFFFFF;
+  --ok:#1E7A45; --ok-band:#E4F3EA; --ok-line:#A8DCBD;
+  --warn:#9E650B; --warn-band:#FBF0D8; --warn-line:#E7CA92;
+  --crit:#B62F2B; --crit-band:#FBE4E3; --crit-line:#EFB8B6;
+  --shadow:0 1px 2px rgba(14,46,74,.06), 0 8px 22px -12px rgba(14,46,74,.26);
+  --step:1;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0A151E; --surface:#11202C; --band:#152836;
+    --ink:#E9F1F7; --ink-2:#AEC3D3; --ink-3:#7C93A7;
+    --line:#213747;
+    --brand:#63B0EC; --brand-deep:#A2D2F5; --btn-ink:#07131B;
+    --ok:#5CC68C; --ok-band:#0F2E1E; --ok-line:#1F5236;
+    --warn:#EABA5C; --warn-band:#31270F; --warn-line:#584618;
+    --crit:#F4736F; --crit-band:#391918; --crit-line:#66302E;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 26px -14px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0A151E; --surface:#11202C; --band:#152836;
+  --ink:#E9F1F7; --ink-2:#AEC3D3; --ink-3:#7C93A7;
+  --line:#213747;
+  --brand:#63B0EC; --brand-deep:#A2D2F5; --btn-ink:#07131B;
+  --ok:#5CC68C; --ok-band:#0F2E1E; --ok-line:#1F5236;
+  --warn:#EABA5C; --warn-band:#31270F; --warn-line:#584618;
+  --crit:#F4736F; --crit-band:#391918; --crit-line:#66302E;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 26px -14px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  font-size:calc(20px * var(--step)); line-height:1.75; -webkit-text-size-adjust:100%;
+}
+h1,h2,h3{margin:0; text-wrap:balance; letter-spacing:-.02em}
+p,ul{margin:0}
+:focus-visible{outline:3px solid var(--brand); outline-offset:3px; border-radius:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.page{max-width:620px; margin:0 auto; background:var(--ground)}
+.pad{padding:0 20px}
+.sec{padding:38px 0 40px}
+.sec + .sec{border-top:1px solid var(--line)}
+.sec.tint{background:var(--band); border-top:0}
+
+h2{font-size:1.35em; font-weight:700; margin-bottom:6px}
+.sec .kicker{font-size:.75em; font-weight:700; letter-spacing:.1em; color:var(--brand); margin-bottom:8px}
+.sec .lead{font-size:.9em; color:var(--ink-2); margin-bottom:22px}
+
+/* header */
+.top{background:var(--brand-deep); color:#fff; padding:26px 20px 24px; text-align:center}
+:root[data-theme="dark"] .top, :root:not([data-theme="light"]) .top{color:#07131B}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .top{color:#fff}}
+.top .org{font-size:.8em; font-weight:600; letter-spacing:.08em; opacity:.85}
+.top h1{font-size:1.6em; font-weight:700; margin:8px 0 6px; line-height:1.3}
+.top .sub{font-size:.85em; opacity:.85}
+
+/* text size control */
+.tsize{display:flex; align-items:center; gap:10px; justify-content:center; flex-wrap:wrap;
+  background:var(--surface); border-bottom:1px solid var(--line); padding:14px 20px}
+.tsize span{font-size:.8em; color:var(--ink-2); font-weight:600}
+.tsize .grp{display:flex; gap:8px}
+.tsize button{
+  font:inherit; font-size:.85em; font-weight:700; cursor:pointer;
+  padding:9px 16px; border-radius:10px; min-height:48px;
+  border:2px solid var(--line); background:var(--surface); color:var(--ink-2);
+}
+.tsize button[aria-pressed="true"]{border-color:var(--brand); background:var(--brand); color:var(--btn-ink)}
+
+/* big three */
+.three{display:flex; flex-direction:column; gap:12px}
+.three li{
+  display:flex; gap:14px; align-items:flex-start; list-style:none;
+  background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 18px;
+}
+.three .n{
+  flex:none; width:38px; height:38px; border-radius:50%; background:var(--brand); color:var(--btn-ink);
+  display:grid; place-items:center; font-weight:700; font-size:.9em;
+}
+.three b{display:block; font-size:1.05em; font-weight:700; line-height:1.45}
+.three em{display:block; font-style:normal; font-size:.85em; color:var(--ink-2); margin-top:3px}
+
+/* video buttons */
+.vid{
+  display:block; text-decoration:none; color:inherit; margin-bottom:14px;
+  background:var(--surface); border:2px solid var(--brand); border-radius:16px;
+  padding:20px 20px 18px; box-shadow:var(--shadow);
+}
+.vid .tag{font-size:.72em; font-weight:700; letter-spacing:.06em; color:var(--brand)}
+.vid h3{font-size:1.15em; font-weight:700; margin:6px 0 4px}
+.vid p{font-size:.83em; color:var(--ink-2)}
+.vid .go{
+  display:flex; align-items:center; justify-content:center; gap:10px; margin-top:16px;
+  background:var(--brand); color:var(--btn-ink); border-radius:12px;
+  padding:16px; font-size:1.05em; font-weight:700; min-height:58px;
+}
+
+/* stages */
+.stage{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:12px}
+.when{
+  display:inline-block; font-size:.75em; font-weight:700; color:var(--btn-ink);
+  background:var(--brand); padding:5px 13px; border-radius:99px;
+}
+.stage h3{font-size:1.1em; font-weight:700; margin:11px 0 10px}
+.list{list-style:none; padding:0; display:flex; flex-direction:column; gap:9px}
+.list li{position:relative; padding-left:24px; font-size:.94em; line-height:1.65}
+.list li::before{
+  content:""; position:absolute; left:0; top:.62em; width:11px; height:11px;
+  border-radius:3px; background:var(--dot,var(--brand));
+}
+
+/* alerts */
+.alert{border-radius:14px; padding:20px; margin-bottom:12px; border:1px solid var(--ac-line); background:var(--ac-band)}
+.alert h3{display:flex; align-items:center; gap:10px; font-size:1.08em; font-weight:700; color:var(--ac); margin-bottom:11px}
+.alert h3::before{content:""; width:16px; height:16px; border-radius:50%; background:var(--ac); flex:none}
+.alert .list li::before{background:var(--ac)}
+.er{border:3px solid var(--crit); background:var(--crit-band); border-radius:14px; padding:22px; margin-top:16px}
+.er b{display:block; color:var(--crit); font-size:1.12em; font-weight:700; margin-bottom:9px}
+.er p{font-size:.94em; font-weight:600; line-height:1.6}
+.er .tags{display:flex; flex-wrap:wrap; gap:8px; margin-top:13px}
+.er .tags span{background:var(--surface); border:1px solid var(--crit-line); color:var(--crit);
+  border-radius:9px; padding:8px 14px; font-size:.88em; font-weight:700}
+
+/* rules */
+.rules{list-style:none; padding:0; display:flex; flex-direction:column; gap:10px}
+.rules li{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+.rules b{display:block; font-size:.98em; font-weight:700}
+.rules span{display:block; font-size:.83em; color:var(--ink-2); margin-top:2px}
+
+/* contact */
+.call-slot{
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  border:3px dashed var(--crit-line); color:var(--ink-3); border-radius:14px; padding:20px;
+  font-size:.85em; font-weight:600; min-height:58px; margin-top:8px; line-height:1.55;
+}
+.contact-note{font-size:.8em; color:var(--ink-3); margin-top:12px; line-height:1.6}
+
+footer{text-align:center; padding:34px 20px 46px; border-top:1px solid var(--line)}
+footer .quote{font-size:.95em; font-weight:700; color:var(--brand-deep)}
+footer .org{margin-top:8px; font-size:.82em; color:var(--ink-3)}
+footer .disc{margin-top:18px; font-size:.78em; color:var(--ink-3); line-height:1.65}
+</style>
+
+<div class="page">
+
+<div class="top">
+  <div class="org">복벽탈장센터</div>
+  <h1>복벽탈장 수술 후<br>퇴원 안내</h1>
+  <p class="sub">집에서 회복하시는 동안 이 안내를 보관해 주세요.</p>
+</div>
+
+<div class="tsize">
+  <span>글자 크기</span>
+  <div class="grp">
+    <button type="button" data-step="1" aria-pressed="true">보통</button>
+    <button type="button" data-step="1.15" aria-pressed="false">크게</button>
+    <button type="button" data-step="1.32" aria-pressed="false">아주 크게</button>
+  </div>
+</div>
+
+<!-- 1. 영상 -->
+<section class="sec pad tint">
+  <div class="kicker">동영상 안내</div>
+  <h2>먼저 영상을 보세요</h2>
+  <p class="lead">글보다 영상이 이해가 빠릅니다. 눌러서 바로 보실 수 있습니다.</p>
+
+  <a class="vid" href="https://youtu.be/6RIzdwcScAE" target="_blank" rel="noopener">
+    <span class="tag">전체 과정</span>
+    <h3>수술 후 관리 방법</h3>
+    <p>퇴원 후 3개월까지 무엇을 하고 무엇을 피해야 하는지 설명합니다.</p>
+    <span class="go">
+      <svg width="18" height="21" viewBox="0 0 18 21" aria-hidden="true"><path d="M1 1.3 17 10.5 1 19.7Z" fill="currentColor"/></svg>
+      영상 보기
+    </span>
+  </a>
+
+  <a class="vid" href="https://youtu.be/5_PZQxt0ios" target="_blank" rel="noopener">
+    <span class="tag">수술 2주 후부터</span>
+    <h3>복횡근 재활 운동법</h3>
+    <p>배 속 깊은 근육을 되살리는 운동을 순서대로 보여드립니다.</p>
+    <span class="go">
+      <svg width="18" height="21" viewBox="0 0 18 21" aria-hidden="true"><path d="M1 1.3 17 10.5 1 19.7Z" fill="currentColor"/></svg>
+      영상 보기
+    </span>
+  </a>
+</section>
+
+<!-- 2. 가장 중요한 세 가지 -->
+<section class="sec pad">
+  <div class="kicker">꼭 기억하세요</div>
+  <h2>가장 중요한 세 가지</h2>
+  <p class="lead">이것만 지켜도 회복의 대부분이 안전해집니다.</p>
+  <ul class="three">
+    <li><span class="n">1</span><div><b>매일 걸으세요</b><em>누워만 계시면 회복이 늦어집니다. 하루 3~6번 조금씩.</em></div></li>
+    <li><span class="n">2</span><div><b>무거운 것을 들지 마세요</b><em>수술 후 한 달간 4.5~5kg(쌀 반 포대) 이상은 금물입니다.</em></div></li>
+    <li><span class="n">3</span><div><b>열이 나거나 배가 심하게 아프면 바로 병원으로</b><em>참지 마시고 연락하세요. 아래 &lsquo;이럴 때 연락하세요&rsquo;를 보세요.</em></div></li>
+  </ul>
+</section>
+
+<!-- 3. 단계별 -->
+<section class="sec pad tint">
+  <div class="kicker">회복 순서</div>
+  <h2>시기별로 하실 일</h2>
+  <p class="lead">수술 날부터 세어 지금 어느 시기인지 확인하세요.</p>
+
+  <div class="stage" style="--dot:#3E8BD4">
+    <span class="when">수술 후 ~ 2주</span>
+    <h3>보호하며 걷기</h3>
+    <ul class="list">
+      <li>수술 다음 날부터 가볍게 걷기 (하루 3~6회)</li>
+      <li>숨을 깊게 쉬고, 발목을 자주 움직이기</li>
+      <li>기침이나 재채기가 나올 때는 베개로 배를 눌러 받치기</li>
+      <li>4.5~5kg 이상 들지 않기</li>
+    </ul>
+  </div>
+
+  <div class="stage" style="--dot:#2E9668">
+    <span class="when">2주 ~ 1개월</span>
+    <h3>배 속 근육 깨우기</h3>
+    <ul class="list">
+      <li>걷는 시간을 30분까지 늘리기</li>
+      <li>복횡근 운동 시작 — 위 영상을 보며 매일 5회씩</li>
+      <li>배에 억지로 힘을 주지 않기</li>
+      <li>7kg 이상 들지 않기</li>
+    </ul>
+  </div>
+
+  <div class="stage" style="--dot:#1E6FA8">
+    <span class="when">수술 후 1개월</span>
+    <h3>외래 진료와 CT 검사</h3>
+    <ul class="list">
+      <li>복부 CT로 복벽이 잘 아물었는지 확인합니다</li>
+      <li>이 결과를 보고 다음 운동을 시작할지 정합니다</li>
+      <li>예약일을 꼭 지켜 주세요</li>
+    </ul>
+  </div>
+
+  <div class="stage" style="--dot:#C08418">
+    <span class="when">1개월 ~ 3개월</span>
+    <h3>복벽 강화 운동</h3>
+    <ul class="list">
+      <li>순서대로 진행합니다 — 복횡근 운동 → 골반 기울이기 → 브릿지 → 버드독</li>
+      <li>아프지 않은 범위에서, 조금씩 늘리기</li>
+      <li>통증이 늘면 그날은 중단하기</li>
+    </ul>
+  </div>
+
+  <div class="stage" style="--dot:#C96A24">
+    <span class="when">수술 후 3개월</span>
+    <h3>마지막 종합 평가</h3>
+    <ul class="list">
+      <li>외래 진료와 복부 CT로 최종 확인합니다</li>
+      <li>괜찮으면 활동 제한을 단계적으로 풀어 드립니다</li>
+    </ul>
+  </div>
+
+  <div class="stage" style="--dot:#2C6EA8">
+    <span class="when">3개월 이후 · 매년</span>
+    <h3>일상 복귀와 정기 확인</h3>
+    <ul class="list">
+      <li>걷기, 수영, 등산, 골프, 근력운동 모두 가능합니다</li>
+      <li>한꺼번에 늘리지 말고 천천히 올리세요</li>
+      <li>이후 1년마다 복부 CT와 외래로 확인합니다</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 4. 상처 -->
+<section class="sec pad">
+  <div class="kicker">상처 돌보기</div>
+  <h2>수술 부위 관리</h2>
+  <p class="lead">깨끗하고 건조하게. 시간이 지나면서 좋아집니다.</p>
+  <ul class="list" style="--dot:var(--brand)">
+    <li>상처를 깨끗하고 건조하게 유지하세요</li>
+    <li>의료진이 허락한 뒤 샤워하시고, 문지르지 마세요</li>
+    <li>딱지나 피부에 붙은 접착제를 억지로 떼지 마세요</li>
+    <li>상처가 붉어지거나 진물이 나는지 매일 살펴보세요</li>
+    <li>복대는 4주까지 착용하세요</li>
+  </ul>
+  <div class="alert" style="--ac:var(--ok); --ac-band:var(--ok-band); --ac-line:var(--ok-line); margin-top:18px">
+    <h3>이런 것은 정상입니다</h3>
+    <ul class="list">
+      <li>가볍게 당기는 느낌, 멍, 약간의 부기</li>
+      <li>상처 아래가 단단하게 만져지는 것 (아무는 과정입니다. 시간이 지나면 부드러워집니다)</li>
+      <li>시간이 지나며 점점 줄어드는 통증</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5. 응급 -->
+<section class="sec pad tint">
+  <div class="kicker">안전</div>
+  <h2>이럴 때 연락하세요</h2>
+  <p class="lead">망설이지 마시고 연락 주세요. 확인하는 편이 항상 낫습니다.</p>
+
+  <div class="alert" style="--ac:var(--warn); --ac-band:var(--warn-band); --ac-line:var(--warn-line)">
+    <h3>병원에 전화로 문의</h3>
+    <ul class="list">
+      <li>좋아지던 통증이 다시 심해질 때</li>
+      <li>상처 주변이 붉어지고 붓고 열이 날 때</li>
+      <li>진물이 새로 나거나 배가 볼록 나올 때</li>
+      <li>토하거나, 대변·방귀가 나오지 않을 때</li>
+    </ul>
+  </div>
+
+  <div class="alert" style="--ac:var(--crit); --ac-band:var(--crit-band); --ac-line:var(--crit-line)">
+    <h3>바로 진료를 받으세요</h3>
+    <ul class="list">
+      <li>38도 이상 열이 날 때</li>
+      <li>갑자기 배가 심하게 아플 때</li>
+      <li>상처에서 고름이나 냄새 나는 진물이 나올 때</li>
+      <li>배가 몹시 부르고 계속 토할 때</li>
+      <li>소변이 나오지 않을 때</li>
+    </ul>
+  </div>
+
+  <div class="er">
+    <b>이 증상은 119 또는 가까운 응급실로</b>
+    <p>배와 상관없는 심장·폐 문제일 수 있습니다. 병원 연락을 기다리지 마시고 곧바로 가세요.</p>
+    <div class="tags"><span>가슴 통증</span><span>숨쉬기 어려움</span><span>식은땀이 나며 가슴이나 명치가 심하게 아픔</span></div>
+  </div>
+
+  <div class="call-slot">전화번호를 넣어 주세요 &mdash; 이 자리에 &lsquo;병원에 전화하기&rsquo; 버튼이 들어갑니다</div>
+  <p class="contact-note">평일 진료시간 외에는 응급실로 연락하세요. 진료 예약 변경도 같은 번호로 하실 수 있습니다.</p>
+</section>
+
+<!-- 6. 생활 -->
+<section class="sec pad">
+  <div class="kicker">생활 수칙</div>
+  <h2>매일 지켜 주세요</h2>
+  <ul class="rules">
+    <li><b>기침·재채기 때 배를 받치기</b><span>손이나 베개로 수술 부위를 눌러 주세요</span></li>
+    <li><b>무거운 물건 들지 않기</b><span>4.5~5kg을 넘기지 마세요</span></li>
+    <li><b>물과 채소를 충분히</b><span>변비가 생기면 배에 힘이 들어가 좋지 않습니다</span></li>
+    <li><b>복대는 4주까지</b><span>의료진이 알려드린 대로 착용하세요</span></li>
+    <li><b>금연, 체중 관리, 기침 치료</b><span>재발을 막는 가장 중요한 세 가지입니다</span></li>
+    <li><b>충분히 쉬고 잘 주무세요</b><span>몸은 자는 동안 아뭅니다</span></li>
+  </ul>
+</section>
+
+<footer>
+  <p class="quote">&ldquo;안전한 회복이 더 튼튼한 내일을 만듭니다.&rdquo;</p>
+  <p class="org">복벽탈장센터</p>
+  <p class="disc">이 안내는 일반적인 회복 지침입니다. 수술 방법과 개인 상태에 따라 다를 수 있으니, 최종 판단은 담당 의료진의 지시를 따르세요.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var KEY='hernia-text-step';
+  var btns=document.querySelectorAll('.tsize button');
+  function apply(step,save){
+    document.documentElement.style.setProperty('--step',step);
+    btns.forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.step===String(step)?'true':'false'); });
+    if(save){ try{ localStorage.setItem(KEY,step); }catch(e){} }
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){ apply(b.dataset.step,true); }); });
+  try{ var s=localStorage.getItem(KEY); if(s) apply(s,false); }catch(e){}
+})();
+</script>
+</body>
+</html>
