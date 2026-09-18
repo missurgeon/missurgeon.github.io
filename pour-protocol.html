@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>수술 후 배뇨장애 대응 프로토콜</title>
+<meta name="description" content="복부수술 후 배뇨장애(POUR)와 도뇨 중 요도손상·혈뇨에 대한 근거기반 병동 대응 프로토콜 — 저년차 실무 뷰 / 고년차 감독 뷰. 교육용 의사결정 지원 자료.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#f6f7f5; --surface:#ffffff; --surface-2:#eef1ee;
+  --ink:#16201d; --ink-2:#4a5854; --ink-3:#79867f;
+  --line:#d8dfda; --line-2:#c2ccc6;
+  --accent:#14655c; --accent-soft:#e2efec;
+  --alt:#5b3d84; --alt-soft:#efe9f6; --alt-line:#c9b8e0;
+  --crit:#a92a1f; --crit-soft:#fbe8e6; --crit-line:#e9b5ae;
+  --warn:#8a5300; --warn-soft:#fbf0dd; --warn-line:#e6cd9c;
+  --ok:#2a6340; --ok-soft:#e4f0e7; --ok-line:#a9ceb6;
+  --info:#2a5580; --info-soft:#e5eef7; --info-line:#a9c6e2;
+  --shadow:0 1px 2px rgba(22,32,29,.06), 0 6px 18px -10px rgba(22,32,29,.18);
+  --display:"Archivo","IBM Plex Sans KR",-apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Archivo",-apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e1412; --surface:#151d1a; --surface-2:#1c2723;
+    --ink:#e6ece9; --ink-2:#a9b6b1; --ink-3:#7d8a85;
+    --line:#2a3733; --line-2:#3a4a45;
+    --accent:#5ec3b4; --accent-soft:#12302b;
+    --alt:#b69ae0; --alt-soft:#241a33; --alt-line:#463461;
+    --crit:#ff9081; --crit-soft:#361814; --crit-line:#6b2c24;
+    --warn:#e3ac52; --warn-soft:#33260f; --warn-line:#6a4f1c;
+    --ok:#7ccd97; --ok-soft:#14301f; --ok-line:#2c5a3b;
+    --info:#82b4e3; --info-soft:#122534; --info-line:#27496a;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 22px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e1412; --surface:#151d1a; --surface-2:#1c2723;
+  --ink:#e6ece9; --ink-2:#a9b6b1; --ink-3:#7d8a85;
+  --line:#2a3733; --line-2:#3a4a45;
+  --accent:#5ec3b4; --accent-soft:#12302b;
+  --alt:#b69ae0; --alt-soft:#241a33; --alt-line:#463461;
+  --crit:#ff9081; --crit-soft:#361814; --crit-line:#6b2c24;
+  --warn:#e3ac52; --warn-soft:#33260f; --warn-line:#6a4f1c;
+  --ok:#7ccd97; --ok-soft:#14301f; --ok-line:#2c5a3b;
+  --info:#82b4e3; --info-soft:#122534; --info-line:#27496a;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 22px -12px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--body); font-size:15px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+[hidden]{display:none!important}
+h1,h2,h3,h4{font-family:var(--display); font-weight:700; text-wrap:balance; margin:0; letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--accent)}
+
+/* ── header ─────────────────────────────── */
+.topbar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:30;
+  background:color-mix(in srgb, var(--paper) 93%, transparent);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+}
+.topbar-in{max-width:1080px; margin:0 auto; padding:13px 20px 0}
+.eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:4px}
+.eyebrow a.home{color:inherit; text-decoration:none; border-bottom:1px solid transparent}
+.eyebrow a.home:hover{border-bottom-color:currentColor}
+.topbar h1{font-size:18px; line-height:1.3}
+.topbar .sub{font-size:12px; color:var(--ink-3); margin-top:2px}
+
+/* role switch */
+.roleswitch{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap}
+.roleswitch button{
+  flex:1 1 220px; appearance:none; cursor:pointer; text-align:left;
+  background:var(--surface); border:1px solid var(--line-2); border-radius:9px;
+  padding:9px 13px; font-family:var(--body); color:var(--ink-2);
+  display:grid; gap:1px; min-width:0;
+}
+.roleswitch button .rt{font-family:var(--display); font-weight:700; font-size:13.5px; color:var(--ink)}
+.roleswitch button .rd{font-size:11.5px; color:var(--ink-3); line-height:1.4}
+.roleswitch button[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft); box-shadow:inset 0 0 0 1px var(--accent)}
+.roleswitch button[aria-pressed="true"] .rt{color:var(--accent)}
+.roleswitch button#roleB[aria-pressed="true"]{border-color:var(--alt); background:var(--alt-soft); box-shadow:inset 0 0 0 1px var(--alt)}
+.roleswitch button#roleB[aria-pressed="true"] .rt{color:var(--alt)}
+.roleswitch button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+nav{display:flex; gap:2px; overflow-x:auto; margin-top:10px; scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{
+  flex:0 0 auto; appearance:none; background:none; border:0; border-bottom:2px solid transparent;
+  color:var(--ink-3); font-family:var(--body); font-size:13px; font-weight:500;
+  padding:8px 11px 9px; cursor:pointer; white-space:nowrap;
+}
+nav button:hover{color:var(--ink-2)}
+nav button[aria-selected="true"]{color:var(--accent); border-bottom-color:var(--accent); font-weight:600}
+body[data-role="B"] nav button[aria-selected="true"]{color:var(--alt); border-bottom-color:var(--alt)}
+nav button:focus-visible{outline:2px solid var(--accent); outline-offset:-2px; border-radius:3px}
+
+main{max-width:1080px; margin:0 auto; padding:22px 20px 60px}
+.panel{display:grid; gap:18px}
+
+/* ── blocks ─────────────────────────────── */
+.card{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:17px 19px; box-shadow:var(--shadow)}
+.sect-head{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:3px}
+.sect-head h2{font-size:16.5px}
+.en{font-family:var(--display); font-size:11.5px; font-weight:600; color:var(--ink-3)}
+.lede{font-size:12.8px; color:var(--ink-3); margin-bottom:13px}
+
+.step{
+  font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.1em;
+  color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; white-space:nowrap;
+}
+body[data-role="B"] .step{background:var(--alt)}
+.step.crit{background:var(--crit)}
+
+.tag{display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.05em;
+  padding:2px 7px; border-radius:4px; border:1px solid var(--line-2); color:var(--ink-2); background:var(--surface-2); white-space:nowrap}
+.tag.crit{color:var(--crit); background:var(--crit-soft); border-color:var(--crit-line)}
+.tag.warn{color:var(--warn); background:var(--warn-soft); border-color:var(--warn-line)}
+.tag.ok{color:var(--ok); background:var(--ok-soft); border-color:var(--ok-line)}
+.tag.info{color:var(--info); background:var(--info-soft); border-color:var(--info-line)}
+.tag.acc{color:var(--accent); background:var(--accent-soft); border-color:var(--accent)}
+
+.banner{border-radius:10px; padding:15px 18px; border:1px solid; display:grid; gap:8px}
+.banner.crit{background:var(--crit-soft); border-color:var(--crit-line)}
+.banner.warn{background:var(--warn-soft); border-color:var(--warn-line)}
+.banner.info{background:var(--info-soft); border-color:var(--info-line)}
+.banner.ok{background:var(--ok-soft); border-color:var(--ok-line)}
+.banner h2{font-size:15.5px}
+.banner.crit h2{color:var(--crit)} .banner.warn h2{color:var(--warn)}
+.banner.info h2{color:var(--info)} .banner.ok h2{color:var(--ok)}
+.banner p,.banner li{font-size:13.3px}
+
+ul.tight{margin:0; padding-left:1.15em; display:grid; gap:5px}
+ol.tight{margin:0; padding-left:1.35em; display:grid; gap:6px}
+ul.tight li,ol.tight li{font-size:13.3px}
+ul.tight li::marker{color:var(--ink-3)}
+ul.plain{list-style:none; margin:0; padding:0; display:grid; gap:7px}
+ul.plain li{font-size:13.3px; padding-left:1.35em; position:relative}
+ul.plain li::before{content:"→"; position:absolute; left:0; color:var(--ink-3); font-family:var(--mono)}
+ul.no li::before{content:"✕"; color:var(--crit)}
+ul.yes li::before{content:"✓"; color:var(--ok)}
+
+/* ── case strip ─────────────────────────── */
+.casestrip{display:flex; gap:0; overflow-x:auto; padding-bottom:4px}
+.cs{flex:1 0 148px; border-left:2px solid var(--line-2); padding:0 13px 2px}
+.cs:first-child{border-left-color:var(--accent)}
+.cs.bad{border-left-color:var(--crit)}
+.cs .when{font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); display:block; margin-bottom:3px}
+.cs.bad .when{color:var(--crit)}
+.cs .what{font-size:12.6px; line-height:1.5}
+
+/* ── flow ───────────────────────────────── */
+.flow{display:grid; gap:0}
+.node{border:1px solid var(--line-2); border-radius:9px; background:var(--surface); padding:12px 15px}
+.node .nhead{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px}
+.node .nhead strong{font-family:var(--display); font-size:13.5px}
+.node p,.node li{font-size:13px}
+.node.act{border-left:4px solid var(--accent)}
+.node.altc{border-left:4px solid var(--alt)}
+.node.stop{border-left:4px solid var(--crit); background:var(--crit-soft); border-color:var(--crit-line)}
+.node.dec{border-left:4px solid var(--info)}
+.node.good{border-left:4px solid var(--ok)}
+.arrow{justify-self:start; margin-left:22px; width:2px; height:15px; background:var(--line-2); position:relative}
+.arrow::after{content:""; position:absolute; bottom:-1px; left:-4px; border-left:5px solid transparent; border-right:5px solid transparent; border-top:6px solid var(--line-2)}
+.branch{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media (max-width:620px){.branch{grid-template-columns:1fr}}
+
+/* ── tables ─────────────────────────────── */
+.tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:9px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:560px; font-size:12.8px}
+th,td{text-align:left; padding:9px 13px; border-bottom:1px solid var(--line); vertical-align:top}
+thead th{font-family:var(--mono); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); background:var(--surface-2); font-weight:500; white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+.num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+.ref{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); white-space:nowrap}
+
+/* ── verdict / metrics ──────────────────── */
+.verdict{display:grid; grid-template-columns:repeat(auto-fit,minmax(246px,1fr)); gap:13px}
+.vcol{border-radius:9px; padding:14px 16px; border:1px solid; display:grid; gap:9px; align-content:start}
+.vcol.ok{background:var(--ok-soft); border-color:var(--ok-line)}
+.vcol.warn{background:var(--warn-soft); border-color:var(--warn-line)}
+.vcol.crit{background:var(--crit-soft); border-color:var(--crit-line)}
+.vcol h3{font-size:13px}
+.vcol.ok h3{color:var(--ok)} .vcol.warn h3{color:var(--warn)} .vcol.crit h3{color:var(--crit)}
+.vcol li{font-size:12.6px; line-height:1.55}
+
+.metrics{display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:9px; overflow:hidden}
+.metric{background:var(--surface); padding:12px 14px}
+.metric .v{font-family:var(--mono); font-size:21px; font-weight:500; line-height:1.15; font-variant-numeric:tabular-nums; color:var(--accent)}
+body[data-role="B"] .metric .v{color:var(--alt)}
+.metric .k{font-size:11.3px; color:var(--ink-2); margin-top:3px; line-height:1.45}
+.metric .s{font-family:var(--mono); font-size:9.5px; color:var(--ink-3); margin-top:4px}
+
+/* ── checklist ──────────────────────────── */
+.check{display:grid; gap:0; border:1px solid var(--line); border-radius:9px; overflow:hidden; background:var(--surface)}
+.check label{display:flex; gap:10px; align-items:flex-start; padding:10px 14px; border-bottom:1px solid var(--line); font-size:12.9px; cursor:pointer}
+.check label:last-child{border-bottom:0}
+.check input{margin-top:3px; accent-color:var(--accent); flex:0 0 auto}
+.check label:has(input:checked){color:var(--ink-3); text-decoration:line-through; text-decoration-color:var(--line-2)}
+.check .grp{background:var(--surface-2); font-family:var(--mono); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); padding:7px 14px; border-bottom:1px solid var(--line)}
+
+.tpl{background:var(--surface-2); border:1px dashed var(--line-2); border-radius:8px; padding:13px 15px;
+  font-family:var(--mono); font-size:11.6px; line-height:1.72; white-space:pre-wrap; color:var(--ink-2); overflow-x:auto}
+
+.foot{margin-top:30px; padding-top:17px; border-top:1px solid var(--line); font-size:11.8px; color:var(--ink-3); display:grid; gap:7px}
+.foot strong{color:var(--ink-2)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+</head>
+<body data-role="A">
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="eyebrow"><a href="index.html" class="home">← 수술 전후 처치 대시보드</a> · Ward Protocol</div>
+    <h1>수술 후 배뇨장애 &amp; 도뇨 외상 대응 프로토콜</h1>
+    <p class="sub">Postoperative Urinary Retention and Traumatic Catheterization · 근거기반 병동 의사결정 지원</p>
+
+    <div class="roleswitch" role="group" aria-label="역할 선택">
+      <button id="roleA" aria-pressed="true">
+        <span class="rt">🩺 저년차 실무</span>
+        <span class="rd">전공의 1–2년차 · 인턴 · PA — “지금 무엇을 할 것인가”</span>
+      </button>
+      <button id="roleB" aria-pressed="false">
+        <span class="rt">🎓 고년차 감독</span>
+        <span class="rd">전문의 · 지도전문의 — “무엇을 판단하고 무엇을 막을 것인가”</span>
+      </button>
+    </div>
+
+    <nav id="navA" role="tablist" aria-label="저년차 섹션">
+      <button role="tab" aria-selected="true"  aria-controls="a1" id="ta1">STEP 0 · 멈춤</button>
+      <button role="tab" aria-selected="false" aria-controls="a2" id="ta2">STEP 1 · 응급처치</button>
+      <button role="tab" aria-selected="false" aria-controls="a3" id="ta3">STEP 2 · 평가</button>
+      <button role="tab" aria-selected="false" aria-controls="a4" id="ta4">STEP 3 · 보고·협진</button>
+      <button role="tab" aria-selected="false" aria-controls="a5" id="ta5">STEP 4 · 배액 후</button>
+      <button role="tab" aria-selected="false" aria-controls="a6" id="ta6">STEP 5 · 예방</button>
+    </nav>
+
+    <nav id="navB" role="tablist" aria-label="고년차 섹션" hidden>
+      <button role="tab" aria-selected="true"  aria-controls="b1" id="tb1">1 · 상황 판단</button>
+      <button role="tab" aria-selected="false" aria-controls="b2" id="tb2">2 · 의사결정 분기</button>
+      <button role="tab" aria-selected="false" aria-controls="b3" id="tb3">3 · 감독 포인트</button>
+      <button role="tab" aria-selected="false" aria-controls="b4" id="tb4">4 · 시스템 예방</button>
+      <button role="tab" aria-selected="false" aria-controls="b5" id="tb5">5 · 의사결정 분석</button>
+      <button role="tab" aria-selected="false" aria-controls="b6" id="tb6">6 · 근거문헌</button>
+    </nav>
+  </div>
+</div>
+
+<main>
+
+<!-- 공통 시나리오 -->
+<div class="card" id="casecard" style="margin-bottom:18px">
+  <div class="sect-head"><h2>대표 시나리오</h2><span class="en">Teaching scenario</span></div>
+  <p class="lede">복부수술 후 배뇨장애가 도뇨 외상으로 이어지는 전형적 경로입니다. 특정 환자의 진료기록이 아니라, 문헌에 보고된 전형적 양상을 재구성한 <b>교육용 가상 시나리오</b>입니다.</p>
+  <div class="casestrip">
+    <div class="cs"><span class="when">Index op</span><p class="what">위절제술 후 <b>internal hernia</b> → bowel reduction. 도뇨관 유치.</p></div>
+    <div class="cs"><span class="when">POD 2 · 제거</span><p class="what">도뇨관 제거. <b>처음에는 자가배뇨 성공</b>.</p></div>
+    <div class="cs"><span class="when">이후</span><p class="what">배뇨곤란 호소 → 방광스캔 <b>잔뇨 320 mL</b>.</p></div>
+    <div class="cs bad"><span class="when">Nelaton 시도</span><p class="what"><b>삽입 저항</b> · <b>육안적 혈뇨</b> · 소변 <b>5 mL만 배액</b>.</p></div>
+    <div class="cs bad"><span class="when">현재</span><p class="what">배뇨 불가, 통증 심화. <b>완전 요폐 + 요도손상 의심</b>.</p></div>
+  </div>
+</div>
+
+<!-- ═══════════════ 저년차 뷰 ═══════════════ -->
+<div id="viewA">
+
+<!-- STEP 0 -->
+<section class="panel" role="tabpanel" id="a1" aria-labelledby="ta1">
+  <div class="banner crit">
+    <div class="sect-head"><span class="step crit">STEP 0</span><h2>지금 당장 멈출 것</h2><span class="en">Hard stops</span></div>
+    <p>여기 있는 다섯 가지는 <b>판단이 필요 없는 규칙</b>입니다. 상황이 급해 보여도 예외를 만들지 마십시오.</p>
+    <ul class="plain no">
+      <li><b>추가 nelaton / Foley 맹목 삽입 금지.</b> 실패한 경로로 다시 들어가면 요도 가짜통로가 깊어집니다.</li>
+      <li><b>소변이 콸콸 나오는 것을 눈으로 확인하기 전에는 balloon을 절대 부풀리지 않습니다.</b> 요도 안에서 balloon을 부풀리면 요도가 찢어집니다.</li>
+      <li><b>힘으로 밀어 넣지 않습니다.</b> 부지(bougie)·필리폼은 비뇨의학과만 사용합니다.</li>
+      <li><b>하복부를 눌러(credé) 배뇨시키거나 방광세척으로 뚫으려 하지 않습니다.</b></li>
+      <li><b>2회 실패하면 끝입니다.</b> 숙련자 2인이 각 1회씩 실패했으면 3회째는 없습니다 — 비뇨의학과로 넘깁니다.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>왜 멈춰야 하는가 — 한 문장</h2></div>
+    <p style="font-size:14px">저항이 느껴지고 · 피가 나오고 · 소변이 5 mL밖에 안 나왔다면, <b>카테터는 방광에 들어가지 않았고 요도에 새 길(false passage)을 냈다</b>는 뜻입니다. 5 mL는 방광 소변이 아니라 요도에 고여 있던 소변과 피일 가능성이 큽니다.</p>
+  </div>
+
+  <div class="banner warn">
+    <div class="sect-head"><h2>이 세 가지가 보이면 바로 위(STEP 0)로 돌아가십시오</h2><span class="en">Red flags</span></div>
+    <ul class="tight">
+      <li><b>요도구에서 피가 비친다</b> (meatal blood)</li>
+      <li><b>넣는 도중 저항이 있다</b> — 아프다고 하거나 더 이상 들어가지 않는다</li>
+      <li><b>소변량이 방광스캔 용적과 전혀 맞지 않는다</b> — 스캔은 320 mL인데 5 mL만 나왔다</li>
+    </ul>
+  </div>
+</section>
+
+<!-- STEP 1 -->
+<section class="panel" role="tabpanel" id="a2" aria-labelledby="ta2" hidden>
+  <div class="card">
+    <div class="sect-head"><span class="step">STEP 1</span><h2>응급처치 — 처음 15분</h2><span class="en">First 15 minutes</span></div>
+    <p class="lede">순서대로 하십시오. 이 단계에서 새로 넣는 기구는 없습니다.</p>
+    <div class="flow">
+      <div class="node stop">
+        <div class="nhead"><strong>① 손을 뗀다</strong><span class="tag crit">0분</span></div>
+        <ul class="tight">
+          <li>도뇨 시도를 중단하고 기구를 치웁니다. 환자를 편안한 자세로 눕힙니다.</li>
+          <li>지금 넣으려던 카테터를 다시 잡지 않습니다.</li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node act">
+        <div class="nhead"><strong>② 활력징후와 통증</strong><span class="tag warn">≤ 5분</span></div>
+        <ul class="tight">
+          <li>BP · HR · BT · RR · SpO₂ 측정. <b>발열·오한·저혈압은 즉시 보고 대상</b>입니다(요도손상 후 균혈증 가능).</li>
+          <li>진통제는 <b>비마약성 우선</b>. 마약성 진통제는 요폐를 더 악화시킵니다.</li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node act">
+        <div class="nhead"><strong>③ 지금 확인해야 할 3가지</strong><span class="tag warn">≤ 10분</span></div>
+        <ul class="tight">
+          <li><b>방광스캔 다시</b> — 지금 용적이 얼마인지가 다음 판단을 결정합니다.</li>
+          <li><b>외성기·회음부 눈으로 확인</b> — 요도구 출혈, 음경·음낭·회음부가 붓거나 멍들었는지.</li>
+          <li><b>항응고제를 맞고 있는지</b> — 위절제 후 VTE 예방 heparin/LMWH 여부를 처방에서 확인해 보고합니다.</li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node good">
+        <div class="nhead"><strong>④ 윗년차에게 보고</strong><span class="tag ok">≤ 15분</span></div>
+        <ul class="tight">
+          <li>혼자 해결하려 하지 말고 <b>이 시점에 반드시 보고</b>합니다. STEP 3의 SBAR 문구를 그대로 쓰면 됩니다.</li>
+          <li>보고 전에 STEP 2의 항목을 훑어 두면 한 번에 끝납니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="banner info">
+    <div class="sect-head"><h2>기억할 숫자</h2><span class="en">Numbers to remember</span></div>
+    <div class="metrics" style="margin-top:4px">
+      <div class="metric"><div class="v">2회</div><div class="k">도뇨 시도 상한 — 숙련자 2인 × 각 1회</div></div>
+      <div class="metric"><div class="v">5–10분</div><div class="k">리도카인 젤 주입 후 기다려야 하는 시간</div></div>
+      <div class="metric"><div class="v">400–500</div><div class="k">도뇨를 고려하는 방광 용적 (mL)</div></div>
+      <div class="metric"><div class="v">&lt; 200</div><div class="k">배뇨 후 정상 잔뇨 목표 (mL)</div></div>
+      <div class="metric"><div class="v">6시간</div><div class="k">도뇨관 제거 후 자가배뇨를 기다리는 한계</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section class="panel" role="tabpanel" id="a3" aria-labelledby="ta3" hidden>
+  <div class="card">
+    <div class="sect-head"><span class="step">STEP 2</span><h2>평가 — 무엇을 보고 무엇을 기록할 것인가</h2><span class="en">Assessment</span></div>
+    <p class="lede">아래 표를 그대로 채우면 보고와 협진 의뢰가 동시에 준비됩니다.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>항목</th><th>확인 방법</th><th>왜 중요한가</th></tr></thead>
+        <tbody>
+          <tr><td><b>현재 방광 용적</b></td><td>방광스캔 재측정 (mL)</td><td>배액이 급한지, 기다려도 되는지를 결정</td></tr>
+          <tr><td><b>요도구 출혈</b></td><td>육안 확인</td><td>있으면 요도손상 — 추가 도뇨 금지</td></tr>
+          <tr><td><b>음경·음낭·회음부</b></td><td>부종·반상출혈 촉진</td><td>요누출·혈종 시사</td></tr>
+          <tr><td><b>복부</b></td><td>압통·반발통·장음·배액관 성상</td><td><b>internal hernia 재발이나 장폐색</b>이 배뇨장애에 기여할 수 있음 — 빠뜨리기 쉬운 항목</td></tr>
+          <tr><td><b>약물</b></td><td>처방 확인</td><td>opioid · 항콜린제 · 경막외진통(PCEA) 여부 — 모두 요폐 유발</td></tr>
+          <tr><td><b>항응고/항혈소판</b></td><td>처방 확인</td><td>혈뇨 지속 시 보류 여부 판단에 필요</td></tr>
+          <tr><td><b>검사</b></td><td>CBC · Cr/BUN · CRP · 요검사(검체 있으면)</td><td>감염·신기능·출혈 정도 파악</td></tr>
+          <tr><td><b>시도 경위</b></td><td>몇 회, 누가, 몇 cm에서 저항, 배액량</td><td>비뇨의학과가 가장 먼저 묻는 정보</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>방광 용적별 판단</h2><span class="en">Volume thresholds</span></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>방광 용적</th><th>무엇을 할 것인가</th></tr></thead>
+        <tbody>
+          <tr><td class="num">&lt; 300 mL</td><td>도뇨하지 않습니다. 보행·기립배뇨·프라이버시·온수·진통 조정 후 <b>2–4시간 뒤 재스캔</b>.</td></tr>
+          <tr><td class="num">300–400 mL</td><td>보존적 조치 + 남성이면 α1 차단제 시작 검토 → <b>2시간 내 재스캔</b>. <span class="tag warn">이 시나리오가 여기</span></td></tr>
+          <tr><td class="num">400–500 mL</td><td>배뇨 못 하거나 증상 심하면 <b>숙련자가 1회</b> 도뇨. 실패하면 바로 에스컬레이션.</td></tr>
+          <tr><td class="num">&gt; 500 mL</td><td>지체 없이 배액. 과팽창이 2–3시간 넘으면 방광근육이 상합니다.</td></tr>
+          <tr><td class="num">&gt; 1,000 mL</td><td>간헐도뇨보다 <b>유치도뇨</b>. 배액 후 소변량·전해질 감시.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px; color:var(--ink-3); margin-top:10px">이 역치는 무작위 비교연구로 확립된 수치가 아니라 다수 문헌에서 반복 사용되는 실무 기준입니다. 최종 판단은 반드시 윗년차·비뇨의학과와 함께 하십시오.</p>
+  </div>
+
+  <div class="banner warn">
+    <div class="sect-head"><h2>저년차가 가장 자주 하는 실수 6가지</h2><span class="en">Common pitfalls</span></div>
+    <ul class="plain no">
+      <li><b>증상만 듣고 바로 도뇨한다.</b> 방광스캔이 먼저입니다.</li>
+      <li><b>320 mL를 “많다”고 판단한다.</b> 개입 역치에 미치지 않습니다.</li>
+      <li><b>“처음엔 봤다”는 말을 흘려듣는다.</b> 완전 요폐가 아니라 불완전 배출이라는 중요한 정보입니다.</li>
+      <li><b>젤을 바르기만 하고 바로 넣는다.</b> 주입 후 5–10분 기다려야 마취가 됩니다.</li>
+      <li><b>안 들어가니까 더 얇은 카테터로 바꿔 계속 시도한다.</b> 남성 BPH에서는 오히려 16–18 Fr coudé가 맞습니다.</li>
+      <li><b>혈뇨가 나왔는데 “원래 조금 날 수 있다”고 넘긴다.</b> 손상이 이미 생겼다는 신호입니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- STEP 3 -->
+<section class="panel" role="tabpanel" id="a4" aria-labelledby="ta4" hidden>
+  <div class="card">
+    <div class="sect-head"><span class="step">STEP 3</span><h2>보고와 협진 — 그대로 읽으면 됩니다</h2><span class="en">Escalation scripts</span></div>
+    <p class="lede">괄호만 채우십시오. 빠뜨리면 되묻는 항목을 미리 넣어 두었습니다.</p>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>① 윗년차 구두 보고 (SBAR)</h2></div>
+    <div class="tpl">S  OOO 환자, 위절제 후 internal hernia 로 bowel reduction 하신 분,
+   POD 2일째 배뇨를 못 하고 있습니다.
+
+B  오늘 도뇨관 제거 후 처음엔 소변을 봤는데 이후 배뇨곤란이 있었고,
+   방광스캔에서 잔뇨 320 mL 나와 nelaton 을 시도했습니다.
+   삽입 중 저항이 있었고 혈뇨가 나오면서 소변은 5 mL 만 나왔습니다.
+   그 뒤로는 전혀 못 보고 있습니다. 추가 시도는 중단한 상태입니다.
+
+A  카테터가 방광에 들어가지 않고 요도 손상이 생긴 것 같습니다.
+   현재 방광스캔 OOO mL, 요도구 출혈 (있음/없음),
+   V/S BP OOO/OO, HR OO, BT OO.O, 항응고제 (OOO / 없음) 입니다.
+
+R  비뇨의학과 응급 협진 넣어도 될지 확인 부탁드립니다.
+   추가 도뇨는 하지 않고 대기하겠습니다.</div>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>② 비뇨의학과 협진 의뢰</h2></div>
+    <div class="tpl">[비뇨의학과 응급 협진]
+
+환자: OOO / M / OO세 / 등록번호 OOOOOOO
+주진단: Gastric cancer, s/p gastrectomy → internal hernia, s/p bowel reduction (POD #2)
+
+경과:
+- POD #2 urethral catheter 제거, 초기 자가배뇨 있었으나 이후 배뇨곤란
+- Bladder scan: residual urine 320 mL
+- Nelaton catheterization 시도 중 삽입 저항 및 gross hematuria 발생,
+  urine 5 mL 만 배액됨. 이후 자가배뇨 불가.
+- 현재 bladder scan OOO mL / 요도구 출혈 (유·무) / 회음부 부종 (유·무)
+- V/S: BP OOO/OO, HR OO, BT OO.O℃
+- 항응고제: (약제명·용량) 또는 없음
+- 추가 도뇨 시도는 중단한 상태입니다.
+
+의뢰 사유:
+Iatrogenic urethral injury (false passage 의심) 동반 acute urinary retention.
+요도 평가(RGU 및/또는 flexible cystourethroscopy)와 안전한 배뇨로 확보
+(guidewire-assisted catheterization 또는 suprapubic cystostomy) 부탁드립니다.</div>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>③ 경과기록</h2></div>
+    <div class="tpl">S) 소변을 보기 어렵고 아랫배가 불편하다고 호소함.
+
+O) Bladder scan OOO mL. 요도구 출혈 (유·무), 음경·음낭·회음부 부종 (유·무),
+   하복부 방광 촉지 (유·무).
+   Nelaton 삽입 시 OO cm 지점에서 저항 있었고 혈액 유출되어 시도 중단함.
+   배액된 소변 5 mL. Balloon 은 팽창시키지 않았음.
+   복부: 압통·반발통 (유·무), 장음 (정상·감소), 배액관 성상 OOO.
+   V/S 안정. Lab: WBC OOOO, CRP O.O, Cr O.O.
+
+A) #1 Acute urinary retention, POD #2
+   #2 Suspected iatrogenic urethral injury (false passage) after catheterization
+   #3 R/O recurrent internal hernia / ileus
+
+P) 1. 추가 blind catheterization 중단, 비뇨의학과 응급 협진 의뢰함.
+   2. 요도 평가 및 배뇨로 확보(비뇨의학과 판단) 예정.
+   3. Opioid 감량, 비마약성 진통제 전환. 항콜린제 중단.
+   4. V/S·발열 monitoring, 혈뇨 성상 추적.
+   5. 배액 후 시간뇨량·전해질 monitoring (post-obstructive diuresis).
+   6. 환자·보호자에게 현 상황, 계획, 요도협착 가능성 및 장기 추적 필요성 설명함.</div>
+  </div>
+
+  <div class="banner ok">
+    <div class="sect-head"><h2>협진 긴급도 — 어느 쪽인지 판단이 서지 않으면 위쪽을 고르십시오</h2></div>
+    <ul class="tight">
+      <li><span class="tag crit">응급 · 즉시</span> 도뇨 중 혈뇨 / 요도구 출혈 / 배액 불일치 <b>(이 시나리오)</b> · 요도 내 balloon 팽창 의심 · 회음부 부종 · 패혈증 징후</li>
+      <li><span class="tag warn">당일</span> 숙련자 2인 도뇨 실패 · 요도협착/전립선수술 병력자 도뇨 필요 · 방광 500 mL 초과인데 배액 불가</li>
+      <li><span class="tag info">24–72시간</span> 카테터 제거 시도 1회 이상 실패 · 반복 요폐</li>
+      <li><span class="tag ok">퇴원 시</span> 외상성 도뇨를 겪은 환자는 <b>전원 3·6개월 비뇨의학과 추적 예약</b></li>
+    </ul>
+  </div>
+</section>
+
+<!-- STEP 4 -->
+<section class="panel" role="tabpanel" id="a5" aria-labelledby="ta5" hidden>
+  <div class="card">
+    <div class="sect-head"><span class="step">STEP 4</span><h2>배액이 된 다음 — 24–48시간</h2><span class="en">After drainage</span></div>
+    <div class="flow">
+      <div class="node act">
+        <div class="nhead"><strong>배액은 빠르고 완전하게</strong></div>
+        <ul class="tight">
+          <li>조금씩 빼거나 중간에 잠그는(clamping) 것은 <b>근거가 없습니다</b>. 한 번에 다 빼는 것이 안전합니다.</li>
+          <li>혈뇨나 혈압 하강이 올 수 있으나 임상적으로 문제가 되는 경우는 드뭅니다. 다만 고령·탈수 환자는 활력징후를 더 자주 봅니다.</li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node act">
+        <div class="nhead"><strong>폐색후 이뇨 감시</strong><span class="tag warn">놓치기 쉬움</span></div>
+        <ul class="tight">
+          <li>배액량이 500 mL를 넘었으면 <b>시간뇨량·전해질·체중</b>을 봅니다.</li>
+          <li>위절제 후 환자는 경구섭취가 제한되어 <b>탈수에 특히 취약</b>합니다.</li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node act">
+        <div class="nhead"><strong>혈뇨 · 감염</strong></div>
+        <ul class="tight">
+          <li>혈뇨 지속: 수액으로 소변을 맑게 유지, 응고검사 확인, 3-way 관류는 비뇨의학과 판단.</li>
+          <li><b>항생제를 자동으로 시작하지 않습니다.</b> 발열·균뇨·패혈증 징후·면역저하 시 선택적으로.</li>
+          <li>다만 외상성 도뇨 후 요로감염 위험이 높으므로(30일 13%) 발열 감시를 강화합니다.</li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node good">
+        <div class="nhead"><strong>카테터 제거 시도 &amp; 퇴원 준비</strong></div>
+        <ul class="tight">
+          <li>요도손상이 있었으면 유치 기간은 <b>비뇨의학과가 정합니다</b>(보통 1–2주 이상).</li>
+          <li>제거 후 자가배뇨 확인 + 잔뇨 측정, 목표 <b>&lt; 200 mL</b>.</li>
+          <li><b>퇴원요약에 손상 사건을 반드시 기재</b>하고 3·6개월 비뇨의학과 외래를 예약합니다. 요도협착은 수개월 뒤에 나타납니다.</li>
+          <li>환자 교육: 소변 줄기가 가늘어지거나 잔뇨감이 생기면 즉시 내원.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 5 -->
+<section class="panel" role="tabpanel" id="a6" aria-labelledby="ta6" hidden>
+  <div class="card">
+    <div class="sect-head"><span class="step">STEP 5</span><h2>다음 환자에게서 막는 법</h2><span class="en">Prevention you can do</span></div>
+    <p class="lede">저년차가 직접 실행할 수 있는 것만 모았습니다. 제도 차원의 예방은 고년차 뷰에 있습니다.</p>
+    <div class="verdict">
+      <div class="vcol ok">
+        <h3>수술 전 — 미리 물어볼 것</h3>
+        <ul class="tight">
+          <li>남성이면 <b>소변 줄기가 가는지, 밤에 자주 깨는지, 전립선약을 먹는지</b>를 문진에 넣습니다.</li>
+          <li><b>이전에 소변줄 넣기 어려웠던 적이 있는지</b> — 한 문장이면 사고를 막습니다.</li>
+          <li>요도협착·전립선수술 병력이 있으면 <b>수술 전에 미리 보고</b>해 비뇨의학과와 조율하게 합니다.</li>
+        </ul>
+      </div>
+      <div class="vcol warn">
+        <h3>수술 후 — 도뇨관 제거 전후</h3>
+        <ul class="tight">
+          <li><b>경막외 진통(PCEA)이 유지 중이면 Foley를 먼저 빼지 않도록</b> 확인하고 보고합니다.</li>
+          <li>제거는 <b>오전에</b>. 문제가 생겨도 대응할 인력이 있는 시간대입니다.</li>
+          <li>제거 <b>6시간 내</b> 자가배뇨 없으면 즉시 방광스캔.</li>
+          <li>배뇨했더라도 <b>첫 배뇨 후 잔뇨 스캔 1회</b>는 반드시 시행합니다.</li>
+          <li>opioid를 줄이고 조기 보행을 독려합니다.</li>
+        </ul>
+      </div>
+      <div class="vcol crit">
+        <h3>도뇨를 하게 되었을 때</h3>
+        <ul class="tight">
+          <li>리도카인 젤 <b>10–20 mL 주입 후 5–10분 대기</b>.</li>
+          <li>남성·BPH 의심 시 <b>16–18 Fr coudé tip</b> 또는 실리콘 카테터.</li>
+          <li><b>소변 자유유출 확인 후에만</b> balloon 팽창.</li>
+          <li>저항·통증·혈액 → <b>즉시 중단·보고</b>, 재시도 없음.</li>
+          <li>유치하면 <b>고정장치(securement)</b>를 붙이고 요도구를 매 근무조 확인합니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>병동 체크리스트</h2><span class="en">Ward checklist</span></div>
+    <p class="lede">클릭해 체크할 수 있습니다. 체크 상태는 이 브라우저에만 남습니다.</p>
+    <div class="check">
+      <div class="grp">도뇨관 제거 당일</div>
+      <label><input type="checkbox" id="c1"><span>제거 시각 기록. 경막외 진통 유지 중이면 제거 보류 여부 확인.</span></label>
+      <label><input type="checkbox" id="c2"><span>제거 후 6시간 내 자가배뇨 없으면 <b>즉시 방광스캔</b> 후 보고.</span></label>
+      <label><input type="checkbox" id="c3"><span>자가배뇨 시에도 <b>첫 배뇨 후 잔뇨 스캔</b> 1회 (목표 &lt; 200 mL).</span></label>
+      <div class="grp">배뇨곤란 발생 시</div>
+      <label><input type="checkbox" id="c4"><span>방광스캔 용적 기록 → 300 mL 미만이면 보존적 조치 후 2–4시간 재스캔(도뇨 금지).</span></label>
+      <label><input type="checkbox" id="c5"><span>보존적 조치: 보행 / 기립·좌위 배뇨 / 프라이버시 / 온수 / 진통 조정 / opioid·항콜린제 검토.</span></label>
+      <label><input type="checkbox" id="c6"><span>400–500 mL 이상 또는 증상 심함 → 주치의 보고 후 <b>숙련자</b>가 도뇨.</span></label>
+      <div class="grp">도뇨 수행 시</div>
+      <label><input type="checkbox" id="c7"><span>리도카인 젤 10–20 mL 주입 후 <b>5–10분 대기</b>.</span></label>
+      <label><input type="checkbox" id="c8"><span>남성·BPH 의심 시 <b>16–18 Fr coudé</b> 또는 실리콘 카테터 준비.</span></label>
+      <label><input type="checkbox" id="c9"><span><b>소변 자유유출 확인 전 balloon 팽창 금지.</b></span></label>
+      <label><input type="checkbox" id="c10"><span>저항·통증·혈액 시 <b>즉시 중단</b>하고 보고. 재시도 없음.</span></label>
+      <label><input type="checkbox" id="c11"><span><b>총 2회 실패 시 비뇨의학과 협진</b> — 3회째 시도 금지.</span></label>
+      <label><input type="checkbox" id="c12"><span>유치 시 고정장치 적용, 요도구 관찰 매 근무조.</span></label>
+      <div class="grp">배액 후</div>
+      <label><input type="checkbox" id="c13"><span>배액량·성상 기록. 빠르고 완전한 배액 — clamping 불필요.</span></label>
+      <label><input type="checkbox" id="c14"><span>배액량 &gt; 500 mL 시 시간뇨량·V/S 감시.</span></label>
+      <label><input type="checkbox" id="c15"><span>발열·오한·저혈압 시 즉시 보고.</span></label>
+      <div class="grp">퇴원 시</div>
+      <label><input type="checkbox" id="c16"><span>외상성 도뇨 사건을 <b>퇴원요약에 기재</b>.</span></label>
+      <label><input type="checkbox" id="c17"><span><b>3개월·6개월 비뇨의학과 외래 예약</b> 및 환자 교육 완료.</span></label>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ═══════════════ 고년차 뷰 ═══════════════ -->
+<div id="viewB" hidden>
+
+<!-- 1 -->
+<section class="panel" role="tabpanel" id="b1" aria-labelledby="tb1" hidden>
+  <div class="banner crit">
+    <div class="sect-head"><span class="step crit">01</span><h2>Working diagnosis</h2></div>
+    <p><b>삽입 저항 + 육안적 혈뇨 + 5 mL 배액</b>의 삼징후는 카테터가 방광에 도달하지 못하고 <b>요도 가짜통로(false passage) 또는 요도 열상</b>을 형성했을 가능성이 가장 높습니다. 배액된 5 mL는 방광 소변이 아니라 요도 내 잔류 소변·혈액으로 보는 것이 타당합니다.</p>
+    <p>따라서 현 상태는 <b>급성 요폐 + 의인성 요도손상 동반</b>으로 관리해야 하며, 추가 맹목 도뇨는 손상 확장·요도협착·균혈증 위험을 올립니다.</p>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>감별 및 동반 원인</h2><span class="en">Differential</span></div>
+    <p class="lede">배뇨장애를 요도 문제로만 좁히면 복강내 원인을 놓칩니다. 이 환자는 재수술 직후입니다.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>범주</th><th>감별 대상</th><th>확인</th></tr></thead>
+        <tbody>
+          <tr><td>요도·방광</td><td>의인성 요도손상 / false passage <span class="tag crit">가장 유력</span></td><td>요도구 출혈, 배액 불일치, 회음부 소견 → RUG·방광요도경</td></tr>
+          <tr><td>요도·방광</td><td>기저 BPH·방광경부 상승·요도협착</td><td>병력, IPSS, 이전 도뇨 곤란 이력</td></tr>
+          <tr><td>배뇨근</td><td>과팽창 후 배뇨근 기능부전</td><td>과팽창 지속시간, 배액량</td></tr>
+          <tr><td>약물</td><td>opioid · 항콜린제 · glycopyrrolate · 경막외진통</td><td>처방 리뷰. 경막외는 독립 위험인자</td></tr>
+          <tr><td>복강내</td><td><b>internal hernia 재발 · 장폐색 · 복강내 저류(농양·혈종)</b></td><td>복부 진찰, 배액 성상, 필요시 CT — <b>재수술 후이므로 반드시 배제</b></td></tr>
+          <tr><td>전신</td><td>패혈증 · AKI · 전해질 이상</td><td>V/S, CBC, CRP, Cr, 전해질</td></tr>
+          <tr><td>신경</td><td>척추마취·경막외 후 배뇨반사 지연</td><td>마취기록, 하지 감각·운동</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>이 사건의 규모 감각</h2><span class="en">Why this matters</span></div>
+    <div class="metrics">
+      <div class="metric"><div class="v">5.3 / 1,000</div><div class="k">삽입 카테터당 외상성 도뇨</div><div class="s">Lawton 2024</div></div>
+      <div class="metric"><div class="v">33%</div><div class="k">비뇨의학과 도뇨 협진 중 외상성 비율</div><div class="s">Lawton 2024</div></div>
+      <div class="metric"><div class="v">100%</div><div class="k">외상성 도뇨 환자가 남성 (중앙 69세)</div><div class="s">Lawton 2024</div></div>
+      <div class="metric"><div class="v">71%</div><div class="k">손상 환자에 비뇨기 병력 존재</div><div class="s">Lawton 2024</div></div>
+      <div class="metric"><div class="v">50%</div><div class="k">육안적 혈뇨 — 최다 후유 소견</div><div class="s">Lawton 2024</div></div>
+      <div class="metric"><div class="v">13%</div><div class="k">30일 내 카테터 관련 요로감염</div><div class="s">Lawton 2024</div></div>
+      <div class="metric"><div class="v">16 / 9%</div><div class="k">의인성 요도손상 환자의 패혈증 / 패혈성 쇼크</div><div class="s">Yagihashi 2014</div></div>
+      <div class="metric"><div class="v">78%</div><div class="k">도뇨 관련 손상의 장기 합병증 중 요도협착</div><div class="s">Morozov 2024</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="panel" role="tabpanel" id="b2" aria-labelledby="tb2" hidden>
+  <div class="card">
+    <div class="sect-head"><span class="step">02</span><h2>의사결정 분기</h2><span class="en">Decision algorithm</span></div>
+    <div class="flow">
+      <div class="node stop">
+        <div class="nhead"><strong>0 · 중단 및 안정화</strong><span class="tag crit">즉시</span></div>
+        <ul class="tight">
+          <li>도뇨 중단. 비마약성 진통으로 전환(opioid는 요폐 악화).</li>
+          <li>패혈증 선별 — 손상된 요도를 통한 균혈증 위험.</li>
+          <li>항응고·항혈소판제 확인. 출혈 지속 시 VTE 위험과 함께 보류 여부 공동 결정.</li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node altc">
+        <div class="nhead"><strong>1 · 재평가</strong><span class="tag warn">≤ 15분</span></div>
+        <ul class="tight">
+          <li>방광스캔 재측정 · 외성기·회음부 진찰 · <b>복부 재평가(복강내 원인 배제)</b> · 약물 리뷰 · 기본 검사.</li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node dec">
+        <div class="nhead"><strong>2 · 분기</strong><span class="tag info">≤ 30분</span></div>
+        <p>요도손상 의심 소견(요도구 출혈 / 혈뇨 / 삽입 저항 / 배액 불일치)이 <b>하나라도</b> 있으면 좌측 경로.</p>
+      </div>
+      <div class="arrow"></div>
+      <div class="branch">
+        <div class="node stop">
+          <div class="nhead"><strong>A · 요도손상 의심 (이 시나리오)</strong><span class="tag crit">해당</span></div>
+          <ul class="tight">
+            <li><b>비뇨의학과 응급 협진.</b></li>
+            <li>진단 — <b>연성 방광요도경 및/또는 역행성 요도조영(RUG)</b><br><span class="tag acc">EAU Strong</span> “Evaluate male urethral injuries with flexible cystourethroscopy and/or retrograde urethrography.”</li>
+            <li>배뇨로 확보 — ⓐ 방광경 유도 guidewire + council-tip 카테터, 또는 ⓑ 초음파 유도 치골상부 방광루<br><span class="tag acc">EAU Strong</span> “Treat iatrogenic anterior urethral injuries by transurethral or suprapubic urinary diversion.”</li>
+            <li>bedside RUG + 요도경 프로토콜로 난치성 도뇨 55례 전례에서 SPC 없이 100% 경요도 성공 보고. <span class="ref">Patil 2024</span></li>
+          </ul>
+        </div>
+        <div class="node good">
+          <div class="nhead"><strong>B · 손상 근거 없음</strong><span class="tag ok">참고</span></div>
+          <ul class="tight">
+            <li>&lt; 400 mL · 증상 경미 → 보존적 조치 후 2–4시간 재스캔.</li>
+            <li>≥ 400–500 mL 또는 증상 심함 → 숙련자 1회 도뇨(리도카인 젤 대기 5–10분, 16–18 Fr coudé 우선).</li>
+            <li>남성·BPH → α1 차단제 즉시 시작.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="arrow"></div>
+      <div class="node altc">
+        <div class="nhead"><strong>3 · 배액 후</strong><span class="tag warn">24–48시간</span></div>
+        <ul class="tight">
+          <li>빠르고 완전한 배액. 단계적 clamping을 지지하는 연구는 없습니다. <span class="ref">Nyman 1997 · Etafy 2017</span></li>
+          <li>폐색후 이뇨 감시 — 시간뇨량·전해질·체중. 위절제 후 경구섭취 제한으로 탈수 취약.</li>
+          <li>항생제는 선택적. 발열·균뇨·패혈증 징후·면역저하 시.</li>
+          <li>α1 차단제 유지 — TWOC 성공률 향상. <span class="ref">Yoon 2015 · Gwon 2022</span></li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node dec">
+        <div class="nhead"><strong>4 · TWOC 및 추적</strong></div>
+        <ul class="tight">
+          <li>손상 동반 시 유치 기간은 비뇨의학과 결정. 즉시 vs 지연 TWOC는 <b>어느 쪽도 우월하지 않음</b>. <span class="ref">Christensen 2024</span></li>
+          <li>성공 기준 잔뇨 &lt; 200 mL.</li>
+          <li><b>3·6개월 비뇨의학과 추적 필수</b> — 요속검사·IPSS, 요도협착 감시.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>개입 역치와 근거 강도</h2><span class="en">Thresholds</span></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>방광 용적</th><th>상황</th><th>조치</th><th>근거 강도</th></tr></thead>
+        <tbody>
+          <tr><td class="num">&lt; 300 mL</td><td>배뇨곤란 호소</td><td>보존적 조치, 2–4시간 재스캔. 도뇨 불필요.</td><td><span class="tag ok">일관됨</span></td></tr>
+          <tr><td class="num">300–400 mL</td><td>배뇨 일부 가능, 증상 경미</td><td>보존 + α1 차단제 + 2시간 재스캔. <b>이 시나리오가 해당하는 구간.</b></td><td><span class="tag warn">근거 제한적</span></td></tr>
+          <tr><td class="num">400–500 mL</td><td>배뇨 불가 또는 증상 심함</td><td>숙련자 1회 간헐도뇨. 실패 시 즉시 에스컬레이션.</td><td><span class="tag warn">전문가 합의</span></td></tr>
+          <tr><td class="num">&gt; 500 mL</td><td>전부</td><td>지체 없는 배액. 과팽창 2–3시간 시 배뇨근 손상.</td><td><span class="tag ok">일관됨</span></td></tr>
+          <tr><td class="num">&gt; 1,000 mL</td><td>전부</td><td>유치도뇨 선호, 폐색후 이뇨 감시.</td><td><span class="tag warn">전문가 합의</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px; color:var(--ink-3); margin-top:10px">POUR의 방광용적 역치와 도뇨 기간에 대한 <b>표준화된 정의는 아직 없습니다</b>. 위 표는 다수 문헌의 실무 역치를 정리한 것으로, 기관 프로토콜 확정 시 비뇨의학과와 합의가 필요합니다. <span class="ref">Cambise 2024 · AUGS 2023</span></p>
+  </div>
+
+  <div class="banner info">
+    <div class="sect-head"><h2>난치성 도뇨 사다리 — 비뇨의학과 시행</h2><span class="en">Difficult catheterization ladder</span></div>
+    <ol class="tight">
+      <li>18 Fr coudé tip 또는 12 Fr 실리콘, 충분한 윤활마취젤 선주입 후 대기.</li>
+      <li>연성 방광경 직시하 guidewire 유치 → council-tip 카테터 활강.</li>
+      <li>협착 확인 시 요관확장기 또는 요도 balloon 확장 후 유치.</li>
+      <li>실패 시 초음파 유도 치골상부 방광루.</li>
+    </ol>
+    <p style="font-size:12px; color:var(--ink-3)">전향 비교연구가 부족한 영역으로, 서술적 고찰과 단일기관 프로토콜에 기반합니다. <span class="ref">Villanueva &amp; Hemstreet 2008 · Wagner 2016 · Patil 2024</span></p>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="panel" role="tabpanel" id="b3" aria-labelledby="tb3" hidden>
+  <div class="card">
+    <div class="sect-head"><span class="step">03</span><h2>감독 포인트 — 어디서 개입할 것인가</h2><span class="en">Supervision</span></div>
+    <p class="lede">저년차가 놓치는 지점과, 그 지점에서 고년차가 물어야 할 질문을 짝지었습니다.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>저년차가 놓치는 지점</th><th>고년차가 물어야 할 한 문장</th><th>개입 수준</th></tr></thead>
+        <tbody>
+          <tr><td>증상만 듣고 도뇨를 결정</td><td>“방광스캔 몇 mL 나왔지?”</td><td><span class="tag info">질문</span></td></tr>
+          <tr><td>320 mL를 개입 역치로 오인</td><td>“400 안 되는데 왜 지금 넣어야 하지? 보존적으로 2시간 보면 안 되나?”</td><td><span class="tag warn">중단 지시</span></td></tr>
+          <tr><td>“처음엔 봤다”를 흘려들음</td><td>“한 번도 못 본 건가, 보다가 안 되는 건가?”</td><td><span class="tag info">질문</span></td></tr>
+          <tr><td>저항을 느끼고도 계속 시도</td><td>“몇 cm에서 걸렸어? 지금 몇 번째야?”</td><td><span class="tag crit">즉시 중단</span></td></tr>
+          <tr><td>혈뇨를 “원래 좀 난다”로 해석</td><td>“피가 나온 시점이 넣기 전이야 후야?”</td><td><span class="tag crit">즉시 중단</span></td></tr>
+          <tr><td>5 mL 배액을 성공으로 기록</td><td>“소변이 콸콸 나왔어, 아니면 조금 비쳤어?”</td><td><span class="tag crit">즉시 중단</span></td></tr>
+          <tr><td>balloon을 넣었는지 불명확</td><td>“balloon 넣었어? 넣기 전에 소변 봤어?”</td><td><span class="tag crit">직접 확인</span></td></tr>
+          <tr><td>복강내 원인 미배제</td><td>“배는 어때? 재발 탈장이나 ileus 가능성은 봤어?”</td><td><span class="tag warn">재평가 지시</span></td></tr>
+          <tr><td>항응고제 확인 누락</td><td>“헤파린 맞고 있나?”</td><td><span class="tag info">질문</span></td></tr>
+          <tr><td>협진 타이밍 지연</td><td>“지금 비뇨과 부르자. 더 시도하지 마.”</td><td><span class="tag crit">직접 지시</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="banner crit">
+    <div class="sect-head"><h2>고년차가 직접 개입해야 하는 순간</h2><span class="en">Take over now</span></div>
+    <ul class="plain no">
+      <li>혈뇨 또는 요도구 출혈이 보고된 순간 — 추가 시도를 <b>말로 중단</b>시키고 직접 확인합니다.</li>
+      <li>“소변이 조금만 나왔다”는 보고 — 배액량과 방광스캔 용적의 불일치를 직접 대조합니다.</li>
+      <li>3회째 시도가 거론되는 순간 — 프로토콜 위반입니다.</li>
+      <li>발열·저혈압이 동반된 요폐 — 균혈증을 전제로 움직입니다.</li>
+      <li>재수술 환자에서 배뇨장애가 복부 증상과 함께 나타난 경우 — 복강내 원인을 직접 평가합니다.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>교육 포인트 — 회진·컨퍼런스에서 반복할 세 문장</h2><span class="en">Teaching points</span></div>
+    <ul class="plain yes">
+      <li><b>“소변이 자유롭게 나오는 것을 보기 전에는 balloon을 넣지 않는다.”</b> 일본의 한 조사에서 간호사 7%가 소변 유출 없이도 balloon을 주입한다고 응답했습니다. 이 한 문장이 전층 파열을 막습니다. <span class="ref">Yagihashi 2014</span></li>
+      <li><b>“저항은 중단 신호이지 더 밀 이유가 아니다.”</b> 의인성 요도손상의 두 대표 기전이 요도 내 balloon 팽창과 가짜통로입니다. <span class="ref">Morozov 2024</span></li>
+      <li><b>“두 번 실패하면 사람을 바꾸는 게 아니라 과를 바꾼다.”</b> EAU는 <b>Strong</b> 등급으로 “외상성 도뇨를 줄이기 위한 적절한 교육 제공”을 권고합니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="panel" role="tabpanel" id="b4" aria-labelledby="tb4" hidden>
+  <div class="card">
+    <div class="sect-head"><span class="step">04</span><h2>시스템 예방</h2><span class="en">System-level prevention</span></div>
+    <p class="lede">개인 주의력에 기대는 예방은 재현되지 않습니다. 오더세트·역치·정지규칙으로 바꾸어야 합니다.</p>
+    <div class="flow">
+      <div class="node altc">
+        <div class="nhead"><strong>수술 전</strong></div>
+        <ul class="tight">
+          <li>남성 환자 입원 오더에 <b>IPSS 간이 문진 + 이전 도뇨 곤란 이력</b>을 고정 항목으로 넣습니다.</li>
+          <li>요도협착·전립선수술 병력자는 <b>수술장 도뇨를 비뇨의학과가 시행</b>하도록 사전 조율.</li>
+          <li>α1 차단제 예방은 <b>근거가 양분</b>되어 있습니다 — 23 RCT 메타분석에서 tamsulosin은 POUR를 <b>RR 0.50 (0.38–0.67)</b>로 낮췄으나 <span class="ref">Baysden 2023</span>, 선택적 복부수술 이중맹검 RCT에서는 차이가 없었습니다(26% vs 31%, p=0.49) <span class="ref">Papageorge 2021</span>. → <b>BPH/LUTS 있는 남성에 한해 선택적 적용</b>이 합리적이며 전 환자 일괄 적용은 근거 부족.</li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node altc">
+        <div class="nhead"><strong>수술 중</strong></div>
+        <ul class="tight">
+          <li>수액 과다 투여 제한, 항콜린제 최소화.</li>
+          <li>다중양식 진통(TAP block, acetaminophen, NSAIDs)으로 opioid 총량 감축.</li>
+          <li>도뇨는 숙련자 시행, 저항 시 중단·보고를 <b>수술실 규칙으로</b> 명문화.</li>
+          <li>카테터 고정장치 필수 — 요도구 압박손상 위험 OR 0.26. <span class="ref">Shenhar 2020</span></li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node altc">
+        <div class="nhead"><strong>카테터 제거 정책</strong></div>
+        <ul class="tight">
+          <li>ERAS 원칙상 조기 제거가 CAUTI를 줄이지만, <b>경막외 진통 유지 중에는 제거를 늦추는 것</b>이 합리적입니다. 복벽재건 코호트에서 POD1 제거군의 요폐 재삽입이 유의하게 많았고(p=0.02), 경막외 제거 후 Foley를 뺀 군에서 CAUTI 증가는 없었습니다. <span class="ref">Haskins 2018</span></li>
+          <li><b>오전 제거 원칙</b>을 오더세트에 고정.</li>
+        </ul>
+      </div>
+      <div class="arrow"></div>
+      <div class="node good">
+        <div class="nhead"><strong>제거 후 감시 — 사고를 막는 지점</strong><span class="tag ok">핵심</span></div>
+        <ul class="tight">
+          <li>제거 후 <b>6시간 내 자가배뇨</b> 확인, 배뇨 시 <b>잔뇨 스캔</b>(목표 &lt; 200 mL)을 자동 오더로.</li>
+          <li>배뇨 없거나 잔뇨 과다 시 <b>q2–4h 방광스캔</b>. 증상만으로 도뇨 결정하지 않음.</li>
+          <li>휴대용 방광초음파는 불필요한 도뇨를 16–47%, 요로감염을 38–72% 줄입니다 — <b>장비 접근성 자체가 예방 수단</b>입니다. <span class="ref">Ontario HTA 2006</span></li>
+          <li><b>정지규칙을 오더세트 문구로 넣습니다</b> — “숙련자 2인 × 각 1회 실패 시 비뇨의학과 협진, 3회째 시도 금지.”</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>위험도 층화 — 2개 이상이면 고위험</h2><span class="en">Risk stratification</span></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>영역</th><th>위험인자</th><th>크기 / 비고</th></tr></thead>
+        <tbody>
+          <tr><td>환자</td><td>남성</td><td class="num">4.7% vs 2.9%</td></tr>
+          <tr><td>환자</td><td>50세 이상</td><td class="num">약 2.4배</td></tr>
+          <tr><td>환자</td><td>BPH · 요도협착 · 이전 요폐</td><td>외상성 도뇨 환자의 71%가 비뇨기 병력 보유</td></tr>
+          <tr><td>환자</td><td>당뇨 · 신기능저하 · 비만</td><td>대장수술 코호트에서 BMI·전립선질환이 독립 예측인자</td></tr>
+          <tr><td>수술</td><td>수술시간 2–4시간 초과</td><td>—</td></tr>
+          <tr><td>수술</td><td>개복 · 재수술 · 골반 조작</td><td>개복이 독립 위험인자</td></tr>
+          <tr><td>마취·진통</td><td>척추마취 · 경막외 진통(PCEA)</td><td>경막외 제거 전 Foley 제거 시 요폐 유의 증가 <span class="ref">Haskins 2018</span></td></tr>
+          <tr><td>마취·진통</td><td>고용량 opioid · 항콜린제 · glycopyrrolate</td><td>—</td></tr>
+          <tr><td>기타</td><td>지연 보행 · 변매복</td><td>고령 코호트에서 반복 보고</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="banner info">
+    <div class="sect-head"><h2>설명 및 동의 — 반드시 포함할 내용</h2><span class="en">Disclosure</span></div>
+    <ul class="tight">
+      <li>도뇨 과정에서 요도 손상이 생긴 것으로 판단된다는 점과 그 판단 근거(혈뇨·배액 불일치).</li>
+      <li>추가 시도를 중단하고 비뇨의학과 처치로 전환하는 이유 — 무리한 재시도가 손상을 키우기 때문.</li>
+      <li>치골상부 방광루가 필요할 수 있다는 점과 그 의미.</li>
+      <li><b>요도협착이 수개월 뒤에 나타날 수 있어 장기 추적이 필요하다</b>는 점 — 분쟁 대비가 아니라 환자 안전을 위해 사전에 설명하고 기록합니다.</li>
+      <li>설명 일시·참석자·설명자를 기록에 남깁니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="panel" role="tabpanel" id="b5" aria-labelledby="tb5" hidden>
+  <div class="card">
+    <div class="sect-head"><span class="step">05</span><h2>의사결정 분석</h2><span class="en">Decision analysis</span></div>
+    <p class="lede">위 시나리오의 각 분기에서 어떤 선택이 근거에 부합하고 어떤 선택이 위험을 키우는지 정리한 것입니다. 특정 사례에 대한 평가가 아니라 <b>교육·시스템 설계용 분석</b>입니다.</p>
+    <div class="verdict">
+      <div class="vcol ok">
+        <h3>✓ 적절했던 판단</h3>
+        <ul class="tight">
+          <li><b>방광스캔을 먼저 시행.</b> 증상만으로 도뇨하지 않고 객관적 용적을 측정한 것은 표준에 부합합니다. 휴대용 방광초음파는 불필요한 도뇨를 16–47%, 요로감염을 38–72% 줄입니다. <span class="ref">Ontario HTA 2006</span></li>
+          <li><b>배뇨장애를 조기에 인지.</b> 과팽창이 2–3시간 넘게 지속되면 벽내 허혈·신경손상으로 배뇨근이 상합니다.</li>
+          <li><b>유치도뇨 대신 간헐도뇨를 먼저 선택.</b> CAUTI 관점에서 합리적입니다.</li>
+          <li><b>balloon을 팽창시키지 않은 것.</b> 이 한 가지가 전층 파열을 막았습니다.</li>
+        </ul>
+      </div>
+      <div class="vcol warn">
+        <h3>△ 재고가 필요한 판단</h3>
+        <ul class="tight">
+          <li><b>320 mL에서의 즉시 도뇨 — 역치 미달.</b> 방광 정상 최대용적은 약 500 mL이며 통상 개입 역치는 400–500 mL 또는 심한 증상입니다. <span class="ref">Baldini 2009 · AUGS 2023</span></li>
+          <li><b>완전 요폐가 아니었음.</b> “처음에는 배뇨했다”는 불완전 배출을 뜻하며, 보존적 조치와 α1 차단제를 먼저 시도할 여지가 있었습니다.</li>
+          <li><b>α1 차단제보다 기구가 먼저 들어간 것.</b> 남성·50세 이상·복부수술 조합에서 tamsulosin/alfuzosin은 도뇨에 앞서 고려할 수 있는 수단입니다. <span class="ref">Yoon 2015 · Gwon 2022</span></li>
+          <li><b>복강내 원인 재평가 누락 가능성.</b> internal hernia 정복 후 재발·장폐색·복강내 저류를 함께 배제했어야 합니다.</li>
+        </ul>
+      </div>
+      <div class="vcol crit">
+        <h3>✕ 명백한 위험 지점</h3>
+        <ul class="tight">
+          <li><b>저항 후에도 시도를 계속한 것.</b> 삽입 저항은 중단 신호입니다. 여기서 멈췄다면 가짜통로를 피할 수 있었습니다.</li>
+          <li><b>혈뇨 발생 후에도 진행한 것.</b> 혈뇨는 손상이 이미 발생했다는 뜻이며, 이후의 모든 시도는 손상을 키웁니다.</li>
+          <li><b>5 mL 배액을 성공으로 해석할 위험.</b> 소변 자유유출이 없으면 카테터는 방광에 없습니다.</li>
+          <li><b>시도 횟수 상한·에스컬레이션 규칙의 부재.</b> 명문화된 STOP 규칙이 없으면 같은 사건이 반복됩니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sect-head"><h2>이 시나리오가 시사하는 제도 개선 3가지</h2><span class="en">Action items</span></div>
+    <ol class="tight">
+      <li><b>오더세트 개정</b> — 도뇨관 제거 오더에 “6시간 내 자가배뇨 확인 + 첫 배뇨 후 잔뇨 스캔”을 자동 포함. 경막외 진통 유지 중이면 제거 보류 알림.</li>
+      <li><b>정지규칙 명문화</b> — “숙련자 2인 × 각 1회 실패 시 비뇨의학과 협진, 3회째 시도 금지”, “소변 자유유출 확인 전 balloon 팽창 금지”를 간호지시·전공의 매뉴얼에 동일 문구로 삽입.</li>
+      <li><b>연 1회 술기 교육</b> — 리도카인 젤 대기시간, coudé 카테터 선택, 저항 시 중단을 실습 항목으로. EAU가 Strong 등급으로 권고하는 항목입니다.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="panel" role="tabpanel" id="b6" aria-labelledby="tb6" hidden>
+  <div class="card">
+    <div class="sect-head"><span class="step">06</span><h2>근거문헌</h2><span class="en">Evidence table</span></div>
+    <p class="lede">PubMed 검색·검증 결과와 EAU Urological Trauma Guideline(2025)을 근거로 정리했습니다.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>주제</th><th>문헌</th><th>유형</th><th>반영된 결론</th></tr></thead>
+        <tbody>
+          <tr><td>요도손상 진단·치료</td><td>EAU Guidelines on Urological Trauma, 2025<br><a href="https://uroweb.org/guidelines/urological-trauma/chapter/urogenital-trauma-guidelines" target="_blank" rel="noopener">uroweb.org</a></td><td>가이드라인</td><td><b>Strong</b>: 외상성 도뇨 예방 교육 제공 / 남성 요도손상은 연성 방광요도경 및·또는 RUG로 평가 / 의인성 전부요도 손상은 경요도 또는 치골상부 배뇨로 확보</td></tr>
+          <tr><td>외상성 도뇨 실태</td><td>Lawton JD, et al. <i>Urol Pract</i> 2024;11(2):385-93<br><a href="https://doi.org/10.1097/UPJ.0000000000000502" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 38215014</span></td><td>후향 코호트 (협진 300건)</td><td>도뇨 1,000건당 5.3건; 전례 남성, 중앙 69세; 71% 비뇨기 병력; 혈뇨 50%; 30일 CAUTI 13%</td></tr>
+          <tr><td>POUR 전반</td><td>Baldini G, et al. <i>Anesthesiology</i> 2009;110(5):1139-57<br><a href="https://doi.org/10.1097/ALN.0b013e31819f7aea" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 19352147</span></td><td>종설</td><td>발생률 5–70%; 초음파 방광용적 측정이 관리 지침; 부적절한 관리는 과팽창·요로감염·카테터 합병증 초래</td></tr>
+          <tr><td>POUR 합의</td><td>McDermott CD, et al. AUGS Clinical Consensus. <i>Urogynecology</i> 2023;29(4):381-96<br><a href="https://doi.org/10.1097/SPV.0000000000001344" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 37695249</span></td><td>전문가 합의 (Delphi)</td><td>37개 진술 중 34개 합의 — 발생률·약물·환자·수술 인자·요역동학·배뇨시도</td></tr>
+          <tr><td>POUR 역치</td><td>Cambise C, et al. <i>Saudi J Anaesth</i> 2024;18(2):265-71<br><a href="https://doi.org/10.4103/sja.sja_88_24" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 38654881</span></td><td>서술적 종설</td><td>도뇨가 표준 치료이나 <b>대상 선정·방광용적 역치·도뇨 기간은 미확립</b></td></tr>
+          <tr><td>Tamsulosin 예방</td><td>Baysden M, et al. <i>Am J Health Syst Pharm</i> 2023;80(6):373-83<br><a href="https://doi.org/10.1093/ajhp/zxac349" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 36445826</span></td><td>SR/MA (23 RCT, n=3,555)</td><td>POUR 위험 <b>RR 0.50 (95% CI 0.38–0.67)</b>, 최대요속 개선. UTI·수술시간 차이 없음</td></tr>
+          <tr><td>Tamsulosin (반대 근거)</td><td>Papageorge CM, et al. <i>J Surg Res</i> 2021;262:130-9<br><a href="https://doi.org/10.1016/j.jss.2020.12.055" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 33561724</span></td><td>이중맹검 RCT (n=141)</td><td>선택적 복부수술에서 예방효과 <b>없음</b>(26% vs 31%, p=0.49). 경막외·개복·50세 미만이 위험인자</td></tr>
+          <tr><td>α1 차단제와 TWOC</td><td>Yoon PD, et al. <i>Prostate Cancer Prostatic Dis</i> 2015;18(4):297-302<br><a href="https://doi.org/10.1038/pcan.2015.15" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 26195469</span></td><td>SR/MA</td><td>TWOC 전 α1 차단제 사용 권고; 도뇨 기간 &lt; 3일이 안전</td></tr>
+          <tr><td>α1 차단제 비교</td><td>Gwon YN, et al. <i>Prostate Int</i> 2023;11(2):91-9<br><a href="https://doi.org/10.1016/j.prnil.2022.12.002" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 37409094</span></td><td>네트워크 MA (13 RCT)</td><td>alfuzosin+tamsulosin &gt; tamsulosin &gt; silodosin &gt; alfuzosin; doxazosin은 위약과 차이 없음</td></tr>
+          <tr><td>TWOC 시점</td><td>Christensen VS, et al. <i>BJUI Compass</i> 2024;5(8):732-47<br><a href="https://doi.org/10.1002/bco2.369" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 39157169</span></td><td>SR (61편)</td><td>즉시 vs 지연 TWOC — <b>어느 쪽도 우월하지 않음</b>(근거 확실성 낮음)</td></tr>
+          <tr><td>방광 감압 방식</td><td>Nyman MA, et al. <i>Mayo Clin Proc</i> 1997;72(10):951-6<br><a href="https://doi.org/10.1016/S0025-6196(11)63368-5" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 9379700</span></td><td>종설</td><td>빠른 완전 배액이 안전·권장. 혈뇨 2–16%, 임상적 유의성 드묾. <b>단계적 배액을 지지하는 연구 없음</b></td></tr>
+          <tr><td>방광 감압 (검증)</td><td>Etafy MH, et al. <i>Urol Ann</i> 2017;9(4):339-42<br><a href="https://doi.org/10.4103/0974-7796.216320" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 29118535</span></td><td>환자-대조 (n=62)</td><td>급속 vs 점진 배액 간 유의한 차이 없음; 혈뇨 2례 모두 경미</td></tr>
+          <tr><td>난치성 도뇨</td><td>Villanueva C, Hemstreet GP. <i>Int Braz J Urol</i> 2008;34(4):401-11<br><a href="https://doi.org/10.1590/s1677-55382008000400002" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 18778491</span></td><td>비교 종설 (14편)</td><td>1차 18 Fr coudé + 12 Fr 실리콘 → 연성 방광경 또는 glidewire → 협착 시 확장</td></tr>
+          <tr><td>난치성 도뇨 프로토콜</td><td>Patil BS, et al. <i>Cureus</i> 2024;16(9):e69363<br><a href="https://doi.org/10.7759/cureus.69363" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 39398705</span></td><td>전향 관찰 (n=55)</td><td>1회 실패 후 bedside RGU+요도경 프로토콜 → <b>전례(100%) 경요도 성공, SPC 회피</b>. 최다 원인 구부요도협착 50.9%</td></tr>
+          <tr><td>손상 예방</td><td>Morozov AO, et al. <i>Urologiia</i> 2024;(2):100-4<br><span class="ref">PMID 39563547</span></td><td>종설 (약 20편)</td><td>주요 기전은 <b>요도 내 balloon 팽창과 가짜통로</b>; 장기 합병증의 78%가 요도협착; 예방 핵심은 올바른 술기와 마취젤, 어려울 때 coudé·실리콘·직시형 카테터</td></tr>
+          <tr><td>의인성 요로손상</td><td>Vorobev V, et al. <i>Urol Int</i> 2021;105(5-6):460-9<br><a href="https://doi.org/10.1159/000512882" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 33535218</span></td><td>종설</td><td>부정확·외상성 도뇨는 감염과 요도협착(보고된 상대위험 ≥11–36%)으로 이어짐; 진단 지연은 예후 악화</td></tr>
+          <tr><td>도뇨 후 패혈증</td><td>Yagihashi Y, et al. <i>Nihon Hinyokika Gakkai Zasshi</i> 2014;105(4):196-201<br><a href="https://doi.org/10.5980/jpnjurol.105.196" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 25757350</span></td><td>후향 + 간호사 설문 (n=32 / 133)</td><td>의인성 요도손상 환자에서 패혈증 16%, 패혈성 쇼크 9%. 간호사 <b>7%가 “소변 유출 없이도 balloon을 넣는다”</b>고 응답</td></tr>
+          <tr><td>요도협착 원인</td><td>Astolfi RH, et al. <i>World J Urol</i> 2019;37(4):661-6<br><a href="https://doi.org/10.1007/s00345-019-02696-9" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 30810832</span></td><td>다기관 후향 (n=899)</td><td>남성 요도협착 최다 원인은 <b>의인성 43.4%</b>. 의인성의 59%가 요도 기구조작, 그중 60%가 도뇨 — 즉 의인성 협착의 약 35%가 도뇨 기인. 60세 초과에서 68%가 의인성</td></tr>
+          <tr><td>요도구 압박손상</td><td>Shenhar C, et al. <i>Neurourol Urodyn</i> 2020;39(5):1456-63<br><a href="https://doi.org/10.1002/nau.24372" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 32339318</span></td><td>단면연구 (n=168)</td><td>남성 유치도뇨 환자 36%에서 요도구 압박손상. <b>고정이 보호적(OR 0.26)</b>, 14일 초과 유치가 위험</td></tr>
+          <tr><td>카테터 제거 시점</td><td>Haskins IN, et al. <i>Am Surg</i> 2018;84(11):1808-13<br><span class="ref">PMID 30747638</span></td><td>전향 코호트 (n=67)</td><td>복벽재건 후 경막외 유지 중 POD1 Foley 제거 시 요폐 재삽입 유의 증가(p=0.02); <b>경막외 제거 후 Foley 제거해도 CAUTI 증가 없음</b></td></tr>
+          <tr><td>방광초음파</td><td>Medical Advisory Secretariat, Ontario MOHLTC. <i>Ont Health Technol Assess Ser</i> 2006;6(11):1-51<br><span class="ref">PMID 23074481</span></td><td>근거기반 HTA</td><td>불필요 도뇨 16–47%, 요로감염 38–72% 감소. 잔뇨 100–150 mL 초과를 요폐 지표로 사용</td></tr>
+          <tr><td>요도손상 관리</td><td>Patel AB, et al. <i>J Clin Med</i> 2023;12(4):1495<br><a href="https://doi.org/10.3390/jcm12041495" target="_blank" rel="noopener">DOI</a> · <span class="ref">PMID 36836030</span></td><td>종설</td><td>의인성 요도손상은 대개 외상성 도뇨에 의하며, <b>숙련자의 재시도 또는 치골상부 카테터</b>로 배뇨로를 확보하는 것이 최선. 비뇨의학과 정기 추적 필수</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="banner warn">
+    <div class="sect-head"><h2>근거의 한계</h2><span class="en">Limitations</span></div>
+    <ul class="tight">
+      <li>POUR의 <b>표준 정의·방광용적 역치·도뇨 기간</b>에 대한 고품질 근거가 없습니다. 본 문서의 역치표는 다수 문헌의 실무 관행을 정리한 것으로, 무작위 비교연구로 확립된 수치가 아닙니다.</li>
+      <li>“2회 실패 시 중단” 규칙은 <b>가이드라인 등급의 권고가 아니라</b> 기관 프로토콜·전문가 합의 수준입니다. 다만 EAU가 Strong 등급으로 권고하는 “교육을 통한 외상성 도뇨 예방”의 구체적 실행 수단으로 타당합니다.</li>
+      <li>위암 위절제·internal hernia 정복 후 배뇨장애를 직접 다룬 연구는 확인되지 않았습니다. 본 내용은 복부수술 일반·비뇨기 외상 문헌을 이 시나리오에 적용한 것입니다.</li>
+      <li>α1 차단제 예방 효과는 메타분석과 복부수술 RCT가 상반되므로 <b>전 환자 일괄 적용은 근거가 부족</b>합니다.</li>
+    </ul>
+  </div>
+</section>
+</div>
+
+<div class="foot">
+  <p><strong>출처 표기</strong> — 문헌 정보는 PubMed에서 검색·검증하였으며(According to PubMed), 가이드라인 권고문은 EAU Urological Trauma Guideline 2025 원문에서 인용했습니다. 각 문헌의 DOI 링크를 근거표에 함께 표기했습니다.</p>
+  <p><strong>사용 범위</strong> — 임상 의사결정 <em>지원</em> 자료이며, 개별 환자 진료 판단과 비뇨의학과 전문 진료를 대체하지 않습니다. 기관 프로토콜로 확정하기 전 비뇨의학과·감염관리·간호부와 합의 절차를 거치십시오.</p>
+  <p><strong>면책</strong> — 본 페이지의 시나리오는 특정 환자의 진료기록이 아니며, 문헌에 보고된 전형적 경과를 재구성한 교육용 구성 사례입니다. 실제 환자 식별정보는 일절 포함되어 있지 않습니다.</p>
+  <p>작성 2026-09-18 · 한양대학교병원 로봇복벽탈장수술 · 수술 전후 처치 대시보드</p>
+</div>
+
+</main>
+
+<script>
+(function(){
+  var body = document.body;
+  var roleA = document.getElementById('roleA'), roleB = document.getElementById('roleB');
+  var viewA = document.getElementById('viewA'), viewB = document.getElementById('viewB');
+  var navA = document.getElementById('navA'),  navB  = document.getElementById('navB');
+
+  function tabsOf(nav){ return Array.prototype.slice.call(nav.querySelectorAll('[role="tab"]')); }
+
+  function selectTab(nav, i, scroll){
+    var tabs = tabsOf(nav);
+    tabs.forEach(function(t,j){
+      t.setAttribute('aria-selected', j===i ? 'true' : 'false');
+      var p = document.getElementById(t.getAttribute('aria-controls'));
+      if(p) p.hidden = (j!==i);
+    });
+    try{ localStorage.setItem('pour-tab-'+nav.id, String(i)); }catch(e){}
+    if(scroll) window.scrollTo({top:0, behavior:'instant'});
+  }
+
+  [navA, navB].forEach(function(nav){
+    tabsOf(nav).forEach(function(t,i){
+      t.addEventListener('click', function(){ selectTab(nav, i, true); });
+      t.addEventListener('keydown', function(e){
+        var d = e.key==='ArrowRight' ? 1 : e.key==='ArrowLeft' ? -1 : 0;
+        if(!d) return;
+        e.preventDefault();
+        var tabs = tabsOf(nav), n = (i + d + tabs.length) % tabs.length;
+        tabs[n].focus(); selectTab(nav, n, true);
+      });
+    });
+  });
+
+  function setRole(r, scroll){
+    var isA = (r === 'A');
+    body.setAttribute('data-role', r);
+    roleA.setAttribute('aria-pressed', isA ? 'true' : 'false');
+    roleB.setAttribute('aria-pressed', isA ? 'false' : 'true');
+    viewA.hidden = !isA; viewB.hidden = isA;
+    navA.hidden  = !isA; navB.hidden  = isA;
+    // ensure the active view has exactly one visible panel
+    var nav = isA ? navA : navB, saved = 0;
+    try{
+      var s = parseInt(localStorage.getItem('pour-tab-'+nav.id), 10);
+      if(!isNaN(s) && s>=0 && s<tabsOf(nav).length) saved = s;
+    }catch(e){}
+    selectTab(nav, saved, false);
+    try{ localStorage.setItem('pour-role', r); }catch(e){}
+    if(scroll) window.scrollTo({top:0, behavior:'instant'});
+  }
+
+  roleA.addEventListener('click', function(){ setRole('A', true); });
+  roleB.addEventListener('click', function(){ setRole('B', true); });
+
+  var startRole = 'A';
+  try{ var sr = localStorage.getItem('pour-role'); if(sr==='A'||sr==='B') startRole = sr; }catch(e){}
+  setRole(startRole, false);
+
+  Array.prototype.forEach.call(document.querySelectorAll('.check input[type=checkbox]'), function(cb){
+    try{ if(localStorage.getItem('pour-'+cb.id)==='1') cb.checked = true; }catch(e){}
+    cb.addEventListener('change', function(){
+      try{ localStorage.setItem('pour-'+cb.id, cb.checked ? '1' : '0'); }catch(e){}
+    });
+  });
+})();
+</script>
+</body>
+</html>
